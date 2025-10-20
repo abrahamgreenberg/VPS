@@ -1,0 +1,1 @@
+docker run -p 4001:4001 -d --name test test-app:latest
