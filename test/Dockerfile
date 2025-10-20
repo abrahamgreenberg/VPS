@@ -9,14 +9,11 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+COPY nodejs/ ./nodejs/
 
-# Copy Node.js app and install dependencies
-COPY nodejs/package*.json ./nodejs/
 WORKDIR /app/nodejs
 RUN npm install
 
-# Copy full Node.js code
-COPY nodejs/ ./nodejs/
 
 # Copy Python script
 WORKDIR /app
