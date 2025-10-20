@@ -1,30 +1,27 @@
-# Base image with Node.js and Python
+# Dockerfile
 FROM python:3.12-slim
 
-# Install Node.js
+# Install Node.js and cron
 RUN apt-get update && \
-    apt-get install -y curl gnupg && \
+    apt-get install -y curl gnupg cron && \
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     apt-get clean
 
-# Install cron
-RUN apt-get install -y cron
-
-# Set workdir
 WORKDIR /app
 
-# Copy Node.js code
-COPY nodejs/ ./nodejs/
+# Copy Node.js code and install dependencies first
+COPY nodejs/package*.json ./nodejs/
 WORKDIR /app/nodejs
-
-# Install Node.js dependencies
 RUN npm install
+
+# Copy the rest of Node.js code
+COPY nodejs/ ./nodejs/
 
 # Copy Python scripts
 COPY python/ ../python/
 
-# Copy cron file
+# Copy cron file and setup
 COPY cronfile /etc/cron.d/mycron
 RUN chmod 0644 /etc/cron.d/mycron && crontab /etc/cron.d/mycron
 
