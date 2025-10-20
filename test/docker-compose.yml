@@ -7,8 +7,7 @@ services:
     ports:
       - "4001:4001"
     volumes:
-      - ./nodejs:/app/nodejs
-      - ./python:/app/python
-      - ./cronfile:/etc/cron.d/mycron
+      - ./nodejs:/app/nodejs   # Node.js code
+      - ./python:/app/python   # Python scripts
     environment:
       - NODE_ENV=production

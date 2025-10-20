@@ -8,20 +8,20 @@ RUN apt-get update && \
     apt-get install -y nodejs && \
     apt-get clean
 
+# Set working directory
 WORKDIR /app
 
-# Copy Node.js code and install dependencies first
+# Copy Node.js code and install dependencies
 COPY nodejs/package*.json ./nodejs/
 WORKDIR /app/nodejs
 RUN npm install
 
-# Copy the rest of Node.js code
-COPY nodejs/ ./nodejs/
+COPY nodejs/ ./     # Copy Node.js code
 
 # Copy Python scripts
 COPY python/ ../python/
 
-# Copy cron file and setup
+# Setup cron
 COPY cronfile /etc/cron.d/mycron
 RUN chmod 0644 /etc/cron.d/mycron && crontab /etc/cron.d/mycron
 
@@ -29,4 +29,4 @@ RUN chmod 0644 /etc/cron.d/mycron && crontab /etc/cron.d/mycron
 EXPOSE 4001
 
 # Start cron and Node.js server
-CMD cron && node server.js
+CMD ["sh", "-c", "cron && node server.js"]
