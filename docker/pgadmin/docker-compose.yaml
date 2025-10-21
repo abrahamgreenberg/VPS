@@ -13,3 +13,7 @@ services:
 
 volumes:
   pgadmin_data:
+
+networks:
+  proxy-network:
+    external: true
