@@ -10,7 +10,9 @@ services:
     volumes:
       - portainer_data:/data
       - /var/run/docker.sock:/var/run/docker.sock
-
+    networks:           # <-- attach it here
+      - proxy-network
+      
 volumes:
   portainer_data:
 

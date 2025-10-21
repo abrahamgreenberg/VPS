@@ -8,6 +8,8 @@ services:
       - "${PGADMIN_PORT}:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+    networks:           # <-- attach it here
+      - proxy-network
 
 volumes:
   pgadmin_data:

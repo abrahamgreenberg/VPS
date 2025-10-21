@@ -9,10 +9,12 @@ services:
       POSTGRES_DB: mydb
     volumes:
       - postgres_data:/var/lib/postgresql/data   # removed the ~ at the end
-
+    networks:           # <-- attach it here
+      - proxy-network
+      
 volumes:
   postgres_data:
 
-  networks:
+networks:
   proxy-network:
     external: true

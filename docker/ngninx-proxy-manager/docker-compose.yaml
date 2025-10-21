@@ -27,7 +27,9 @@ services:
     volumes:
       - npm_data:/data
       - npm_letsencrypt:/etc/letsencrypt
-
+    networks:           # <-- attach it here
+      - proxy-network
+      
 volumes:
   npm_db_data:
   npm_data:
