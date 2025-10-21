@@ -1,0 +1,31 @@
+// prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Halacha {
+  id      Int           @id @default(autoincrement())
+  heTitle String
+  enTitle String? // optional English title
+  heText  String
+  url     String        @unique
+  date    DateTime      @default(now())
+  lines   HalachaLine[] // relation to line-by-line translation
+
+  @@index([date])
+}
+
+model HalachaLine {
+  id        Int     @id @default(autoincrement())
+  hebrew    String
+  english   String
+  halacha   Halacha @relation(fields: [halachaId], references: [id])
+  halachaId Int
+
+  @@index([halachaId])
+}
