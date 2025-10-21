@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 const OpenAI = require("openai");
 
 // Import your logger
-const { createLogger } = require("../utils/logger");
+const { createLogger } = require("../logger");
 
 // Create a logger specific to this file
 const logger = createLogger(__filename);

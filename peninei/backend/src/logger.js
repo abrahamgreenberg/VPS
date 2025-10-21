@@ -1,40 +1,48 @@
-// src/utils/logger.js
+// src/logger.js
 import winston from "winston";
 import path from "path";
-import { fileURLToPath } from "url";
+import dotenv from "dotenv";
 
-// Resolve __dirname (for ES modules)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config(); // load .env
 
 const { combine, timestamp, printf, colorize } = winston.format;
 
+// ==========================
 // Custom log format
+// ==========================
 const logFormat = printf(({ level, message, timestamp, file }) => {
     return `[${timestamp}] [${level}]${file ? ` [${file}]` : ""}: ${message}`;
 });
 
-// Create a function that returns a logger for a given module/file
-export function createLogger(moduleUrl) {
-    const file = path.relative(process.cwd(), fileURLToPath(moduleUrl));
+// ==========================
+// Create a logger factory
+// ==========================
+export function createLogger(file = "app") {
+    const logLevel = process.env.LOG_LEVEL || "info";
 
     return winston.createLogger({
-        level: process.env.LOG_LEVEL || "info",
+        level: logLevel,
         format: combine(
             timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
             logFormat
         ),
+        defaultMeta: { file },
         transports: [
-            // Console logs (for Docker)
+            // Console logs — perfect for Docker
             new winston.transports.Console({
-                format: combine(colorize(), logFormat),
+                format: combine(
+                    colorize(),
+                    timestamp({ format: "HH:mm:ss" }),
+                    logFormat
+                ),
             }),
 
-            // File logs (rotated by Docker or external log driver)
+            // File logs — stored locally (Docker can mount /logs)
             new winston.transports.File({
-                filename: path.join(__dirname, "../../logs/app.log"),
+                filename: path.resolve("logs", "app.log"),
+                maxsize: 5 * 1024 * 1024, // 5 MB rotation threshold
+                maxFiles: 5,
             }),
         ],
-        defaultMeta: { file },
     });
 }

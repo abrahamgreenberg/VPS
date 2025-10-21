@@ -1,5 +1,9 @@
 const cheerio = require("cheerio");
 const axios = require("axios");
+const path = require("path");
+const { createLogger } = require("../logger");
+
+const logger = createLogger(__filename);
 
 const allowedTags = [
     "p",
@@ -18,21 +22,20 @@ const allowedTags = [
 // CLEANUP DOM FUNCTION
 // ============================
 function cleanDom($) {
+    logger.debug("Starting DOM cleanup");
+
     // Remove disallowed tags but keep their contents
     $("*").each((_, el) => {
         const tag = el.tagName?.toLowerCase();
         if (!allowedTags.includes(tag)) $(el).replaceWith($(el).contents());
     });
 
-    // Remove <script> tags
     $("script").remove();
-
-    // Remove style, class, id attributes
     $("*").each((_, el) => {
         $(el).removeAttr("style").removeAttr("class").removeAttr("id");
     });
 
-    // Replace YouTube <iframe> with <a>
+    // Replace YouTube iframes with links
     $("iframe").each((_, el) => {
         const src = $(el).attr("src");
         if (src?.includes("youtube.com/embed/")) {
@@ -47,7 +50,6 @@ function cleanDom($) {
         }
     });
 
-    // Remove stray text nodes in <body>
     $("body")
         .contents()
         .each((_, el) => {
@@ -56,22 +58,26 @@ function cleanDom($) {
             }
         });
 
-    // Remove footnote links
     $('a[href*="ftn"]').remove();
+
+    logger.debug("Finished DOM cleanup");
 }
 
 // ============================
 // EXTRACT CLEAN HTML
 // ============================
 const extractHtml = ($) => {
+    logger.debug("Extracting cleaned HTML from DOM");
+
     $("br").remove();
 
     const innerBody = $("body").html()?.trim() || "";
-
     const cleanedInner = innerBody
-        .replace(/^\s*[\r\n]/gm, "") // remove empty lines
-        .replace(/\s{2,}/g, " ") // collapse multiple spaces
+        .replace(/^\s*[\r\n]/gm, "")
+        .replace(/\s{2,}/g, " ")
         .trim();
+
+    logger.debug(`Extracted HTML length: ${cleanedInner.length} characters`);
 
     return `<div>${cleanedInner}</div>`;
 };
@@ -80,7 +86,8 @@ const extractHtml = ($) => {
 // EXTRACT TITLES & PARAGRAPHS
 // ============================
 const extractTitlesAndParagraphs = ($) => {
-    // Hebrew titles (h3 > a)
+    logger.debug("Extracting titles and paragraphs");
+
     const titles = [];
     $("h3 > a").each((i, el) => {
         if (i < 2) {
@@ -91,7 +98,6 @@ const extractTitlesAndParagraphs = ($) => {
         }
     });
 
-    // First two paragraphs
     const paragraphs = [];
     $("p").each((i, el) => {
         const text = $(el).text().trim();
@@ -100,6 +106,10 @@ const extractTitlesAndParagraphs = ($) => {
         }
     });
 
+    logger.debug(
+        `Extracted ${titles.length} titles and ${paragraphs.length} paragraphs`
+    );
+
     return { titles, paragraphs };
 };
 
@@ -107,34 +117,54 @@ const extractTitlesAndParagraphs = ($) => {
 // SCRAPE PENINEI HALACHA
 // ============================
 const scrapePeninei = async (url) => {
-    console.log(url);
-    const { data: html } = await axios.get(url);
-    const $ = cheerio.load(html);
+    logger.info(`Fetching Peninei Halacha HTML from ${url}`);
 
-    cleanDom($);
+    try {
+        const { data: html } = await axios.get(url);
+        const $ = cheerio.load(html);
 
-    const cleanedHtml = extractHtml($);
-    const { titles, paragraphs } = extractTitlesAndParagraphs($);
+        cleanDom($);
 
-    return { html: cleanedHtml, titles, paragraphs };
+        const cleanedHtml = extractHtml($);
+        const { titles, paragraphs } = extractTitlesAndParagraphs($);
+
+        logger.info(
+            `Scrape completed: ${titles.length} titles, ${paragraphs.length} paragraphs`
+        );
+
+        return { html: cleanedHtml, titles, paragraphs };
+    } catch (err) {
+        logger.error(`Error scraping ${url}: ${err.message}`);
+        logger.debug(err.stack);
+        throw err;
+    }
 };
 
 // ============================
 // MAIN
 // ============================
 const main = async (date) => {
-    const { titles, paragraphs } = await scrapePeninei(
-        `https://ph.yhb.org.il/wp-content//plugins//db-connect//py0.php?date=${date.getTime()}`
-    );
+    const targetUrl = `https://ph.yhb.org.il/wp-content//plugins//db-connect//py0.php?date=${date.getTime()}`;
+    logger.info(`Starting scrape for date: ${date.toISOString()}`);
 
-    // Combine the first two titles with corresponding paragraphs
-    const halachas = titles.map((title, i) => ({
-        title: title.text,
-        url: title.url,
-        text: (paragraphs[i] || "").replace(/\n/g, " "), // fallback if paragraph is missing
-    }));
+    try {
+        const { titles, paragraphs } = await scrapePeninei(targetUrl);
 
-    return halachas;
+        const halachas = titles.map((title, i) => ({
+            title: title.text,
+            url: title.url,
+            text: (paragraphs[i] || "").replace(/\n/g, " "),
+        }));
+
+        logger.info(`Scrape complete — extracted ${halachas.length} halachot`);
+        return halachas;
+    } catch (err) {
+        logger.error(
+            `Scrape failed for date ${date.toISOString()}: ${err.message}`
+        );
+        logger.debug(err.stack);
+        throw err;
+    }
 };
 
 module.exports = main;
