@@ -11,7 +11,9 @@ services:
       MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD}
     volumes:
       - npm_db_data:/var/lib/mysql
-
+    networks:           # <-- attach it here
+      - proxy-network
+      
   # Nginx Proxy Manager
   npm:
     image: jc21/nginx-proxy-manager:latest
@@ -29,7 +31,7 @@ services:
       - npm_letsencrypt:/etc/letsencrypt
     networks:           # <-- attach it here
       - proxy-network
-      
+
 volumes:
   npm_db_data:
   npm_data:
