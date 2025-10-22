@@ -6,8 +6,10 @@ services:
     env_file: .env
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-    networks:           # <-- attach it here
+    networks:          
       - proxy-network
+    ports:
+      - "127.0.0.1:8080:80"
 
 volumes:
   pgadmin_data:
