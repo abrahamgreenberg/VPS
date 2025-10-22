@@ -135,7 +135,7 @@ const scrapePeninei = async (url) => {
         return { html: cleanedHtml, titles, paragraphs };
     } catch (err) {
         logger.error(`Error scraping ${url}: ${err.message}`);
-        logger.debug(err.stack);
+        logger.error(err.stack);
         throw err;
     }
 };

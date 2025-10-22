@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 // ---------------------------
 // GET halachas by date
 // ---------------------------
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
     logger.info("Log!");
     return res.status(200).json({ result: "Ok!" });
 });
