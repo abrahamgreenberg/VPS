@@ -16,6 +16,10 @@ This repository contains notes and a roadmap for setting up and maintaining a pr
 
 ---
 
+## TODO:
+
+-   Finish off peninei scraper
+
 ## Project Overview
 
 This VPS hosts multiple services and applications:

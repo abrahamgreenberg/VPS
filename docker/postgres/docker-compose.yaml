@@ -3,15 +3,16 @@ services:
     image: postgres:15
     container_name: postgres
     restart: always
+    env_file: .env
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: adminpassword
-      POSTGRES_DB: mydb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - postgres_data:/var/lib/postgresql/data   # removed the ~ at the end
-    networks:           # <-- attach it here
+      - postgres_data:/var/lib/postgresql/data
+    networks:
       - proxy-network
-      
+
 volumes:
   postgres_data:
 
