@@ -2,23 +2,13 @@
 
 This repository contains notes and a roadmap for setting up and maintaining a private VPS with various services, scrapers, and a frontend UI.
 
-## Project roadmap
-
-1. [Project Overview](#project-overview)
-2. [Setup Instructions](#setup-instructions)
-3. [Services](#services)
-4. [Scrapers](#scrapers)
-5. [UI Development](#ui-development)
-6. [Security](#security)
-7. [Email Setup](#email-setup)
-8. [Service API](#service-api)
-9. [Future Projects](#future-projects)
-
----
-
 ## TODO:
 
+-   Create PG admin user
 -   Finish off peninei scraper
+    -   Load Vite frontend through the configured domain.
+    -   Enable CORS for API requests.
+    -   Finish off UI
 
 ## Project Overview
 
@@ -29,30 +19,6 @@ This VPS hosts multiple services and applications:
 -   **Proxies & Routing:** Nginx / Nginx Proxy Manager
 -   **Scrapers:** Peninei Halacha, Rambam Mishneh Torah
 -   **Additional Features:** Codeshare website, mail server, authentication
-
----
-
-## Setup Instructions
-
-1. **Docker Setup**
-
-    - Run all services in Docker containers for easy deployment and isolation.
-    - Example services include backend, frontend, database, and mail server.
-
-2. **Networking**
-
-    - Connect containers to a common Docker network for internal communication.
-    - Expose only necessary ports to reduce attack surface.
-
-3. **Domain Setup**
-
-    - Add your domain to Nginx / Nginx Proxy Manager.
-    - Configure SSL using Let’s Encrypt.
-
-4. **Frontend**
-
-    - Load Vite frontend through the configured domain.
-    - Enable CORS for API requests.
 
 ---
 

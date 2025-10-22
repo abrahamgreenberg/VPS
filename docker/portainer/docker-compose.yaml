@@ -4,9 +4,9 @@ services:
     container_name: portainer
     restart: always
     env_file: .env
-    ports:
-      - "${PORTAINER_PORT}:9000"
-      - "${PORTAINER_SSL_PORT}:9443"
+    # ports:
+      # - "${PORTAINER_PORT}:9000"
+      # - "${PORTAINER_SSL_PORT}:9443"
     volumes:
       - portainer_data:/data
       - /var/run/docker.sock:/var/run/docker.sock
