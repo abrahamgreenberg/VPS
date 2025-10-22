@@ -1,5 +1,0 @@
-1. how can i get vite to make a final build to server as the ui 
-2. how can i make a docker file that can build the two projects (backend/ frontend/) 
-3. how can i make a docker compose that will expose the two (backend on port 5002 and frontend on port 5003, but i want to be able to change this with environment variables) & create a storage bin so i can store log files 
-4. how can i enable cors on my backend so only my frontend can make requests to it using my domain 
-5. how can i assign a domain in nginxproxymanager that will forward the request to the ui

@@ -1,0 +1,37 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "127.0.0.1:5002:5002"
+    env_file: 
+      .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      OPEN_API_KEY: ${OPEN_API_KEY}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      API_PORT: ${API_PORT}
+    volumes:
+      - logs:/app/logs
+    networks :
+      - proxy-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "127.0.0.1:5001:80"
+    env_file: 
+      .env
+    environment:
+      VITE_API_URL: "${VITE_API_URL}"
+    depends_on:
+      - backend
+    networks:           
+      - proxy-network
+
+volumes:
+  logs:
+
+networks:
+  proxy-network:
+    external: true
+

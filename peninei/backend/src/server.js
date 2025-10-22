@@ -30,6 +30,11 @@ app.use((req, res, next) => {
 // ---------------------------
 // GET halachas by date
 // ---------------------------
+app.get("/", (req, res) => {
+    logger.info("Log!");
+    return res.status(200).json({ result: "Ok!" });
+});
+
 app.get("/api/halachas/:date", async (req, res) => {
     const dateParam = req.params.date;
     const date = new Date(dateParam);
@@ -98,7 +103,7 @@ app.get("/api/available-dates", async (req, res) => {
 // ---------------------------
 // Start server
 // ---------------------------
-const PORT = process.env.API_PORT || 5001;
+const PORT = process.env.API_PORT || 5002;
 app.listen(PORT, () => {
     logger.info(`Server running on http://localhost:${PORT}`);
 });
