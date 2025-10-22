@@ -4,8 +4,6 @@ services:
     container_name: pgadmin
     restart: always
     env_file: .env
-    # ports:
-    #   - "${PGADMIN_PORT}:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:           # <-- attach it here
