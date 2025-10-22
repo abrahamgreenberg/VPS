@@ -56,7 +56,7 @@ app.get("/api/halachas/:date", async (req, res) => {
         logger.error(
             `Error fetching halachot for date ${dateParam}: ${err.message}`
         );
-        logger.debug(err.stack);
+        logger.error(err);
         return res.status(500).json({ error: "Internal server error" });
     }
 });
