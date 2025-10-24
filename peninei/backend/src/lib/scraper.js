@@ -1,9 +1,10 @@
-const cheerio = require("cheerio");
-const axios = require("axios");
-const path = require("path");
-const { createLogger } = require("../logger");
+import { createLogger } from "../logger.js";
+import axios from "axios";
+// const che
+// erio = require("cheerio");
+import { load } from "cheerio";
 
-const logger = createLogger(__filename);
+const logger = createLogger("scraper");
 
 const allowedTags = [
     "p",
@@ -121,7 +122,7 @@ const scrapePeninei = async (url) => {
 
     try {
         const { data: html } = await axios.get(url);
-        const $ = cheerio.load(html);
+        const $ = load(html);
 
         cleanDom($);
 
@@ -166,5 +167,4 @@ const main = async (date) => {
         throw err;
     }
 };
-
-module.exports = main;
+export default main;

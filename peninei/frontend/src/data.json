@@ -1,0 +1,282 @@
+[
+    {
+        "id": 1,
+        "heTitle": "יח - הסגרת אדם למיתה",
+        "enTitle": null,
+        "heText": "תבעו מקבוצה של אנשים להסגיר אחד מהם כדי להורגו, תוך איום שאם לא יסגירו אחד מהם יהרגו את כולם - ייהרגו כולם ואל יתנו להם אחד להריגה (תוספתא תרומות ז, כג). אבל אם התביעה היא להסגיר להריגה אדם מסוים כשבע בן בכרי, ואם לא - יהרגו את כולם, יסגירו אותו ואל ייהרגו (ירושלמי תרומות ח, ד). שבע בן בכרי היה איש בליעל שהמריד את ישראל נגד המלך דוד, וכאשר יואב שר הצבא השיב מלחמה נגדו, ברח לעיר 'אבל בית מעכה' והתבצר בה. יואב החל במצור על העיר, תוך מגמה להחריבה ולהרוג את יושביה שסייעו למרד. כשראתה זאת אשה חכמה מהעיר, סיכמה עם יואב שראשו של שבע בן בכרי יושלך אל יואב, ובכך יואב יסיר את המצור. אנשי העיר אכן הרגו את שבע בן בכרי והשליכו את ראשו אל יואב, המצור הוסר והעיר ניצלה (שמואל ב' כ, טז-כב).  לדעת רבי יוחנן, גם אם האדם שהגויים תובעים להסגיר אינו חייב מיתה, כיוון שבעטיו הגויים באים על כל החבורה, הם רשאים להסגירו כדי להינצל. ולדעת ריש לקיש, רק אם זה שהם מבקשים חייב מיתה כשבע בן בכרי, מסגירים אותו. אבל אם אינו חייב מיתה, אסור להסגירו ולגרום בכך להריגתו כדי להציל את נפשם. למעשה, נחלקו הפוסקים כמי ההלכה.",
+        "url": "https://ph.yhb.org.il//20-04-18/",
+        "date": "2025-10-19T00:00:00.000Z",
+        "lines": [
+            {
+                "id": 1,
+                "hebrew": "תבעו מקבוצה של אנשים",
+                "english": "Demand from a group of people",
+                "halachaId": 1
+            },
+            {
+                "id": 2,
+                "hebrew": "להסגיר אחד מהם כדי להורגו,",
+                "english": "to hand over one of them to be killed,",
+                "halachaId": 1
+            },
+            {
+                "id": 3,
+                "hebrew": "תוך איום שאם לא יסגירו אחד מהם",
+                "english": "with a threat that if they do not hand over one of them",
+                "halachaId": 1
+            },
+            {
+                "id": 4,
+                "hebrew": "יהרגו את כולם - ייהרגו כולם",
+                "english": "they will kill them all - they will kill all of them",
+                "halachaId": 1
+            },
+            {
+                "id": 5,
+                "hebrew": "ואל יתנו להם אחד להריגה",
+                "english": "and do not give them one to be killed",
+                "halachaId": 1
+            },
+            {
+                "id": 6,
+                "hebrew": "(תוספתא תרומות ז, כג).",
+                "english": "(Tosefta Terumot 7:23).",
+                "halachaId": 1
+            },
+            {
+                "id": 7,
+                "hebrew": "אבל אם התביעה היא להסגיר להריגה",
+                "english": "But if the claim is to close for killing",
+                "halachaId": 1
+            },
+            {
+                "id": 8,
+                "hebrew": "אדם מסוים כשבע בן בכרי,",
+                "english": "a specific person like Sheva ben Bichri,",
+                "halachaId": 1
+            },
+            {
+                "id": 9,
+                "hebrew": "ואם לא - יהרגו את כולם,",
+                "english": "and if not - they will kill everyone,",
+                "halachaId": 1
+            },
+            {
+                "id": 10,
+                "hebrew": "יסגירו אותו ואל ייהרגו",
+                "english": "they will close him and not kill",
+                "halachaId": 1
+            },
+            {
+                "id": 11,
+                "hebrew": "(ירושלמי תרומות ח, ד).",
+                "english": "(Jerusalem Talmud Tractate Terumot 8, 4).",
+                "halachaId": 1
+            },
+            {
+                "id": 12,
+                "hebrew": "שבע בן בכרי היה",
+                "english": "Sheba son of Bichri was",
+                "halachaId": 1
+            },
+            {
+                "id": 13,
+                "hebrew": "איש בליעל שהמריד את ישראל",
+                "english": "a troublemaker who rebelled against Israel",
+                "halachaId": 1
+            },
+            {
+                "id": 14,
+                "hebrew": "נגד המלך דוד, וכאשר יואב שר הצבא",
+                "english": "against King David, and when Joab the commander",
+                "halachaId": 1
+            },
+            {
+                "id": 15,
+                "hebrew": "השיב מלחמה נגדו, ברח לעיר 'אבל בית מעכה'",
+                "english": "returned from fighting against him, he fled to the city of Abel Beth Maacah",
+                "halachaId": 1
+            },
+            {
+                "id": 16,
+                "hebrew": "והתבצר בה.",
+                "english": "and took refuge there.",
+                "halachaId": 1
+            },
+            {
+                "id": 17,
+                "hebrew": "יואב החל במצור על העיר,",
+                "english": "Joab began the siege on the city,",
+                "halachaId": 1
+            },
+            {
+                "id": 18,
+                "hebrew": "תוך מגמה להחריבה",
+                "english": "with an aim to destroy",
+                "halachaId": 1
+            },
+            {
+                "id": 19,
+                "hebrew": "ולהרוג את יושביה",
+                "english": "and kill its inhabitants",
+                "halachaId": 1
+            },
+            {
+                "id": 20,
+                "hebrew": "שסייעו למרד.",
+                "english": "who assisted the rebellion.",
+                "halachaId": 1
+            },
+            {
+                "id": 21,
+                "hebrew": "כשראתה זאת אשה חכמה מהעיר,",
+                "english": "When she saw a wise woman from the city,",
+                "halachaId": 1
+            },
+            {
+                "id": 22,
+                "hebrew": "סיכמה עם יואב שראשו של שבע בן בכרי",
+                "english": "she made an agreement with Joab that the head of Sheba son of Bichri",
+                "halachaId": 1
+            },
+            {
+                "id": 23,
+                "hebrew": "יושלך אל יואב,",
+                "english": "would be thrown to Joab,",
+                "halachaId": 1
+            },
+            {
+                "id": 24,
+                "hebrew": "ובכך יואב יסיר את המצור.",
+                "english": "and thus Joab would remove the siege.",
+                "halachaId": 1
+            },
+            {
+                "id": 25,
+                "hebrew": "אנשי העיר אכן",
+                "english": "The men of the city indeed",
+                "halachaId": 1
+            },
+            {
+                "id": 26,
+                "hebrew": "הרגו את שבע בן בכרי",
+                "english": "killed Sheba son of Bichri",
+                "halachaId": 1
+            },
+            {
+                "id": 27,
+                "hebrew": "והשליכו את ראשו אל יואב",
+                "english": "and threw his head to Joab",
+                "halachaId": 1
+            },
+            {
+                "id": 28,
+                "hebrew": "המצור הוסר",
+                "english": "The siege was lifted",
+                "halachaId": 1
+            },
+            {
+                "id": 29,
+                "hebrew": "והעיר ניצלה",
+                "english": "and the city was saved",
+                "halachaId": 1
+            },
+            {
+                "id": 30,
+                "hebrew": "(שמואל ב' כ, טז-כב)",
+                "english": "(2 Samuel 20:16-22)",
+                "halachaId": 1
+            },
+            {
+                "id": 31,
+                "hebrew": "לדעת רבי יוחנן,",
+                "english": "According to Rabbi Yochanan,",
+                "halachaId": 1
+            },
+            {
+                "id": 32,
+                "hebrew": "גם אם האדם שהגויים",
+                "english": "even if the person that the gentiles",
+                "halachaId": 1
+            },
+            {
+                "id": 33,
+                "hebrew": "תובעים להסגיר אינו חייב מיתה,",
+                "english": "are demanding to be imprisoned is not liable to death,",
+                "halachaId": 1
+            },
+            {
+                "id": 34,
+                "hebrew": "כיוון שבעטיו הגויים באים על כל החבורה,",
+                "english": "since the gentiles' anger is directed towards the entire group,",
+                "halachaId": 1
+            },
+            {
+                "id": 35,
+                "hebrew": "הם רשאים להסגירו כדי להינצל.",
+                "english": "they are allowed to imprison him in order to save themselves.",
+                "halachaId": 1
+            },
+            {
+                "id": 36,
+                "hebrew": "ולדעת ריש לקיש,",
+                "english": "According to Reish Lakish,",
+                "halachaId": 1
+            },
+            {
+                "id": 37,
+                "hebrew": "רק אם זה שהם מבקשים",
+                "english": "only if they request",
+                "halachaId": 1
+            },
+            {
+                "id": 38,
+                "hebrew": "חייב מיתה כשבע בן בכרי,",
+                "english": "the death penalty like Sheva ben Bichri,",
+                "halachaId": 1
+            },
+            {
+                "id": 39,
+                "hebrew": "מסגירים אותו.",
+                "english": "they close him off.",
+                "halachaId": 1
+            },
+            {
+                "id": 40,
+                "hebrew": "אבל אם אינו חייב מיתה,",
+                "english": "But if he is not liable to death,",
+                "halachaId": 1
+            },
+            {
+                "id": 41,
+                "hebrew": "אסור להסגירו ולגרום בכך",
+                "english": "it is forbidden to imprison him and cause",
+                "halachaId": 1
+            },
+            {
+                "id": 42,
+                "hebrew": "להריגתו כדי להציל את נפשם.",
+                "english": "his death in order to save their lives.",
+                "halachaId": 1
+            },
+            {
+                "id": 43,
+                "hebrew": "למעשה,",
+                "english": "In practice,",
+                "halachaId": 1
+            },
+            {
+                "id": 44,
+                "hebrew": "נחלקו הפוסקים",
+                "english": "the rabbis were divided",
+                "halachaId": 1
+            },
+            {
+                "id": 45,
+                "hebrew": "כמי ההלכה.",
+                "english": "like the law.",
+                "halachaId": 1
+            }
+        ]
+    }
+]

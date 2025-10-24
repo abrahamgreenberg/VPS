@@ -1,5 +1,2 @@
-const ai = require("./ai");
-const scraper = require("./scraper");
-
-module.exports.ai = ai;
-module.exports.scraper = scraper;
+export { default as ai } from "./ai.js";
+export { default as scraper } from "./scraper.js";

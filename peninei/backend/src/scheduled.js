@@ -1,9 +1,11 @@
-const { ai, scraper } = require("./lib");
-const { PrismaClient } = require("@prisma/client");
-const schedule = require("node-schedule");
-const { createLogger } = require("./logger");
+import { ai, scraper } from "./lib/index.js";
+import { PrismaClient } from "@prisma/client";
+import schedule from "node-schedule";
+// const schedule = require("node-schedule");
+// const { createLogger } = require("./logger");
+import { createLogger } from "./logger.js";
 
-const logger = createLogger(__filename);
+const logger = createLogger("scheduler");
 
 Date.prototype.addDays = function (days) {
     const date = new Date(this.valueOf());
@@ -40,30 +42,36 @@ const scrape_halachot = async (date) => {
                     continue;
                 }
 
-                // Save Hebrew halacha
-                const halacha = await prisma.halacha.create({
-                    data: {
-                        heTitle: title,
-                        url,
-                        heText: text,
-                        date,
-                    },
-                });
+                // // Save Hebrew halacha
+                // const halacha = await prisma.halacha.create({
+                //     data: {
+                //         heTitle: title,
+                //         url,
+                //         heText: text,
+                //         date,
+                //     },
+                // });
 
-                logger.info(`Saved new halacha: "${halacha.heTitle}"`);
+                // logger.info(`Saved new halacha: "${halacha.heTitle}"`);
 
+                logger.debug("---- TEXT ---- ");
+                logger.debug(text);
                 // Translate and save lines
                 const translated = await ai(text);
-                logger.info(
-                    `Translation complete — ${translated.length} lines for "${title}"`
-                );
+                // logger.info(
+                //     `Translation complete — ${translated.length} lines for "${title}"`
+                // );
 
-                await prisma.halachaLine.createMany({
-                    data: translated.map((t) => ({
-                        ...t,
-                        halachaId: halacha.id,
-                    })),
-                });
+                logger.debug("RETURNING...");
+
+                // return;
+
+                // await prisma.halachaLine.createMany({
+                //     data: translated.map((t) => ({
+                //         ...t,
+                //         halachaId: halacha.id,
+                //     })),
+                // });
 
                 logger.info(`Saved ${translated.length} translation lines`);
             } catch (err) {
@@ -95,6 +103,7 @@ const scrape_halachot_for_week = async (date) => {
     for (let i = 0; i < 7; i++) {
         logger.info(`Scraping day ${i + 1}/7: ${start.toDateString()}`);
         await scrape_halachot(start);
+        // break;
         start = start.addDays(1);
     }
 
@@ -145,4 +154,4 @@ const main = async () => {
     }
 };
 
-module.exports = main;
+export default main;

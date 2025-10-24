@@ -1,10 +1,14 @@
 // server.js
-const express = require("express");
-const { PrismaClient } = require("@prisma/client");
-const scheduler = require("./scheduled");
-const { createLogger } = require("./logger");
+// const express = require("express");
+// const { PrismaClient } = require("@prisma/client");
+// const scheduler = require("./scheduled");
+// const { createLogger } = require("./logger");
+import express from "express";
+import { PrismaClient } from "@prisma/client";
+import scheduler from "./scheduled.js";
+import { createLogger } from "./logger.js";
 
-const logger = createLogger(__filename);
+const logger = createLogger("server");
 
 scheduler(); // start scheduled jobs
 
@@ -45,7 +49,10 @@ app.get("/api/halachas/:date", async (req, res) => {
     }
 
     try {
-        const halachot = await prisma.halacha.findMany({ where: { date } });
+        const halachot = await prisma.halacha.findMany({
+            where: { date },
+            include: { lines: true },
+        });
         logger.info(
             `Returned ${
                 halachot.length
