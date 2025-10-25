@@ -2,17 +2,61 @@
 import winston from "winston";
 import path from "path";
 import dotenv from "dotenv";
+import fs from "fs";
 
 dotenv.config(); // load .env
 
-const { combine, timestamp, printf, colorize } = winston.format;
+// Clear log file if requested
+if (process.env.CLEAR_LOGS_ON_START === "true") {
+    const logPath = path.resolve("logs", "app.log");
+    try {
+        fs.writeFileSync(logPath, "");
+        // eslint-disable-next-line no-console
+        console.log(`[logger] Cleared log file at ${logPath}`);
+    } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(`[logger] Failed to clear log file at ${logPath}:`, err);
+    }
+}
 
 // ==========================
 // Custom log format
 // ==========================
-const logFormat = printf(({ level, message, timestamp, file }) => {
-    return `[${timestamp}] [${level}]${file ? ` [${file}]` : ""}: ${message}`;
+const errorFormatter = winston.format((info) => {
+    if (info instanceof Error) {
+        return {
+            ...info,
+            message: info.message,
+            stack: info.stack,
+        };
+    }
+    if (info.message instanceof Error) {
+        return {
+            ...info,
+            message: info.message.message,
+            stack: info.message.stack,
+        };
+    }
+    return info;
 });
+
+const logFormat = winston.format.printf(
+    ({ level, message, timestamp, file, stack }) => {
+        // Serialize objects to JSON for better logging
+        let msg = message;
+        if (typeof msg === "object") {
+            try {
+                msg = JSON.stringify(msg, null, 2);
+            } catch {
+                msg = String(msg);
+            }
+        }
+        if (stack) {
+            msg = `${msg}\n${stack}`;
+        }
+        return `[${timestamp}] [${level}]${file ? ` [${file}]` : ""}: ${msg}`;
+    }
+);
 
 // ==========================
 // Create a logger factory
@@ -22,17 +66,19 @@ export function createLogger(file = "app") {
 
     return winston.createLogger({
         level: logLevel,
-        format: combine(
-            timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+        format: winston.format.combine(
+            errorFormatter(),
+            winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
             logFormat
         ),
         defaultMeta: { file },
         transports: [
             // Console logs — perfect for Docker
             new winston.transports.Console({
-                format: combine(
-                    colorize(),
-                    timestamp({ format: "HH:mm:ss" }),
+                format: winston.format.combine(
+                    errorFormatter(),
+                    winston.format.colorize(),
+                    winston.format.timestamp({ format: "HH:mm:ss" }),
                     logFormat
                 ),
             }),
@@ -42,6 +88,11 @@ export function createLogger(file = "app") {
                 filename: path.resolve("logs", "app.log"),
                 maxsize: 5 * 1024 * 1024, // 5 MB rotation threshold
                 maxFiles: 5,
+                format: winston.format.combine(
+                    errorFormatter(),
+                    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+                    logFormat
+                ),
             }),
         ],
     });

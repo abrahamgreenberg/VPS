@@ -8,6 +8,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model Book {
+  id      Int       @id @default(autoincrement())
+  title   String    @unique
+  halachot Halacha[]
+}
+
 model Halacha {
   id      Int           @id @default(autoincrement())
   heTitle String
@@ -16,6 +22,8 @@ model Halacha {
   url     String        @unique
   date    DateTime      @default(now())
   lines   HalachaLine[] // relation to line-by-line translation
+  book    Book?         @relation(fields: [bookId], references: [id])
+  bookId  Int?
 
   @@index([date])
 }

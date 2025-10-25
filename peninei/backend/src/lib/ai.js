@@ -7,108 +7,68 @@ import { createLogger } from "../logger.js";
 // Create a logger specific to this file
 const logger = createLogger("openai");
 
-dotenv.config();
 const openai = new OpenAI({ apiKey: process.env.OPEN_API_KEY });
 
-const main = async (hebrew) => {
+const main = async (halachaObj) => {
     logger.info("Starting Hebrew → English translation job");
-    logger.debug(hebrew);
-    // return;
-    try {
-        const response = await openai.chat.completions.create({
-            model: "gpt-5-mini",
-            messages: [
-                {
-                    role: "system",
-                    content:
-                        "You are a helpful assistant that translates Hebrew text to English. Respond only with JSON in the specified schema. Just output raw JSON with no code blocks",
-                },
-                {
-                    role: "user",
-                    content: `Translate the following Hebrew text to English, line by line with 3-6 words at a time, and return JSON array.:
-// [{"hebrew":"...","english":"..."}]
-// Hebrew text: "${JSON.stringify(hebrew)}."`,
-                },
-            ],
-            reasoning_effort: "minimal",
-        });
+    const maxAttempts = parseInt(process.env.AI_MAX_ATTEMPTS, 10) || 3;
+    logger.debug(`Max attempts set to ${maxAttempts}`);
+    let attempt = 0;
+    let lastError = null;
 
-        const raw = response.choices[0].message.content;
+    // Accept halachaObj: { heTitle, heText }
+    const { heTitle, heText } = halachaObj;
 
+    while (attempt < maxAttempts) {
+        attempt++;
         try {
-            const parsed = JSON.parse(raw);
-            console.log(parsed);
-            logger.info(`Successfully parsed translation`);
-            return parsed;
-        } catch (error) {
-            console.log(raw);
-            console.error(error);
-            logger.error(`Error parsing hebrew`);
-            logger.error(error);
+            const response = await openai.chat.completions.create({
+                model: "gpt-5-mini",
+                messages: [
+                    {
+                        role: "system",
+                        content:
+                            "You are a helpful assistant that translates Hebrew halachic texts. Respond only with JSON in the specified schema. Just output raw JSON with no code blocks.",
+                    },
+                    {
+                        role: "user",
+                        content: `Translate the following Hebrew halacha. Return JSON in the following schema:
+{
+  "enTitle": "<English translation of the title>",
+  "lines": [{"hebrew":"...","english":"..."}]
+}
+Title: ${JSON.stringify(heTitle)}
+Text: ${JSON.stringify(heText)}
+Translate the title to English as 'enTitle', and translate the text line by line (3-6 words per line) as 'lines'.`,
+                    },
+                ],
+                reasoning_effort: "minimal",
+            });
+
+            const raw = response.choices[0].message.content;
+
+            try {
+                const parsed = JSON.parse(raw);
+                logger.info(
+                    `Successfully parsed translation (attempt ${attempt})`
+                );
+                // Expecting { enTitle, lines }
+                return parsed;
+            } catch (error) {
+                logger.error(`Error parsing translation (attempt ${attempt})`);
+                logger.error(error);
+                lastError = error;
+            }
+        } catch (apiError) {
+            logger.error(`Open API Error (attempt ${attempt})`);
+            logger.error(apiError);
+            lastError = apiError;
         }
-    } catch (apiError) {
-        logger.error("Open API Error");
-        logger.error(apiError);
-        console.error(apiError);
     }
+
+    logger.error(`Failed to parse translation after ${maxAttempts} attempts`);
+    if (lastError) logger.error(lastError);
+    return null;
 };
+
 export default main;
-
-// const sentences = hebrew
-//     .split(".")
-//     .map((s) => s.trim())
-//     .filter(Boolean);
-
-// logger.debug(`Split text into ${sentences.length} sentences`);
-
-// const finalResult = [];
-// let attempts = 0;
-
-// for (let i = 0; i < sentences.length; i++) {
-//     const sentence = sentences[i];
-// logger.info(`Processing sentence ${i + 1}/${sentences.length}`);
-// logger.debug(`Sentence content: "${sentence}"`);
-
-// try {
-
-// finalResult.push(...parsed);
-// logger.info(
-// `Successfully parsed translation for sentence ${i + 1}: ${
-// parsed.length
-//                 } line(s)`
-//             );
-//             attempts = 0; // reset on success
-//         } catch (parseErr) {
-//             attempts++;
-//             logger.warn(
-//                 `Failed to parse JSON for sentence ${
-//                     i + 1
-//                 } (attempt ${attempts}): ${parseErr.message}`
-//             );
-//             logger.debug(`Raw response:\n${raw}`);
-//             if (attempts >= 3) {
-//                 logger.error(
-//                     `Exceeded max retry attempts for sentence ${
-//                         i + 1
-//                     }, skipping.`
-//                 );
-//                 attempts = 0;
-//             } else {
-//                 // Retry same sentence again
-//                 i--;
-//                 continue;
-//             }
-//         }
-//     } catch (apiErr) {
-//         logger.error(
-//             `OpenAI API error on sentence ${i + 1}: ${apiErr.message}`
-//         );
-//         logger.debug(apiErr.stack);
-//     }
-// }
-// logger.info(
-//     `Translation complete. Total output entries: ${finalResult.length}`
-// );
-// return finalResult;
-
-// } catch (error) {}

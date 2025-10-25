@@ -1,8 +1,7 @@
 import { ai, scraper } from "./lib/index.js";
 import { PrismaClient } from "@prisma/client";
 import schedule from "node-schedule";
-// const schedule = require("node-schedule");
-// const { createLogger } = require("./logger");
+
 import { createLogger } from "./logger.js";
 
 const logger = createLogger("scheduler");
@@ -15,70 +14,110 @@ Date.prototype.addDays = function (days) {
 
 const prisma = new PrismaClient();
 
-// ======================================
-// SCRAPE HALACHOT FOR A GIVEN DATE
-// ======================================
+const WRITE_TO_DB = process.env.WRITE_TO_DB === "true";
+const PROCESS_WITH_AI = process.env.PROCESS_WITH_AI === "true";
+
 const scrape_halachot = async (date) => {
     logger.info(`Starting scrape for ${date.toDateString()}`);
 
     try {
-        const scrapedHalachot = await scraper(date);
+        const { book, halachot } = await scraper(date);
         logger.info(
             `Scraper returned ${
-                scrapedHalachot.length
-            } halachot for ${date.toDateString()}`
+                halachot.length
+            } halachot for "${book}" on ${date.toDateString()}`
         );
 
-        for (const scrapedHalacha of scrapedHalachot) {
-            const { title, url, text } = scrapedHalacha;
-            logger.debug(`Processing halacha: "${title}" (${url})`);
+        let bookRecord = await prisma.book.findUnique({
+            where: { title: book },
+        });
+        if (!bookRecord) {
+            bookRecord = await prisma.book.create({
+                data: { title: book },
+            });
+            logger.info(`Created new book: "${book}"`);
+        }
+
+        for (const scrapedHalacha of halachot) {
+            const { subtitle, halacha, url } = scrapedHalacha;
+            logger.debug(`Processing halacha: "${subtitle}"`);
 
             try {
+                let translated = null;
+                let enTitle = null;
+                if (PROCESS_WITH_AI) {
+                    // Pass both heTitle and heText to ai
+                    const aiResult = await ai({
+                        heTitle: subtitle,
+                        heText: halacha,
+                    });
+
+                    logger.debug("---- TRANSLATION ---- ");
+                    logger.debug(aiResult);
+
+                    if (!aiResult) {
+                        logger.warn(
+                            `Skipping halacha "${subtitle}" because AI translation failed`
+                        );
+                        continue;
+                    }
+                    enTitle = aiResult.enTitle;
+                    translated = aiResult.lines;
+                }
+
                 const existing = await prisma.halacha.findUnique({
                     where: { url },
                 });
                 if (existing) {
-                    logger.info(`Skipping existing halacha: ${title}`);
+                    logger.info(`Skipping existing halacha: ${subtitle}`);
                     continue;
                 }
 
-                // // Save Hebrew halacha
-                // const halacha = await prisma.halacha.create({
-                //     data: {
-                //         heTitle: title,
-                //         url,
-                //         heText: text,
-                //         date,
-                //     },
-                // });
+                const halachaData = {
+                    heTitle: subtitle,
+                    enTitle: enTitle || null,
+                    url,
+                    heText: halacha,
+                    date,
+                    book: { connect: { id: bookRecord.id } },
+                };
 
-                // logger.info(`Saved new halacha: "${halacha.heTitle}"`);
+                if (!WRITE_TO_DB) {
+                    logger.warn(
+                        "WRITE_TO_DB is not true, skipping database writes."
+                    );
+                    logger.debug(halachaData);
 
+                    continue;
+                }
+
+                const halachaRecord = await prisma.halacha.create({
+                    data: halachaData,
+                });
+
+                logger.info(`Saved new halacha: "${halachaRecord.heTitle}"`);
                 logger.debug("---- TEXT ---- ");
-                logger.debug(text);
-                // Translate and save lines
-                const translated = await ai(text);
-                // logger.info(
-                //     `Translation complete — ${translated.length} lines for "${title}"`
-                // );
+                logger.debug(halachaRecord);
 
-                logger.debug("RETURNING...");
+                if (PROCESS_WITH_AI && translated) {
+                    await prisma.halachaLine.createMany({
+                        data: translated.map((t) => ({
+                            ...t,
+                            halachaId: halachaRecord.id,
+                        })),
+                    });
 
-                // return;
-
-                // await prisma.halachaLine.createMany({
-                //     data: translated.map((t) => ({
-                //         ...t,
-                //         halachaId: halacha.id,
-                //     })),
-                // });
-
-                logger.info(`Saved ${translated.length} translation lines`);
+                    logger.info(`Saved ${translated.length} translation lines`);
+                } else {
+                    logger.info(
+                        "PROCESS_WITH_AI is not true, skipping AI processing."
+                    );
+                }
             } catch (err) {
                 logger.error(
-                    `Failed processing halacha "${scrapedHalacha.title}": ${err.message}`
+                    `Failed processing halacha "${scrapedHalacha.subtitle}": ${err.message}`
                 );
-                logger.debug(err.stack);
+                logger.error(err);
             }
         }
 
@@ -87,13 +126,10 @@ const scrape_halachot = async (date) => {
         logger.error(
             `Scrape failed for ${date.toDateString()}: ${err.message}`
         );
-        logger.debug(err.stack);
+        logger.error(err);
     }
 };
 
-// ======================================
-// SCRAPE HALACHOT FOR A WEEK
-// ======================================
 const scrape_halachot_for_week = async (date) => {
     logger.info(`Starting weekly scrape from ${date.toDateString()}`);
 
@@ -103,20 +139,16 @@ const scrape_halachot_for_week = async (date) => {
     for (let i = 0; i < 7; i++) {
         logger.info(`Scraping day ${i + 1}/7: ${start.toDateString()}`);
         await scrape_halachot(start);
-        // break;
+
         start = start.addDays(1);
     }
 
     logger.info("Weekly scrape completed successfully");
 };
 
-// ======================================
-// MAIN SCHEDULER
-// ======================================
 const main = async () => {
     logger.info("Starting scheduled scraping service");
 
-    // Schedule weekly scrape — every Sunday at 4:00 AM
     schedule.scheduleJob("0 4 * * SUN", async () => {
         logger.info("Scheduled weekly job triggered (Sunday 4AM)");
 
@@ -131,7 +163,6 @@ const main = async () => {
         }
     });
 
-    // Populate database if empty
     const halachotCount = await prisma.halacha.count();
     if (halachotCount === 0) {
         logger.warn("No halachot found in database — populating initial week");

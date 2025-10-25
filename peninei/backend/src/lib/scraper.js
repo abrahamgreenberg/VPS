@@ -1,118 +1,8 @@
 import { createLogger } from "../logger.js";
 import axios from "axios";
-// const che
-// erio = require("cheerio");
-import { load } from "cheerio";
+import { JSDOM } from "jsdom";
 
 const logger = createLogger("scraper");
-
-const allowedTags = [
-    "p",
-    "br",
-    "h2",
-    "h4",
-    "h3",
-    "a",
-    "iframe",
-    "body",
-    "html",
-    "head",
-];
-
-// ============================
-// CLEANUP DOM FUNCTION
-// ============================
-function cleanDom($) {
-    logger.debug("Starting DOM cleanup");
-
-    // Remove disallowed tags but keep their contents
-    $("*").each((_, el) => {
-        const tag = el.tagName?.toLowerCase();
-        if (!allowedTags.includes(tag)) $(el).replaceWith($(el).contents());
-    });
-
-    $("script").remove();
-    $("*").each((_, el) => {
-        $(el).removeAttr("style").removeAttr("class").removeAttr("id");
-    });
-
-    // Replace YouTube iframes with links
-    $("iframe").each((_, el) => {
-        const src = $(el).attr("src");
-        if (src?.includes("youtube.com/embed/")) {
-            const videoUrl = src.replace("/embed/", "/watch?v=");
-            const link = $("<a>")
-                .attr("href", videoUrl)
-                .attr("target", "_blank")
-                .text("צפייה בסרטון ביוטיוב");
-            $(el).replaceWith(link);
-        } else {
-            $(el).remove();
-        }
-    });
-
-    $("body")
-        .contents()
-        .each((_, el) => {
-            if (el.type === "text" && $(el).text().trim() !== "") {
-                $(el).remove();
-            }
-        });
-
-    $('a[href*="ftn"]').remove();
-
-    logger.debug("Finished DOM cleanup");
-}
-
-// ============================
-// EXTRACT CLEAN HTML
-// ============================
-const extractHtml = ($) => {
-    logger.debug("Extracting cleaned HTML from DOM");
-
-    $("br").remove();
-
-    const innerBody = $("body").html()?.trim() || "";
-    const cleanedInner = innerBody
-        .replace(/^\s*[\r\n]/gm, "")
-        .replace(/\s{2,}/g, " ")
-        .trim();
-
-    logger.debug(`Extracted HTML length: ${cleanedInner.length} characters`);
-
-    return `<div>${cleanedInner}</div>`;
-};
-
-// ============================
-// EXTRACT TITLES & PARAGRAPHS
-// ============================
-const extractTitlesAndParagraphs = ($) => {
-    logger.debug("Extracting titles and paragraphs");
-
-    const titles = [];
-    $("h3 > a").each((i, el) => {
-        if (i < 2) {
-            titles.push({
-                text: $(el).text().trim(),
-                url: $(el).attr("href"),
-            });
-        }
-    });
-
-    const paragraphs = [];
-    $("p").each((i, el) => {
-        const text = $(el).text().trim();
-        if (text && paragraphs.length < 2) {
-            paragraphs.push(text);
-        }
-    });
-
-    logger.debug(
-        `Extracted ${titles.length} titles and ${paragraphs.length} paragraphs`
-    );
-
-    return { titles, paragraphs };
-};
 
 // ============================
 // SCRAPE PENINEI HALACHA
@@ -122,18 +12,42 @@ const scrapePeninei = async (url) => {
 
     try {
         const { data: html } = await axios.get(url);
-        const $ = load(html);
+        const dom = new JSDOM(html);
+        const document = dom.window.document;
 
-        cleanDom($);
+        // Extract book title
+        const bookNode = document.querySelector("h4");
+        const book = bookNode ? bookNode.textContent.split(",")[0].trim() : "";
 
-        const cleanedHtml = extractHtml($);
-        const { titles, paragraphs } = extractTitlesAndParagraphs($);
+        // Extract halachot
+        const halachot = [];
+        const subtitleNodes = document.querySelectorAll("h3 > a");
+        subtitleNodes.forEach((subtitleNode) => {
+            const subtitle = subtitleNode.textContent.trim();
+            const url = subtitleNode.getAttribute("href") || "";
+
+            // Find the next <p> with a <br> after this subtitleNode's parent (h3)
+            let halacha = "";
+            let el = subtitleNode.parentElement.nextElementSibling;
+            while (el) {
+                if (el.matches && el.matches("p:has(br)")) {
+                    halacha = el.textContent
+                        .trim()
+                        .replace(/\n+/g, " ")
+                        .replace(/\[\d+\]/g, ""); // Remove [number]
+                    break;
+                }
+                el = el.nextElementSibling;
+            }
+
+            halachot.push({ subtitle, halacha, url });
+        });
 
         logger.info(
-            `Scrape completed: ${titles.length} titles, ${paragraphs.length} paragraphs`
+            `Scrape completed: book "${book}", ${halachot.length} halachot`
         );
 
-        return { html: cleanedHtml, titles, paragraphs };
+        return { book, halachot };
     } catch (err) {
         logger.error(`Error scraping ${url}: ${err.message}`);
         logger.error(err.stack);
@@ -149,16 +63,12 @@ const main = async (date) => {
     logger.info(`Starting scrape for date: ${date.toISOString()}`);
 
     try {
-        const { titles, paragraphs } = await scrapePeninei(targetUrl);
+        const { book, halachot } = await scrapePeninei(targetUrl);
 
-        const halachas = titles.map((title, i) => ({
-            title: title.text,
-            url: title.url,
-            text: (paragraphs[i] || "").replace(/\n/g, " "),
-        }));
-
-        logger.info(`Scrape complete — extracted ${halachas.length} halachot`);
-        return halachas;
+        logger.info(
+            `Scrape complete — extracted ${halachot.length} halachot from book "${book}"`
+        );
+        return { book, halachot };
     } catch (err) {
         logger.error(
             `Scrape failed for date ${date.toISOString()}: ${err.message}`
@@ -167,4 +77,5 @@ const main = async (date) => {
         throw err;
     }
 };
+
 export default main;

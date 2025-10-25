@@ -1,6 +1,7 @@
 TODO:
 
--   Continue improving CHAT GPT
--   Use Sefaria API to scrape peninei halacha
+-   load server data into react (TANSTACK) & plan api routes
 -   Build calendar menu
--   Load server data into react
+-   maybe parse halacha number by our selves?
+-   scraping chapter name as well
+-   batch processing
