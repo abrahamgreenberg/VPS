@@ -134,7 +134,7 @@ const scrape_halachot_for_week = async (date) => {
     logger.info(`Starting weekly scrape from ${date.toDateString()}`);
 
     let start = new Date(date);
-    start.setHours(0, 0, 0, 0);
+    start.setHours(6, 0, 0, 0);
 
     for (let i = 0; i < 7; i++) {
         logger.info(`Scraping day ${i + 1}/7: ${start.toDateString()}`);

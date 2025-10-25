@@ -8,12 +8,43 @@ import { PrismaClient } from "@prisma/client";
 import scheduler from "./scheduled.js";
 import { createLogger } from "./logger.js";
 
+// Optionally load .env if using dotenv (uncomment if needed)
+// import dotenv from "dotenv";
+// dotenv.config();
+// ---------------------------
+// Optional: Allow CORS if env var is set
+// ---------------------------
+
 const logger = createLogger("server");
 
 scheduler(); // start scheduled jobs
 
 const app = express();
 const prisma = new PrismaClient();
+
+if (process.env.ALLOW_CORS === "true") {
+    app.use((req, res, next) => {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header(
+            "Access-Control-Allow-Methods",
+            "GET,PUT,POST,DELETE,OPTIONS"
+        );
+        res.header(
+            "Access-Control-Allow-Headers",
+            "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+        );
+        if (req.method === "OPTIONS") {
+            return res.sendStatus(200);
+        }
+        next();
+    });
+    logger.info("CORS enabled for all origins (ALLOW_CORS=true)");
+
+    app.use((req, res, next) => {
+        res.setHeader("Cache-Control", "no-store");
+        next();
+    });
+}
 
 app.use(express.json());
 
@@ -42,6 +73,11 @@ app.get("/api", (req, res) => {
 app.get("/api/halachas/:date", async (req, res) => {
     const dateParam = req.params.date;
     const date = new Date(dateParam);
+    // logger.debug(`Receib`)
+    logger.debug(`Fetching halachot for date: ${dateParam}`);
+
+    logger.debug(dateParam);
+    logger.debug(date);
 
     if (isNaN(date.getTime())) {
         logger.warn(`Invalid date format received: "${dateParam}"`);
@@ -49,10 +85,22 @@ app.get("/api/halachas/:date", async (req, res) => {
     }
 
     try {
+        // Find all halachot for the given day (ignore time)
+        const startOfDay = new Date(date);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(startOfDay);
+        endOfDay.setDate(endOfDay.getDate() + 1);
+
         const halachot = await prisma.halacha.findMany({
-            where: { date },
+            where: {
+                date: {
+                    gte: startOfDay,
+                    lt: endOfDay,
+                },
+            },
             include: { lines: true },
         });
+        logger.debug(halachot);
         logger.info(
             `Returned ${
                 halachot.length
