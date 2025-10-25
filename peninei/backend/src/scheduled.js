@@ -21,25 +21,27 @@ const scrape_halachot = async (date) => {
     logger.info(`Starting scrape for ${date.toDateString()}`);
 
     try {
-        const { book, halachot } = await scraper(date);
+        const { bookTitle, halachot } = await scraper(date);
         logger.info(
             `Scraper returned ${
                 halachot.length
-            } halachot for "${book}" on ${date.toDateString()}`
+            } halachot for "${bookTitle}" on ${date.toDateString()}`
         );
 
+        // Book linking logic restored
         let bookRecord = await prisma.book.findUnique({
-            where: { title: book },
+            where: { title: bookTitle },
         });
         if (!bookRecord) {
             bookRecord = await prisma.book.create({
-                data: { title: book },
+                data: { title: bookTitle },
             });
-            logger.info(`Created new book: "${book}"`);
+            logger.info(`Created new book: "${bookTitle}"`);
         }
 
         for (const scrapedHalacha of halachot) {
-            const { subtitle, halacha, url } = scrapedHalacha;
+            const { subtitle, halacha, url, chapterNumber, halachaNumber } =
+                scrapedHalacha;
             logger.debug(`Processing halacha: "${subtitle}"`);
 
             try {
@@ -79,7 +81,9 @@ const scrape_halachot = async (date) => {
                     url,
                     heText: halacha,
                     date,
-                    book: { connect: { id: bookRecord.id } },
+                    chapterNumber,
+                    halachaNumber,
+                    book: { connect: { id: bookRecord.id } }, // link to Book
                 };
 
                 if (!WRITE_TO_DB) {

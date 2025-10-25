@@ -9,21 +9,23 @@ generator client {
 }
 
 model Book {
-  id      Int       @id @default(autoincrement())
-  title   String    @unique
+  id       Int       @id @default(autoincrement())
+  title    String    @unique
   halachot Halacha[]
 }
 
 model Halacha {
-  id      Int           @id @default(autoincrement())
-  heTitle String
-  enTitle String? // optional English title
-  heText  String
-  url     String        @unique
-  date    DateTime      @default(now()) @db.Date
-  lines   HalachaLine[] // relation to line-by-line translation
-  book    Book?         @relation(fields: [bookId], references: [id])
-  bookId  Int?
+  id            Int           @id @default(autoincrement())
+  heTitle       String
+  enTitle       String? // optional English title
+  heText        String
+  url           String        @unique
+  date          DateTime      @default(now()) @db.Date
+  chapterNumber Int?
+  halachaNumber Int?
+  bookId        Int?
+  book          Book?         @relation(fields: [bookId], references: [id])
+  lines         HalachaLine[] // relation to line-by-line translation
 
   @@index([date])
 }

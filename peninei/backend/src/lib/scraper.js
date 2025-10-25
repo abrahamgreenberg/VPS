@@ -15,16 +15,30 @@ const scrapePeninei = async (url) => {
         const dom = new JSDOM(html);
         const document = dom.window.document;
 
-        // Extract book title
+        // Extract book node string (full, not just before comma)
         const bookNode = document.querySelector("h4");
-        const book = bookNode ? bookNode.textContent.split(",")[0].trim() : "";
+        const bookTitle = bookNode
+            ? bookNode.textContent.split(",")[0].trim()
+            : "";
 
         // Extract halachot
         const halachot = [];
         const subtitleNodes = document.querySelectorAll("h3 > a");
         subtitleNodes.forEach((subtitleNode) => {
-            const subtitle = subtitleNode.textContent.trim();
+            let subtitle = subtitleNode.textContent.trim();
             const url = subtitleNode.getAttribute("href") || "";
+
+            // Extract chapter and halacha number from the URL (e.g. https://ph.yhb.org.il//20-05-10/)
+            let chapterNumber = null;
+            let halachaNumber = null;
+            const urlMatch = url.match(/(\d+)-(\d+)-(\d+)/);
+            if (urlMatch) {
+                chapterNumber = parseInt(urlMatch[2], 10);
+                halachaNumber = parseInt(urlMatch[3], 10);
+            }
+
+            // Remove leading Hebrew number and dash from the subtitle, if present
+            subtitle = subtitle.replace(/^([א-ת"׳״\s-]+)-\s*/, "").trim();
 
             // Find the next <p> with a <br> after this subtitleNode's parent (h3)
             let halacha = "";
@@ -40,14 +54,21 @@ const scrapePeninei = async (url) => {
                 el = el.nextElementSibling;
             }
 
-            halachot.push({ subtitle, halacha, url });
+            halachot.push({
+                subtitle,
+                halacha,
+                url,
+                bookTitle,
+                chapterNumber,
+                halachaNumber,
+            });
         });
 
         logger.info(
-            `Scrape completed: book "${book}", ${halachot.length} halachot`
+            `Scrape completed: book "${bookTitle}", ${halachot.length} halachot`
         );
 
-        return { book, halachot };
+        return { bookTitle, halachot };
     } catch (err) {
         logger.error(`Error scraping ${url}: ${err.message}`);
         logger.error(err.stack);
@@ -63,12 +84,12 @@ const main = async (date) => {
     logger.info(`Starting scrape for date: ${date.toISOString()}`);
 
     try {
-        const { book, halachot } = await scrapePeninei(targetUrl);
+        const { bookTitle, halachot } = await scrapePeninei(targetUrl);
 
         logger.info(
-            `Scrape complete — extracted ${halachot.length} halachot from book "${book}"`
+            `Scrape complete — extracted ${halachot.length} halachot from book "${bookTitle}"`
         );
-        return { book, halachot };
+        return { bookTitle, halachot };
     } catch (err) {
         logger.error(
             `Scrape failed for date ${date.toISOString()}: ${err.message}`

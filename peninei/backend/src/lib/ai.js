@@ -39,7 +39,7 @@ const main = async (halachaObj) => {
 }
 Title: ${JSON.stringify(heTitle)}
 Text: ${JSON.stringify(heText)}
-Translate the title to English as 'enTitle', and translate the text line by line (3-6 words per line) as 'lines'.`,
+Translate the title to English as 'enTitle', and translate the text line by line (3-6 words per line) as 'lines'. In the hebrew field, include just the words you translated in that line. Ensure the JSON is valid.`,
                     },
                 ],
                 reasoning_effort: "minimal",
