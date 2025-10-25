@@ -73,9 +73,7 @@ app.get("/api", (req, res) => {
 app.get("/api/halachas/:date", async (req, res) => {
     const dateParam = req.params.date;
     const date = new Date(dateParam);
-    // logger.debug(`Receib`)
     logger.debug(`Fetching halachot for date: ${dateParam}`);
-
     logger.debug(dateParam);
     logger.debug(date);
 
@@ -85,26 +83,16 @@ app.get("/api/halachas/:date", async (req, res) => {
     }
 
     try {
-        // Find all halachot for the given day (ignore time)
-        const startOfDay = new Date(date);
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date(startOfDay);
-        endOfDay.setDate(endOfDay.getDate() + 1);
-
+        // For @db.Date, Prisma expects a Date object
         const halachot = await prisma.halacha.findMany({
             where: {
-                date: {
-                    gte: startOfDay,
-                    lt: endOfDay,
-                },
+                date: date,
             },
             include: { lines: true },
         });
         logger.debug(halachot);
         logger.info(
-            `Returned ${
-                halachot.length
-            } halachot for date ${date.toISOString()}`
+            `Returned ${halachot.length} halachot for date ${dateParam}`
         );
         return res.json(halachot);
     } catch (err) {
@@ -125,9 +113,15 @@ app.get("/api/available-dates", async (req, res) => {
 
     if (month) {
         const [year, m] = month.split("-").map(Number);
-        const start = new Date(year, m - 1, 1);
-        const end = new Date(year, m, 1);
-        where = { date: { gte: start, lt: end } };
+        // Use a date range for the month: gte first of month, lt first of next month
+        const start = new Date(Date.UTC(year, m - 1, 1));
+        const end = new Date(Date.UTC(year, m, 1));
+        where = {
+            date: {
+                gte: start,
+                lt: end,
+            },
+        };
         logger.debug(`Filtering available dates for month: ${month}`);
     }
 

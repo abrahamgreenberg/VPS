@@ -31,30 +31,14 @@ export default function CalendarSelector({ selectedDate, onDateChange }) {
     // Convert available date strings to Date objects
     const availableDateObjs = availableDates.map((d) => new Date(d));
 
-    // Helper to format date as YYYY-MM-DD in UTC, but match backend 6am UTC storage
+    // Helper to format date as YYYY-MM-DD (no timezone correction needed)
     function toBackendDateString(date) {
-        // Add one day to correct for off-by-one bug
-        const corrected = new Date(date);
-        corrected.setDate(corrected.getDate() + 1);
-        // Create a new date at 6am UTC for the corrected day
-        const d = new Date(
-            Date.UTC(
-                corrected.getUTCFullYear(),
-                corrected.getUTCMonth(),
-                corrected.getUTCDate(),
-                6,
-                0,
-                0,
-                0
-            )
-        );
-        // Format as YYYY-MM-DD
         return (
-            d.getUTCFullYear() +
+            date.getFullYear() +
             "-" +
-            String(d.getUTCMonth() + 1).padStart(2, "0") +
+            String(date.getMonth() + 1).padStart(2, "0") +
             "-" +
-            String(d.getUTCDate()).padStart(2, "0")
+            String(date.getDate()).padStart(2, "0")
         );
     }
 
