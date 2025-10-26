@@ -8,6 +8,11 @@
     "description": "Daily halacha from Peninei Halacha.",
     "icons": [
         {
+            "src": "/logo_180.png",
+            "sizes": "180x180",
+            "type": "image/png"
+        },
+        {
             "src": "/logo_512.png",
             "sizes": "512x512",
             "type": "image/png"
