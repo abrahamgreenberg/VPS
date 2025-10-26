@@ -39,7 +39,9 @@ if (allowedOrigin) {
         }
         next();
     });
-    logger.info(`CORS enabled for origin: ${allowedOrigin} (BACKEND_CORS_ALLOWED_URL)`);
+    logger.info(
+        `CORS enabled for origin: ${allowedOrigin} (BACKEND_CORS_ALLOWED_URL)`
+    );
 }
 
 app.use(express.json());
@@ -86,6 +88,7 @@ app.get("/api/halachas/:date", async (req, res) => {
             },
             include: { lines: true },
         });
+
         logger.debug(halachot);
         logger.info(
             `Returned ${halachot.length} halachot for date ${dateParam}`

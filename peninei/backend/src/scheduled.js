@@ -19,6 +19,59 @@ const BACKEND_PROCESS_WITH_AI = process.env.BACKEND_PROCESS_WITH_AI === "true";
 const BACKEND_POPULATE_INITIAL_DATABASE =
     process.env.BACKEND_POPULATE_INITIAL_DATABASE === "true";
 
+/**
+ * Convert a number (1-100) to Hebrew gematria string.
+ * Handles 15/16 as ט״ו/ט״ז.
+ */
+function numberToGematria(num) {
+    if (num < 1 || num > 100) return "";
+    const letters = [
+        "",
+        "א",
+        "ב",
+        "ג",
+        "ד",
+        "ה",
+        "ו",
+        "ז",
+        "ח",
+        "ט",
+        "י",
+        "כ",
+        "ל",
+        "מ",
+        "נ",
+        "ס",
+        "ע",
+        "פ",
+        "צ",
+    ];
+    const tens = ["", "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ"];
+    if (num === 15) return "ט״ו";
+    if (num === 16) return "ט״ז";
+    if (num === 100) return "ק";
+
+    let result = "";
+    let n = num;
+
+    // Handle tens
+    if (n >= 10) {
+        const t = Math.floor(n / 10);
+        if (t > 0) result += tens[t];
+        n = n % 10;
+    }
+    // Handle units
+    if (n > 0) result += letters[n];
+
+    // Add gershayim (״) before last letter if >9, otherwise geresh (׳) for single letter >9
+    if (result.length > 1) {
+        result = result.slice(0, -1) + "״" + result.slice(-1);
+    } else if (num > 9) {
+        result += "׳";
+    }
+    return result;
+}
+
 const scrape_halachot = async (date) => {
     logger.info(`Starting scrape for ${date.toDateString()}`);
 
@@ -46,13 +99,26 @@ const scrape_halachot = async (date) => {
                 scrapedHalacha;
             logger.debug(`Processing halacha: "${subtitle}"`);
 
+            // Prepend perek/halacha numbers if present
+            let heTitle = subtitle;
+            let prefix = "";
+            if (chapterNumber) {
+                prefix += `פרק ${numberToGematria(chapterNumber)}, `;
+            }
+            if (halachaNumber) {
+                prefix += `הלכה ${numberToGematria(halachaNumber)}, `;
+            }
+            if (prefix) {
+                heTitle = `${prefix}${heTitle}`;
+            }
+
             try {
                 let translated = null;
                 let enTitle = null;
                 if (BACKEND_PROCESS_WITH_AI) {
                     // Pass both heTitle and heText to ai
                     const aiResult = await ai({
-                        heTitle: subtitle,
+                        heTitle,
                         heText: halacha,
                     });
 
@@ -78,7 +144,7 @@ const scrape_halachot = async (date) => {
                 }
 
                 const halachaData = {
-                    heTitle: subtitle,
+                    heTitle,
                     enTitle: enTitle || null,
                     url,
                     heText: halacha,
