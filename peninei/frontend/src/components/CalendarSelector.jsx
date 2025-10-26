@@ -43,9 +43,9 @@ export default function CalendarSelector({ selectedDate, onDateChange }) {
     }
 
     return (
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center">
             <button
-                className="mb-2 px-6 py-2 rounded-full bg-purple-600 text-white font-bold shadow hover:bg-purple-700 transition-all"
+                className="px-6 py-2 rounded-full bg-purple-600 text-white font-bold shadow hover:bg-purple-700 transition-all"
                 onClick={() => setOpen((v) => !v)}
             >
                 {open ? "Hide Calendar" : "Show Available Dates"}

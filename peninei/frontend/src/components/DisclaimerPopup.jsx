@@ -3,7 +3,7 @@ import { FaExclamationTriangle, FaRobot, FaBook } from "react-icons/fa";
 
 export default function DisclaimerPopup({ show, setShow }) {
     return (
-        <div className="fixed bottom-6 left-0 w-full flex justify-center z-50 pointer-events-none">
+        <div>
             <div className="max-w-xl w-full pointer-events-auto">
                 <button
                     className="w-full flex items-center justify-center gap-2 bg-white/60 backdrop-blur border border-yellow-400 text-yellow-900 font-semibold py-2 px-4 rounded-2xl shadow-lg hover:bg-yellow-100/80 transition-all duration-200"

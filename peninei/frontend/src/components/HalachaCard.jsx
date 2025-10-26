@@ -1,6 +1,9 @@
 import React from "react";
 
-export default function HalachaCard({ halacha }) {
+export default function HalachaCard({ halacha, displayMode }) {
+    // halacha.lines: [{ hebrew, english }]
+    // fallback to heText if no lines
+
     return (
         <div className="max-w-3xl w-full bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl p-8 mb-12 border border-purple-300">
             <h2 className="text-center text-3xl font-extrabold mb-6 text-purple-800 drop-shadow-md">
@@ -23,23 +26,77 @@ export default function HalachaCard({ halacha }) {
                 </h3>
             )}
             <div className="space-y-4">
-                {halacha.lines &&
-                    halacha.lines.map((line) => (
-                        <div
-                            key={line.id}
-                            className="flex flex-col md:flex-row md:justify-between md:items-start gap-2 p-4 rounded-xl transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:bg-purple-50"
-                        >
-                            <p
-                                className="text-right text-lg md:w-1/2 font-semibold text-purple-900"
-                                dir="rtl"
+                {halacha.lines && halacha.lines.length > 0 ? (
+                    <div>
+                        {halacha.lines.map((line, idx) => {
+                            // Layout: single column for "he" or "en", two columns for "both"
+                            let rowClass =
+                                "p-4 rounded-xl transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:bg-purple-50";
+                            if (displayMode === "both") {
+                                rowClass =
+                                    "grid grid-cols-2 gap-4 p-4 rounded-xl transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:bg-purple-50";
+                            } else {
+                                rowClass += " flex justify-center";
+                            }
+                            return (
+                                <div key={idx} className={rowClass}>
+                                    {(displayMode === "he" ||
+                                        displayMode === "both") && (
+                                        <span
+                                            className={
+                                                "font-hebrew text-purple-800" +
+                                                (displayMode === "both"
+                                                    ? " text-right"
+                                                    : " text-center w-full")
+                                            }
+                                        >
+                                            {line.hebrew}
+                                        </span>
+                                    )}
+                                    {(displayMode === "en" ||
+                                        displayMode === "both") && (
+                                        <span
+                                            className={
+                                                displayMode === "both"
+                                                    ? ""
+                                                    : "text-center w-full"
+                                            }
+                                        >
+                                            {line.english}
+                                        </span>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <div>
+                        {(displayMode === "he" || displayMode === "both") && (
+                            <div
+                                className={
+                                    "font-hebrew text-purple-800 mb-2" +
+                                    (displayMode === "both"
+                                        ? " text-right"
+                                        : " text-center w-full")
+                                }
                             >
-                                {line.hebrew}
-                            </p>
-                            <p className="text-left text-lg md:w-1/2 text-gray-700 font-medium">
-                                {line.english}
-                            </p>
-                        </div>
-                    ))}
+                                {halacha.heText}
+                            </div>
+                        )}
+                        {(displayMode === "en" || displayMode === "both") &&
+                            halacha.enTitle && (
+                                <div
+                                    className={
+                                        displayMode === "both"
+                                            ? ""
+                                            : "text-center w-full mb-2"
+                                    }
+                                >
+                                    {halacha.enTitle}
+                                </div>
+                            )}
+                    </div>
+                )}
             </div>
         </div>
     );
