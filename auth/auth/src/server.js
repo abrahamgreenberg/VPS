@@ -109,7 +109,7 @@ const requireAuth = async (req, res, next) => {
 };
 
 // 🧩 Use the middleware for all other routes
-app.use("*", requireAuth);
+app.use(requireAuth);
 
 // 🚀 Start server
 app.listen(PORT, () => console.log(`✅ Proxy running on port ${PORT}`));
