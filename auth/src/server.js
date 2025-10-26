@@ -11,8 +11,12 @@ const cookieParser = require("cookie-parser");
 const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Trust proxy for correct client IP and secure cookies behind NGINX/Proxy
+app.set("trust proxy", 1);
 
 // Middleware
 app.use(helmet());
@@ -152,23 +156,15 @@ function verifyJwt(token) {
     }
 }
 
-// Apply ensureAuthenticated to all routes except /auth/*
-app.use((req, res, next) => {
-    if (req.path.startsWith("/auth")) return next();
-    ensureAuthenticated(req, res, next);
+// Centralized auth: Only protect /auth/* and /login, let other subdomains redirect unauthenticated users to /login with ?next=...
+// /login endpoint: redirects to Google OAuth with next param
+app.get("/login", (req, res) => {
+    const nextUrl = req.query.next || "/";
+    res.redirect(`/auth/google?next=${encodeURIComponent(nextUrl)}`);
 });
 
-// Example protected route
-app.get("/protected", (req, res) => {
-    const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-    let user = null;
-    if (token) {
-        try {
-            user = jwt.verify(token, process.env.JWT_SECRET);
-        } catch {}
-    }
-    res.json({ message: "Protected content", user });
-});
+// Health check
+app.get("/health", (req, res) => res.send("OK"));
 
 app.listen(PORT, () => {
     console.log(`Auth server running on http://localhost:${PORT}`);
