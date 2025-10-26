@@ -4,6 +4,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import { PrismaClient } from "@prisma/client";
+import cookieParser from "cookie-parser";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -11,12 +12,21 @@ const app = express();
 const PORT = process.env.PORT;
 const DOMAIN = process.env.DOMAIN;
 
+// Trust proxy if behind a reverse proxy (e.g., nginx, Heroku)
+app.set("trust proxy", 1);
+
+app.use(cookieParser());
+
 // 🔐 Session setup
 app.use(
     session({
         secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
+        cookie: {
+            secure: process.env.NODE_ENV === "production", // true if HTTPS
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        },
     })
 );
 
@@ -54,6 +64,7 @@ app.get(
     }),
     (req, res) => {
         console.log(req.query.origin);
+        console.log("Redirecting after successful auth");
         const redirect = req.query.origin
             ? `https://${req.query.origin}`
             : `https://${DOMAIN}`;
@@ -71,6 +82,10 @@ app.get("/auth/logout", (req, res) => {
 // 🧱 Auth Middleware
 const proxyCache = {};
 const requireAuth = async (req, res, next) => {
+    // Debug session/cookie
+    console.log("Session:", req.session);
+    console.log("Cookies:", req.cookies);
+
     const host = req.headers.host?.replace(/:\d+$/, "");
     const subdomain = host?.split(".")[0];
 
