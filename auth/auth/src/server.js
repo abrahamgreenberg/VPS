@@ -76,14 +76,15 @@ const requireAuth = async (req, res, next) => {
 
     // Skip for auth subdomain
     if (subdomain === "auth") return next();
-
+    console.log(`🏠 Incoming request for ${subdomain}`);
     // Find site in DB
     const site = await prisma.website.findUnique({
         where: { subdomain },
     });
 
     if (!site) return res.status(404).send("Unknown site");
-
+    console.log(`🌐 Incoming request for site: ${site}`);
+    console.log(site);
     // If whitelist required → ensure user authenticated + whitelisted
     if (site.whitelistRequired) {
         if (!req.isAuthenticated?.() || !req.user?.emails?.[0]?.value) {
@@ -97,10 +98,14 @@ const requireAuth = async (req, res, next) => {
             where: { email },
         });
         if (!user) return res.status(403).send("Not authorized");
+
+        console.log(`✅ Authenticated and authorized user: ${email}`);
     }
 
     // Proxy to service
     const target = `http://${site.targetService}:${site.targetPort}`;
+
+    console.log(`🔀 Proxying request for ${subdomain} to ${target}`);
 
     createProxyMiddleware({
         target,
