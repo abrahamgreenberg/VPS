@@ -1,0 +1,20 @@
+services:
+  auth:
+    build: .
+    env_file:
+      - .env
+    networks:
+      - proxy-network
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+    ports:
+      - "127.0.0.1:3000:3000"
+
+networks:
+  proxy-network:
+    external: true
