@@ -49,12 +49,19 @@ passport.use(
     )
 );
 
+// Helper for base64url encoding/decoding
+function encodeState(obj) {
+    return Buffer.from(JSON.stringify(obj)).toString("base64url");
+}
+function decodeState(str) {
+    return JSON.parse(Buffer.from(str, "base64url").toString());
+}
+
 // 🧭 Login route
 app.get("/auth/login", (req, res, next) => {
-    // Pass both origin and next as state
     const origin = req.query.origin;
     const nextUrl = req.query.next || "/";
-    const state = JSON.stringify({ origin, next: nextUrl });
+    const state = encodeState({ origin, next: nextUrl });
     passport.authenticate("google", {
         scope: ["email", "profile"],
         state,
@@ -71,7 +78,7 @@ app.get(
     async (req, res) => {
         let state;
         try {
-            state = JSON.parse(req.query.state);
+            state = decodeState(req.query.state);
         } catch {
             return res.status(400).send("Invalid state");
         }
