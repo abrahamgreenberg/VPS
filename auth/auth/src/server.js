@@ -53,6 +53,7 @@ app.get(
         session: true,
     }),
     (req, res) => {
+        console.log(req.query.origin);
         const redirect = req.query.origin
             ? `https://${req.query.origin}`
             : `https://${DOMAIN}`;
@@ -68,6 +69,7 @@ app.get("/auth/logout", (req, res) => {
 });
 
 // 🧱 Auth Middleware
+const proxyCache = {};
 const requireAuth = async (req, res, next) => {
     const host = req.headers.host?.replace(/:\d+$/, "");
     const subdomain = host?.split(".")[0];
@@ -77,18 +79,21 @@ const requireAuth = async (req, res, next) => {
     // Skip for auth subdomain
     if (subdomain === "auth") return next();
     console.log(`🏠 Incoming request for ${subdomain}`);
+
     // Find site in DB
     const site = await prisma.website.findUnique({
         where: { subdomain },
     });
 
     if (!site) return res.status(404).send("Unknown site");
-    console.log(`🌐 Incoming request for site: ${site}`);
-    console.log(site);
+    console.log(`🌐 Incoming request for site:`, site);
+
     // If whitelist required → ensure user authenticated + whitelisted
-    console.log(site.whitelistRequired);
+    console.log("Whitelist required:", site.whitelistRequired);
     if (site.whitelistRequired) {
+        console.log("User:", req.user);
         if (!req.isAuthenticated?.() || !req.user?.emails?.[0]?.value) {
+            console.log("User not authenticated, redirecting to login");
             return res.redirect(
                 `https://auth.${DOMAIN}/auth/login?origin=${host}`
             );
@@ -98,22 +103,27 @@ const requireAuth = async (req, res, next) => {
         const user = await prisma.userWhitelist.findUnique({
             where: { email },
         });
-        if (!user) return res.status(403).send("Not authorized");
+        if (!user) {
+            console.log("User not whitelisted:", email);
+            return res.status(403).send("Not authorized");
+        }
 
         console.log(`✅ Authenticated and authorized user: ${email}`);
     }
 
     // Proxy to service
     const target = `http://${site.targetService}:${site.targetPort}`;
-    console.log(site.targetService);
-    console.log(site.targetPort);
-
     console.log(`🔀 Proxying request for ${subdomain} to ${target}`);
 
-    createProxyMiddleware({
-        target,
-        changeOrigin: true,
-    })(req, res, next);
+    // Cache proxy middleware per target for efficiency
+    if (!proxyCache[target]) {
+        proxyCache[target] = createProxyMiddleware({
+            target,
+            changeOrigin: true,
+            // Optionally, add more proxy options here
+        });
+    }
+    return proxyCache[target](req, res, next);
 };
 
 // 🧩 Use the middleware for all other routes
