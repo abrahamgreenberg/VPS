@@ -86,6 +86,7 @@ const requireAuth = async (req, res, next) => {
     console.log(`🌐 Incoming request for site: ${site}`);
     console.log(site);
     // If whitelist required → ensure user authenticated + whitelisted
+    console.log(site.whitelistRequired);
     if (site.whitelistRequired) {
         if (!req.isAuthenticated?.() || !req.user?.emails?.[0]?.value) {
             return res.redirect(
@@ -104,6 +105,8 @@ const requireAuth = async (req, res, next) => {
 
     // Proxy to service
     const target = `http://${site.targetService}:${site.targetPort}`;
+    console.log(site.targetService);
+    console.log(site.targetPort);
 
     console.log(`🔀 Proxying request for ${subdomain} to ${target}`);
 
