@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserWhitelist {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Website {
+  id                Int      @id @default(autoincrement())
+  subdomain         String   @unique
+  targetService     String 
+  targetPort        Int 
+  whitelistRequired Boolean  @default(true)
+  createdAt         DateTime @default(now())
+}

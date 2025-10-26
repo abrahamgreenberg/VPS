@@ -1,6 +1,6 @@
 services:
   auth:
-    build: .
+    build: ./auth
     env_file:
       - .env
     networks:
@@ -10,8 +10,10 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
-      JWT_SECRET: ${JWT_SECRET}
+      # JWT_SECRET: ${JWT_SECRET}
       SESSION_SECRET: ${SESSION_SECRET}
+      DOMAIN: ${DOMAIN}
+      PORT: ${PORT}
     ports:
       - "127.0.0.1:3000:3000"
 
