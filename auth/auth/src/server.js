@@ -50,10 +50,14 @@ passport.use(
 );
 
 // 🧭 Login route
-app.get(
-    "/auth/login",
-    passport.authenticate("google", { scope: ["email", "profile"] })
-);
+app.get("/auth/login", (req, res, next) => {
+    // Pass origin as state if present
+    const origin = req.query.origin;
+    passport.authenticate("google", {
+        scope: ["email", "profile"],
+        state: origin || undefined,
+    })(req, res, next);
+});
 
 // 🧭 Callback
 app.get(
@@ -62,13 +66,29 @@ app.get(
         failureRedirect: "/auth/failure",
         session: true,
     }),
-    (req, res) => {
-        console.log(req.query.origin);
-        console.log("Redirecting after successful auth");
-        const redirect = req.query.origin
-            ? `https://${req.query.origin}`
-            : `https://${DOMAIN}`;
-        res.redirect(redirect);
+    async (req, res, next) => {
+        const origin = req.query.state;
+        console.log("OAuth state (origin):", origin);
+        console.log("Proxying after successful auth");
+
+        if (!origin) return res.status(400).send("Missing origin");
+
+        const subdomain = origin.split(".")[0];
+        const site = await prisma.website.findUnique({
+            where: { subdomain },
+        });
+
+        if (!site) return res.status(404).send("Unknown site");
+        const target = `http://${site.targetService}:${site.targetPort}`;
+        console.log(`🔀 Proxying request for ${subdomain} to ${target}`);
+        if (!proxyCache[target]) {
+            proxyCache[target] = createProxyMiddleware({
+                target,
+                changeOrigin: true,
+                // Optionally, add more proxy options here
+            });
+        }
+        return proxyCache[target](req, res, next);
     }
 );
 
