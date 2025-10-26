@@ -1,6 +1,5 @@
 TODO:
 
--   design logo
 -   install as app
 -   docker compose & host
 -   add authentication
