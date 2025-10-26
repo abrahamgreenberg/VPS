@@ -202,20 +202,22 @@ const scrape_halachot = async (date) => {
     }
 };
 
-const scrape_halachot_for_week = async (date) => {
-    logger.info(`Starting weekly scrape from ${date.toDateString()}`);
+const scrape_halachot_for_week = async (date, numWeeks = 1) => {
+    logger.info(`Starting ${numWeeks}-week scrape from ${date.toDateString()}`);
 
     let start = new Date(date);
     start.setHours(6, 0, 0, 0);
 
-    for (let i = 0; i < 7; i++) {
-        logger.info(`Scraping day ${i + 1}/7: ${start.toDateString()}`);
+    for (let i = 0; i < 7 * numWeeks; i++) {
+        logger.info(
+            `Scraping day ${i + 1}/${7 * numWeeks}: ${start.toDateString()}`
+        );
         await scrape_halachot(start);
 
         start = start.addDays(1);
     }
 
-    logger.info("Weekly scrape completed successfully");
+    logger.info(`${numWeeks}-week scrape completed successfully`);
 };
 
 const main = async () => {
@@ -236,17 +238,20 @@ const main = async () => {
     });
 
     if (BACKEND_POPULATE_INITIAL_DATABASE) {
-        logger.warn("No halachot found in database — populating initial week");
+        logger.warn(
+            "No halachot found in database — populating initial two weeks"
+        );
 
         const today = new Date();
         const lastSunday = new Date(today);
         const dayOfWeek = today.getDay();
 
-        lastSunday.setDate(today.getDate() - dayOfWeek);
+        // Go back 14 days (2 weeks) to the previous previous Sunday
+        lastSunday.setDate(today.getDate() - dayOfWeek - 7);
 
         try {
-            await scrape_halachot_for_week(lastSunday);
-            logger.info("Initial population complete");
+            await scrape_halachot_for_week(lastSunday, 2);
+            logger.info("Initial two-week population complete");
         } catch (err) {
             logger.error("Initial population failed: " + err.message);
             logger.debug(err.stack);
