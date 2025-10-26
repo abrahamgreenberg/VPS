@@ -11,6 +11,6 @@ COPY . .
 RUN npx prisma generate
 
 
-# EXPOSE $API_PORT
+# EXPOSE $BACKEND_API_PORT
 
 CMD ["sh", "-c", "npx prisma migrate deploy && node src/server.js"]

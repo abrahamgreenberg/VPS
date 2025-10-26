@@ -2,14 +2,20 @@ services:
   backend:
     build: ./backend
     ports:
-      - "127.0.0.1:5002:5002"
+      - "127.0.0.1:${BACKEND_API_PORT}:${BACKEND_API_PORT}"
     env_file: 
       .env
     environment:
-      DATABASE_URL: ${DATABASE_URL}
-      OPEN_API_KEY: ${OPEN_API_KEY}
-      LOG_LEVEL: ${LOG_LEVEL:-info}
-      API_PORT: ${API_PORT}
+      BACKEND_DATABASE_URL: ${BACKEND_DATABASE_URL}
+      BACKEND_OPEN_API_KEY: ${BACKEND_OPEN_API_KEY}
+      BACKEND_LOG_LEVEL: info
+      BACKEND_API_PORT: ${BACKEND_API_PORT}
+      BACKEND_WRITE_TO_DB: "true"
+      BACKEND_CLEAR_LOGS_ON_START: "false"
+      BACKEND_PROCESS_WITH_AI: "true"
+      BACKEND_AI_MAX_ATTEMPTS: ${BACKEND_AI_MAX_ATTEMPTS}
+      BACKEND_POPULATE_INITIAL_DATABASE: "true"
+      BACKEND_CORS_ALLOWED_URL: ${BACKEND_CORS_ALLOWED_URL}
     volumes:
       - logs:/app/logs
     networks :
@@ -18,11 +24,11 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "127.0.0.1:5001:80"
+      - "127.0.0.1:${FRONTEND_API_PORT}:80"
     env_file: 
       .env
     environment:
-      VITE_API_URL: "${VITE_API_URL}"
+      VITE_FRONTEND_API_URL: "${VITE_FRONTEND_API_URL}"
     depends_on:
       - backend
     networks:           

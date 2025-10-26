@@ -7,11 +7,11 @@ import { createLogger } from "../logger.js";
 // Create a logger specific to this file
 const logger = createLogger("openai");
 
-const openai = new OpenAI({ apiKey: process.env.OPEN_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.BACKEND_OPEN_API_KEY });
 
 const main = async (halachaObj) => {
     logger.info("Starting Hebrew → English translation job");
-    const maxAttempts = parseInt(process.env.AI_MAX_ATTEMPTS, 10) || 3;
+    const maxAttempts = parseInt(process.env.BACKEND_AI_MAX_ATTEMPTS, 10) || 3;
     logger.debug(`Max attempts set to ${maxAttempts}`);
     let attempt = 0;
     let lastError = null;

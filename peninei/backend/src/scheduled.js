@@ -14,8 +14,10 @@ Date.prototype.addDays = function (days) {
 
 const prisma = new PrismaClient();
 
-const WRITE_TO_DB = process.env.WRITE_TO_DB === "true";
-const PROCESS_WITH_AI = process.env.PROCESS_WITH_AI === "true";
+const BACKEND_WRITE_TO_DB = process.env.BACKEND_WRITE_TO_DB === "true";
+const BACKEND_PROCESS_WITH_AI = process.env.BACKEND_PROCESS_WITH_AI === "true";
+const BACKEND_POPULATE_INITIAL_DATABASE =
+    process.env.BACKEND_POPULATE_INITIAL_DATABASE === "true";
 
 const scrape_halachot = async (date) => {
     logger.info(`Starting scrape for ${date.toDateString()}`);
@@ -47,7 +49,7 @@ const scrape_halachot = async (date) => {
             try {
                 let translated = null;
                 let enTitle = null;
-                if (PROCESS_WITH_AI) {
+                if (BACKEND_PROCESS_WITH_AI) {
                     // Pass both heTitle and heText to ai
                     const aiResult = await ai({
                         heTitle: subtitle,
@@ -86,9 +88,9 @@ const scrape_halachot = async (date) => {
                     book: { connect: { id: bookRecord.id } }, // link to Book
                 };
 
-                if (!WRITE_TO_DB) {
+                if (!BACKEND_WRITE_TO_DB) {
                     logger.warn(
-                        "WRITE_TO_DB is not true, skipping database writes."
+                        "BACKEND_WRITE_TO_DB is not true, skipping database writes."
                     );
                     logger.debug(halachaData);
 
@@ -103,7 +105,7 @@ const scrape_halachot = async (date) => {
                 logger.debug("---- TEXT ---- ");
                 logger.debug(halachaRecord);
 
-                if (PROCESS_WITH_AI && translated) {
+                if (BACKEND_PROCESS_WITH_AI && translated) {
                     await prisma.halachaLine.createMany({
                         data: translated.map((t) => ({
                             ...t,
@@ -114,7 +116,7 @@ const scrape_halachot = async (date) => {
                     logger.info(`Saved ${translated.length} translation lines`);
                 } else {
                     logger.info(
-                        "PROCESS_WITH_AI is not true, skipping AI processing."
+                        "BACKEND_PROCESS_WITH_AI is not true, skipping AI processing."
                     );
                 }
             } catch (err) {
@@ -167,8 +169,7 @@ const main = async () => {
         }
     });
 
-    const halachotCount = await prisma.halacha.count();
-    if (halachotCount === 0) {
+    if (BACKEND_POPULATE_INITIAL_DATABASE) {
         logger.warn("No halachot found in database — populating initial week");
 
         const today = new Date();
@@ -185,7 +186,9 @@ const main = async () => {
             logger.debug(err.stack);
         }
     } else {
-        logger.info(`Database already contains ${halachotCount} halachot`);
+        logger.info(
+            `BACKEND_POPULATE_INITIAL_DATABASE not enabled, skipping initial population`
+        );
     }
 };
 

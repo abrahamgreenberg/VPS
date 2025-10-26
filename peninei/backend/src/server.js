@@ -22,9 +22,10 @@ scheduler(); // start scheduled jobs
 const app = express();
 const prisma = new PrismaClient();
 
-if (process.env.ALLOW_CORS === "true") {
+const allowedOrigin = process.env.BACKEND_CORS_ALLOWED_URL;
+if (allowedOrigin) {
     app.use((req, res, next) => {
-        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Origin", allowedOrigin);
         res.header(
             "Access-Control-Allow-Methods",
             "GET,PUT,POST,DELETE,OPTIONS"
@@ -38,12 +39,7 @@ if (process.env.ALLOW_CORS === "true") {
         }
         next();
     });
-    logger.info("CORS enabled for all origins (ALLOW_CORS=true)");
-
-    app.use((req, res, next) => {
-        res.setHeader("Cache-Control", "no-store");
-        next();
-    });
+    logger.info(`CORS enabled for origin: ${allowedOrigin} (BACKEND_CORS_ALLOWED_URL)`);
 }
 
 app.use(express.json());
@@ -152,7 +148,7 @@ app.get("/api/available-dates", async (req, res) => {
 // ---------------------------
 // Start server
 // ---------------------------
-const PORT = process.env.API_PORT || 5002;
+const PORT = process.env.BACKEND_API_PORT || 5002;
 app.listen(PORT, () => {
     logger.info(`Server running on http://localhost:${PORT}`);
 });

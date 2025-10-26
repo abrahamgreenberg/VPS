@@ -6,5 +6,7 @@ TODO:
 -   fix gradient on mobile
 -   design logo
 -   install as app
+-   cors
+-   docker compose & host
 -   add authentication
 -   you're done :)

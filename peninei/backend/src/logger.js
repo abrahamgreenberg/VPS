@@ -7,7 +7,7 @@ import fs from "fs";
 dotenv.config(); // load .env
 
 // Clear log file if requested
-if (process.env.CLEAR_LOGS_ON_START === "true") {
+if (process.env.BACKEND_CLEAR_LOGS_ON_START === "true") {
     const logPath = path.resolve("logs", "app.log");
     try {
         fs.writeFileSync(logPath, "");
@@ -62,7 +62,7 @@ const logFormat = winston.format.printf(
 // Create a logger factory
 // ==========================
 export function createLogger(file = "app") {
-    const logLevel = process.env.LOG_LEVEL || "info";
+    const logLevel = process.env.BACKEND_LOG_LEVEL || "info";
 
     return winston.createLogger({
         level: logLevel,
