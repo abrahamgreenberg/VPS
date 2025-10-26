@@ -7,6 +7,10 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+
+ARG VITE_FRONTEND_API_URL
+ENV VITE_FRONTEND_API_URL=$VITE_FRONTEND_API_URL
+
 RUN npm run build
 
 # Stage 2: Serve with nginx

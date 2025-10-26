@@ -115,6 +115,15 @@ const scrape_halachot = async (date) => {
             try {
                 let translated = null;
                 let enTitle = null;
+
+                const existing = await prisma.halacha.findUnique({
+                    where: { url },
+                });
+                if (existing) {
+                    logger.info(`Skipping existing halacha: ${subtitle}`);
+                    continue;
+                }
+
                 if (BACKEND_PROCESS_WITH_AI) {
                     // Pass both heTitle and heText to ai
                     const aiResult = await ai({
@@ -133,14 +142,6 @@ const scrape_halachot = async (date) => {
                     }
                     enTitle = aiResult.enTitle;
                     translated = aiResult.lines;
-                }
-
-                const existing = await prisma.halacha.findUnique({
-                    where: { url },
-                });
-                if (existing) {
-                    logger.info(`Skipping existing halacha: ${subtitle}`);
-                    continue;
                 }
 
                 const halachaData = {

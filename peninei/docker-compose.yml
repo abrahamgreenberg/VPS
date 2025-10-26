@@ -22,7 +22,10 @@ services:
       - proxy-network
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_FRONTEND_API_URL: ${VITE_FRONTEND_API_URL}
     ports:
       - "127.0.0.1:${FRONTEND_API_PORT}:80"
     env_file: 
