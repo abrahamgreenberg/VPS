@@ -68,7 +68,7 @@ app.get(
         failureRedirect: "/auth/failure",
         session: true,
     }),
-    async (req, res, next) => {
+    async (req, res) => {
         let state;
         try {
             state = JSON.parse(req.query.state);
@@ -78,28 +78,9 @@ app.get(
         const { origin, next: nextUrl } = state || {};
         if (!origin) return res.status(400).send("Missing origin");
 
-        const subdomain = origin.split(".")[0];
-        const site = await prisma.website.findUnique({
-            where: { subdomain },
-        });
-
-        if (!site) return res.status(404).send("Unknown site");
-        const target = `http://${site.targetService}:${site.targetPort}`;
-        console.log(
-            `🔀 Proxying original request for ${subdomain} to ${target}${nextUrl}`
-        );
-
-        // Proxy the original intended path (nextUrl) to the backend
-        if (!proxyCache[target]) {
-            proxyCache[target] = createProxyMiddleware({
-                target,
-                changeOrigin: true,
-            });
-        }
-
-        // Manually rewrite the URL to the original intended path
-        req.url = decodeURIComponent(nextUrl || "/");
-        return proxyCache[target](req, res, next);
+        // Redirect to the original subdomain and path after login
+        const redirectUrl = `https://${origin}${nextUrl || "/"}`;
+        return res.redirect(redirectUrl);
     }
 );
 
