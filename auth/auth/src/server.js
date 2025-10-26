@@ -51,11 +51,13 @@ passport.use(
 
 // 🧭 Login route
 app.get("/auth/login", (req, res, next) => {
-    // Pass origin as state if present
+    // Pass both origin and next as state
     const origin = req.query.origin;
+    const nextUrl = req.query.next || "/";
+    const state = JSON.stringify({ origin, next: nextUrl });
     passport.authenticate("google", {
         scope: ["email", "profile"],
-        state: origin || undefined,
+        state,
     })(req, res, next);
 });
 
@@ -67,10 +69,13 @@ app.get(
         session: true,
     }),
     async (req, res, next) => {
-        const origin = req.query.state;
-        console.log("OAuth state (origin):", origin);
-        console.log("Proxying after successful auth");
-
+        let state;
+        try {
+            state = JSON.parse(req.query.state);
+        } catch {
+            return res.status(400).send("Invalid state");
+        }
+        const { origin, next: nextUrl } = state || {};
         if (!origin) return res.status(400).send("Missing origin");
 
         const subdomain = origin.split(".")[0];
@@ -80,14 +85,20 @@ app.get(
 
         if (!site) return res.status(404).send("Unknown site");
         const target = `http://${site.targetService}:${site.targetPort}`;
-        console.log(`🔀 Proxying request for ${subdomain} to ${target}`);
+        console.log(
+            `🔀 Proxying original request for ${subdomain} to ${target}${nextUrl}`
+        );
+
+        // Proxy the original intended path (nextUrl) to the backend
         if (!proxyCache[target]) {
             proxyCache[target] = createProxyMiddleware({
                 target,
                 changeOrigin: true,
-                // Optionally, add more proxy options here
             });
         }
+
+        // Manually rewrite the URL to the original intended path
+        req.url = decodeURIComponent(nextUrl || "/");
         return proxyCache[target](req, res, next);
     }
 );
@@ -126,11 +137,11 @@ const requireAuth = async (req, res, next) => {
     // If whitelist required → ensure user authenticated + whitelisted
     console.log("Whitelist required:", site.whitelistRequired);
     if (site.whitelistRequired) {
-        console.log("User:", req.user);
         if (!req.isAuthenticated?.() || !req.user?.emails?.[0]?.value) {
-            console.log("User not authenticated, redirecting to login");
+            // Store original url (including path/query) as state
+            const originalUrl = encodeURIComponent(req.originalUrl);
             return res.redirect(
-                `https://auth.${DOMAIN}/auth/login?origin=${host}`
+                `https://auth.${DOMAIN}/auth/login?origin=${host}&next=${originalUrl}`
             );
         }
 
