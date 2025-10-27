@@ -38,7 +38,7 @@ export default function App() {
 
     return (
         <div
-            className="min-h-screen bg-gradient-to-br from-purple-200/60 via-white/80 to-indigo-400/60 flex flex-col items-center py-10 px-4 relative"
+            className="min-h-screen bg-gradient-to-br from-purple-200/60 via-white/80 to-purple-400/60 flex flex-col items-center py-10 px-4 relative"
             style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
         >
             {/* Top bar: calendar selector + tab group */}
@@ -49,12 +49,12 @@ export default function App() {
                 />
                 <div className="flex mt-4 sm:mt-0">
                     <button
-                        className={`px-4 py-2 rounded-l border border-indigo-600 transition-colors duration-100
-                            ${
-                                displayMode === "he"
-                                    ? "bg-purple-600 text-white"
-                                    : "bg-white text-purple-600"
-                            }`}
+                        className={`px-4 py-2 rounded-l border border-purple-600 transition-colors duration-100 text-purple-600
+                                    ${
+                                        displayMode === "he"
+                                            ? "bg-purple-200 font-bold"
+                                            : "bg-white"
+                                    }`}
                         style={{
                             borderRightWidth: 0,
                         }}
@@ -63,11 +63,11 @@ export default function App() {
                         עברית בלבד
                     </button>
                     <button
-                        className={`px-4 py-2 border-t border-b border-indigo-600 transition-colors duration-100
+                        className={`px-4 py-2 border-t border-b border-purple-600 transition-colors duration-100  text-purple-600 
                                     ${
                                         displayMode === "both"
-                                            ? "bg-purple-600 text-white"
-                                            : "bg-white text-purple-600"
+                                            ? "bg-purple-200 font-bold"
+                                            : "bg-white"
                                     }`}
                         style={{
                             borderLeftWidth: 0,
@@ -77,15 +77,14 @@ export default function App() {
                         Both
                     </button>
                     <button
-                        className={`px-4 py-2 rounded-r border border-indigo-600 transition-colors duration-100
-                            ${
-                                displayMode === "en"
-                                    ? "bg-purple-600 text-white"
-                                    : "bg-white text-purple-600"
-                            }`}
+                        className={`px-4 py-2 rounded-r border border-purple-600 transition-colors duration-100 text-purple-600 
+                                    ${
+                                        displayMode === "en"
+                                            ? "bg-purple-200 font-bold"
+                                            : "bg-white"
+                                    }`}
                         style={{
                             borderLeftWidth: 0,
-                            borderRightWidth: 0,
                         }}
                         onClick={() => setDisplayMode("en")}
                     >

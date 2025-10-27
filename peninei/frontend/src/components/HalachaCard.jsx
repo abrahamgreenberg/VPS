@@ -12,7 +12,7 @@ export default function HalachaCard({ halacha, displayMode }) {
                         href={halacha.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:underline hover:text-indigo-700 transition-colors"
+                        className="hover:underline hover:text-purple-700 transition-colors"
                     >
                         {halacha.heTitle}
                     </a>

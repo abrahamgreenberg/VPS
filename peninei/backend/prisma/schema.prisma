@@ -21,6 +21,7 @@ model Halacha {
   heText        String
   url           String        @unique
   date          DateTime      @default(now()) @db.Date
+  parseWithAi   Boolean       @default(false)
   chapterNumber Int?
   halachaNumber Int?
   bookId        Int?

@@ -27,8 +27,10 @@ const main = async (halachaObj) => {
                 messages: [
                     {
                         role: "system",
-                        content:
-                            "You are a helpful assistant that translates Hebrew halachic texts. Respond only with JSON in the specified schema. Just output raw JSON with no code blocks.",
+                        content: `You are an expert hebrew to english translator.
+You translate religious texts with high accuracy and attention to detail, translating nuances and context effectively.
+For example references to Jewish law -> Halacha, God -> Hashem, etc.
+Respond only with JSON in the specified schema. Just output raw JSON with no code blocks. Ensure the JSON is valid.`,
                     },
                     {
                         role: "user",
@@ -39,7 +41,7 @@ const main = async (halachaObj) => {
 }
 Title: ${JSON.stringify(heTitle)}
 Text: ${JSON.stringify(heText)}
-Translate the title to English as 'enTitle', and translate the text line by line (3-6 words per line) as 'lines'. In the hebrew field, include just the words you translated in that line. Ensure the JSON is valid.`,
+Translate the title to English as 'enTitle', and translate the text phrase by phrase (a few words that would be readable as a short phrase) as 'lines'. In the hebrew field, include just the words you translated in that line.`,
                     },
                 ],
                 reasoning_effort: "minimal",

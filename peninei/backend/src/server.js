@@ -5,7 +5,7 @@
 // const { createLogger } = require("./logger");
 import express from "express";
 import { PrismaClient } from "@prisma/client";
-import scheduler from "./scheduled.js";
+import scheduler from "./scheduled/index.js";
 import { createLogger } from "./logger.js";
 
 // Optionally load .env if using dotenv (uncomment if needed)
