@@ -160,6 +160,7 @@ export const scrape_halachot_for_date_range = async (startDate, endDate) => {
 
     let currentDate = new Date(startDate);
     currentDate.setHours(6, 0, 0, 0); // Set to 6 AM to avoid timezone issues
+    endDate.setHours(6, 0, 0, 0); // Set to 6 AM to avoid timezone issues
 
     while (currentDate <= endDate) {
         logger.info(`Scraping date: ${currentDate.toDateString()}`);
