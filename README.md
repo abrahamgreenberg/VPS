@@ -21,7 +21,7 @@
 
 -   [x] I need to sort out my IDE. Setup profiles & extensions properly.
 -   [x] Merge all projects into a [monorepo](https://chatgpt.com/c/690265e2-e6e0-832e-9c95-1e4dc8ef236f).
--   [ ] Set reminders to pay for VPS, Domain & ai services.
+-   [x] Set reminders to pay for VPS, Domain & ai services.
 
 ### Stage 2: Security basic
 
