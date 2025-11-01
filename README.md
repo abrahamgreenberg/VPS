@@ -1,26 +1,4 @@
-# Private VPS Roadmap
-
-This repository contains notes and a roadmap for setting up and maintaining a private VPS with various services, scrapers, and a frontend UI.
-
-## TODO:
-
--   Create PG admin user
--   Finish off peninei scraper
-    -   Load Vite frontend through the configured domain.
-    -   Enable CORS for API requests.
-    -   Finish off UI
-
-## Project Overview
-
-This VPS hosts multiple services and applications:
-
--   **Backend & Database:** Node.js / Express + PostgreSQL
--   **Frontend:** Vite + React.js + Tailwind
--   **Proxies & Routing:** Nginx / Nginx Proxy Manager
--   **Scrapers:** Peninei Halacha, Rambam Mishneh Torah
--   **Additional Features:** Codeshare website, mail server, authentication
-
----
+# Private VPS
 
 ## Services
 
@@ -28,73 +6,64 @@ This VPS hosts multiple services and applications:
 -   **Database:** PostgreSQL + PgAdmin
 -   **Proxy:** Nginx / Nginx Proxy Manager
 -   **Frontend:** Vite + React.js + Tailwind
--   **Email Server:** Optional Docker email server for sending emails
 
----
+## Road Map
 
-## Scrapers
+### Current deployed containers
 
-### Peninei Halacha
+-   Peninei halacha scraper
+-   PG Admin
+-   Postgres
+-   Nginx proxy manager (npm)
+-   Portainer
 
--   Scrapes Hebrew texts from [Peninei Halacha](https://ph.yhb.org.il).
--   Stores data in PostgreSQL.
--   Includes translation workflow for English.
+### Stage 1: Setup improvements
 
-### Rambam Mishneh Torah
+-   [ ] I need to sort out my IDE. Setup profiles & extensions properly.
+-   [ ] Merge all projects into a [monorepo](https://chatgpt.com/c/690265e2-e6e0-832e-9c95-1e4dc8ef236f).
+-   [ ] Set reminders to pay for VPS, Domain & ai services.
 
--   Scrape daily content automatically.
--   Store and log data in PostgreSQL for easy access.
+### Stage 2: Security basic
 
----
+-   [ ] Build nodejs reverse proxy with authentication on admin pannels (e.g nginx proxy manager, pgadmin)
+    -   [ ] Npm setup:
+        -   [ ] Authenticated routes: req -> npm (ssl) -> auth server -> service
+        -   [ ] Unauthenticated routes: req -> npm (ssl) -> service
+-   [ ] Add rate limiting to pneinei halacha scraper to prevent abuse.
+-   [ ] Add basic monitoring to peninei halacha scraper (e.g request count, response times, error rates).
+-   [ ] Add caching to peninei halacha scraper to improve performance and reduce load on the server.
+        <br/>_(at this point peninei halacha scraper is able to be advertised as a service 🎉)_
 
-## UI Development
+### Stage 3: Security+
 
--   **Main Page:** List all available pages from the database.
--   **Frontend:** Vite + React.js
--   **Features:**
+-   [ ] Make reverse proxy in go for 🔥 better performance
+    -   [ ] Npm setup:
+        -   [ ] Authenticated routes: req -> npm (ssl) -> node js auth -> go proxy -> auth server -> service
+        -   [ ] Unauthenticated routes: req -> npm (ssl) -> service
 
-    -   View website content
-    -   Access scrapers’ data
-    -   API for services
+### Stage 4: Security++
 
----
-
-## Security
-
--   Limit exposed ports.
--   Consider adding **Google Authentication** for all routes.
--   Run services behind a reverse proxy (Nginx) with SSL.
-
----
-
-## Email Setup
-
--   Explore Docker email servers (e.g., Mailu, Mailcow).
--   Optional: Configure VPS mail server for notifications and user communication.
-
----
-
-## Service API
-
--   Define a standard API for backend services.
--   Implement logging for all service calls.
-
----
+-   [ ] Add authentication to go reverse proxy for 🔥🔥 best performance
+    -   [ ] Npm setup:
+        -   [ ] Authenticated routes: req -> npm (ssl) -> go auth proxy -> auth server -> service
+        -   [ ] Unauthenticated routes: req -> npm (ssl) -> service
+-   [ ] Look into adding ssl in go proxy for 🔥🔥🔥 ultimate performance
+    -   [ ] VPS setup:
+        -   [ ] Authenticated routes: req -> go ssl auth proxy -> auth server -> service
+        -   [ ] Unauthenticated routes: req -> go ssl proxy -> service
 
 ## Future Projects
 
--   **Codeshare Website:** Share git projects, files, or code segments.
--   **Automation:** Extend scrapers to other texts.
--   **Enhanced Security:** Continuous improvement and monitoring.
+(in a particular order, the order i want to do them the most in)
 
----
+-   [ ] Learn Next.js
+-   [ ] Make home page to show off the services, make it look nice :)
+-   [ ] Setup monitoring for server resources.
+-   [ ] Make admin panel to _stuff_
+-   [ ] Setup automated backups for Postgres database.
+-   [ ] **Automation:** Extend scrapers to other texts, e.g mishneh torah.
+-   [ ] **Codeshare Website:** Share git projects, files, or code segments.
+-   [ ] Look into pipelines for CI/CD.
+-   [ ] Setup email server for the coolest email address ever.
 
-## Notes
-
--   All services should run in Docker for portability.
--   Keep backups of databases and scraper data.
--   Regularly update services and dependencies for security.
-
----
-
-**_To infitity and beyond🚀_**
+**_To infinity and beyond🚀_**
