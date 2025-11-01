@@ -1,19 +1,11 @@
-// server.js
-// const express = require("express");
-// const { PrismaClient } = require("@prisma/client");
-// const scheduler = require("./scheduled");
-// const { createLogger } = require("./logger");
+// TODO: MAKE MIDDLEWARE TO HANDLE INTERNAL SERVER ERRORS
+
+// server.ts
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import scheduler from "./scheduled/index.js";
 import { createLogger } from "./logger.js";
-
-// Optionally load .env if using dotenv (uncomment if needed)
-// import dotenv from "dotenv";
-// dotenv.config();
-// ---------------------------
-// Optional: Allow CORS if env var is set
-// ---------------------------
+import { CacheManager } from "./utils/CacheManager.ts";
 
 const logger = createLogger("server");
 
@@ -22,6 +14,49 @@ scheduler(); // start scheduled jobs
 const app = express();
 const prisma = new PrismaClient();
 
+const BACKEND_DEBUG_REQUESTS = process.env.BACKEND_DEBUG_REQUESTS === "true";
+const BACKEND_DEBUG_RESULTS = process.env.BACKEND_DEBUG_RESULTS === "true";
+
+const halachaCache = new CacheManager(
+    async (date: Date) => {
+        const halachas = await prisma.halacha.findMany({
+            where: { date: date },
+            include: { lines: true },
+        });
+        return halachas;
+    },
+    6 * 60 * 60 * 1000,
+    "halachaCache"
+);
+
+const availableHalachotCache = new CacheManager(
+    async (dateParam: string) => {
+        const [year, m] = dateParam.split("-").map(Number);
+        const start = new Date(Date.UTC(year, m - 1, 1));
+        const end = new Date(Date.UTC(year, m, 1));
+        const halachot = await prisma.halacha.findMany({
+            where: {
+                date: {
+                    gte: start,
+                    lt: end,
+                },
+            },
+            include: { lines: true },
+        });
+
+        const dates = [
+            ...new Set(halachot.map((e) => e.date.toISOString().split("T")[0])),
+        ];
+
+        return dates;
+    },
+    6 * 60 * 60 * 1000,
+    "availableHalachotCache"
+);
+
+// ---------------------------
+// Optional: Allow CORS if env var is set
+// ---------------------------
 const allowedOrigin = process.env.BACKEND_CORS_ALLOWED_URL;
 if (allowedOrigin) {
     app.use((req, res, next) => {
@@ -50,6 +85,7 @@ app.use(express.json());
 // Middleware: log incoming requests
 // ---------------------------
 app.use((req, res, next) => {
+    if (!BACKEND_DEBUG_REQUESTS) return next();
     const start = Date.now();
     res.on("finish", () => {
         const duration = Date.now() - start;
@@ -81,24 +117,19 @@ app.get("/api/halachas/:date", async (req, res) => {
     }
 
     try {
-        // For @db.Date, Prisma expects a Date object
-        const halachot = await prisma.halacha.findMany({
-            where: {
-                date: date,
-            },
-            include: { lines: true },
-        });
+        const halachot = await halachaCache.get(date);
 
-        logger.debug(halachot);
+        if (BACKEND_DEBUG_RESULTS) logger.debug(halachot);
         logger.info(
             `Returned ${halachot.length} halachot for date ${dateParam}`
         );
         return res.json(halachot);
     } catch (err) {
+        const error = err as Error;
         logger.error(
-            `Error fetching halachot for date ${dateParam}: ${err.message}`
+            `Error fetching halachot for date ${dateParam}: ${error.message}`
         );
-        logger.error(err);
+        logger.error(error);
         return res.status(500).json({ error: "Internal server error" });
     }
 });
@@ -107,43 +138,20 @@ app.get("/api/halachas/:date", async (req, res) => {
 // GET available dates (optionally by month)
 // ---------------------------
 app.get("/api/available-dates", async (req, res) => {
-    const month = req.query.month;
-    let where = {};
+    const month = req.query.month as string | undefined;
 
-    if (month) {
-        const [year, m] = month.split("-").map(Number);
-        // Use a date range for the month: gte first of month, lt first of next month
-        const start = new Date(Date.UTC(year, m - 1, 1));
-        const end = new Date(Date.UTC(year, m, 1));
-        where = {
-            date: {
-                gte: start,
-                lt: end,
-            },
-        };
-        logger.debug(`Filtering available dates for month: ${month}`);
-    }
+    if (!month)
+        return res
+            .status(400)
+            .json({ error: "Month query parameter is required" });
 
     try {
-        const events = await prisma.halacha.findMany({
-            where,
-            select: { date: true },
-        });
-
-        const dates = [
-            ...new Set(events.map((e) => e.date.toISOString().split("T")[0])),
-        ];
-
-        logger.info(
-            `Returned ${dates.length} available dates${
-                month ? " for " + month : ""
-            }`
-        );
-
+        const dates = await availableHalachotCache.get(month);
         return res.json({ dates });
     } catch (err) {
-        logger.error(`Error fetching available dates: ${err.message}`);
-        logger.debug(err.stack);
+        const error = err as Error;
+        logger.error(`Error fetching available dates: ${error.message}`);
+        logger.error(error);
         return res.status(500).json({ error: "Internal server error" });
     }
 });

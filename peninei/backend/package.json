@@ -1,32 +1,33 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "src/server.js",
-  "scripts": {
-    "dev": "ts-node src/server.js",
-    "build": "tsc"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/node": "^24.9.2",
-    "prisma": "^6.17.1",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.17.1",
-    "axios": "^1.12.2",
-    "cheerio": "^1.1.2",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "jsdom": "^27.0.1",
-    "node-schedule": "^2.1.1",
-    "nodemon": "^3.1.10",
-    "openai": "^6.6.0",
-    "winston": "^3.18.3"
-  },
-  "type": "module"
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/server.ts",
+    "scripts": {
+        "dev": "ts-node src/server.ts",
+        "build": "tsc"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/node": "^24.9.2",
+        "prisma": "^6.17.1",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.3"
+    },
+    "dependencies": {
+        "@prisma/client": "^6.17.1",
+        "@types/express": "^5.0.5",
+        "axios": "^1.12.2",
+        "cheerio": "^1.1.2",
+        "dotenv": "^17.2.3",
+        "express": "^5.1.0",
+        "jsdom": "^27.0.1",
+        "node-schedule": "^2.1.1",
+        "nodemon": "^3.1.10",
+        "openai": "^6.6.0",
+        "winston": "^3.18.3"
+    },
+    "type": "module"
 }
