@@ -19,8 +19,8 @@
 
 ### Stage 1: Setup improvements
 
--   [ ] I need to sort out my IDE. Setup profiles & extensions properly.
--   [ ] Merge all projects into a [monorepo](https://chatgpt.com/c/690265e2-e6e0-832e-9c95-1e4dc8ef236f).
+-   [x] I need to sort out my IDE. Setup profiles & extensions properly.
+-   [x] Merge all projects into a [monorepo](https://chatgpt.com/c/690265e2-e6e0-832e-9c95-1e4dc8ef236f).
 -   [ ] Set reminders to pay for VPS, Domain & ai services.
 
 ### Stage 2: Security basic
@@ -64,6 +64,7 @@
 -   [ ] **Automation:** Extend scrapers to other texts, e.g mishneh torah.
 -   [ ] **Codeshare Website:** Share git projects, files, or code segments.
 -   [ ] Look into pipelines for CI/CD.
+-   [ ] Scripts to backup database, delete log files & get logs authomatically.
 -   [ ] Setup email server for the coolest email address ever.
 
 **_To infinity and beyond🚀_**
