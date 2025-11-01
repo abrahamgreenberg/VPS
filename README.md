@@ -66,5 +66,6 @@
 - [ ] Look into pipelines for CI/CD.
 - [ ] Scripts to backup database, delete log files & get logs authomatically.
 - [ ] Setup email server for the coolest email address ever.
+- [ ] start typescript port of peninei
 
 **_To infinity and beyond🚀_**

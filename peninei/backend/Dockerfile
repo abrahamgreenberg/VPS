@@ -2,13 +2,15 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-
-RUN npx prisma generate
+RUN pnpm prisma generate
 
 
 # EXPOSE $BACKEND_API_PORT
@@ -17,8 +19,8 @@ RUN npx prisma generate
 # 1. Connect to the running backend container:
 #    docker compose run --rm backend sh
 # 2. Run one of the following (replace with your migration name):
-#    npx prisma migrate resolve --rolled-back "20251025220827_add_chapter_and_halacha_number"
+#    pnpm prisma migrate resolve --rolled-back "20251025220827_add_chapter_and_halacha_number"
 #    or, if DB is empty and you want to reset:
-#    npx prisma migrate reset
+#    pnpm prisma migrate reset
 
-CMD ["sh", "-c", "npx prisma migrate deploy && node src/server.js"]
+CMD ["sh", "-c", "pnpm prisma migrate deploy && node src/server.js"]

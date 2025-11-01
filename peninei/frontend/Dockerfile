@@ -3,15 +3,18 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
 ARG VITE_FRONTEND_API_URL
 ENV VITE_FRONTEND_API_URL=$VITE_FRONTEND_API_URL
 
-RUN npm run build
+RUN pnpm run build
 
 # Stage 2: Serve with nginx
 FROM nginx:alpine
