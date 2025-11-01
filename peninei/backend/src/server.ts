@@ -7,6 +7,10 @@ import { CacheManager } from "./utils/CacheManager.ts";
 import { asyncHandler, errorHandler } from "./middleware/errorHandler.ts";
 import { corsMiddleware, initializeCors } from "./middleware/cors.ts";
 import { requestLogger } from "./middleware/requestLogger.ts";
+import {
+    rateLimiter,
+    initializeRateLimiter,
+} from "./middleware/rateLimiter.ts";
 
 scheduler(); // start scheduled jobs
 
@@ -57,7 +61,9 @@ const availableHalachotCache = new CacheManager(
 // Middleware
 // ---------------------------
 initializeCors();
+initializeRateLimiter();
 app.use(corsMiddleware);
+app.use(rateLimiter);
 app.use(express.json());
 app.use(requestLogger);
 
