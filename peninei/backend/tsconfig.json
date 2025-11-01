@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": false, // disable strict typing at first
+    "esModuleInterop": true,
+    "allowJs": true, // ✅ allow mixing .js and .ts
+    "checkJs": false, // or true if you want JS checked too
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
