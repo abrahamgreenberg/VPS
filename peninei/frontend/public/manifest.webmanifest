@@ -1,0 +1,30 @@
+{
+    "name": "Peninei Halacha",
+    "short_name": "Peninei Halacha",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#7c3aed",
+    "description": "Daily halacha from Peninei Halacha.",
+    "version": "1.0.1",
+    "icons": [
+        {
+            "src": "/logo_256.png",
+            "sizes": "256x256",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/logo_192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/logo_512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}
