@@ -1,20 +1,19 @@
-// TODO: MAKE MIDDLEWARE TO HANDLE INTERNAL SERVER ERRORS
-
 // server.ts
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import scheduler from "./scheduled/index.js";
 import { createLogger } from "./logger.js";
 import { CacheManager } from "./utils/CacheManager.ts";
-
-const logger = createLogger("server");
+import { asyncHandler, errorHandler } from "./middleware/errorHandler.ts";
+import { corsMiddleware, initializeCors } from "./middleware/cors.ts";
+import { requestLogger } from "./middleware/requestLogger.ts";
 
 scheduler(); // start scheduled jobs
 
+const logger = createLogger("server");
 const app = express();
 const prisma = new PrismaClient();
 
-const BACKEND_DEBUG_REQUESTS = process.env.BACKEND_DEBUG_REQUESTS === "true";
 const BACKEND_DEBUG_RESULTS = process.env.BACKEND_DEBUG_RESULTS === "true";
 
 const halachaCache = new CacheManager(
@@ -55,46 +54,12 @@ const availableHalachotCache = new CacheManager(
 );
 
 // ---------------------------
-// Optional: Allow CORS if env var is set
+// Middleware
 // ---------------------------
-const allowedOrigin = process.env.BACKEND_CORS_ALLOWED_URL;
-if (allowedOrigin) {
-    app.use((req, res, next) => {
-        res.header("Access-Control-Allow-Origin", allowedOrigin);
-        res.header(
-            "Access-Control-Allow-Methods",
-            "GET,PUT,POST,DELETE,OPTIONS"
-        );
-        res.header(
-            "Access-Control-Allow-Headers",
-            "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-        );
-        if (req.method === "OPTIONS") {
-            return res.sendStatus(200);
-        }
-        next();
-    });
-    logger.info(
-        `CORS enabled for origin: ${allowedOrigin} (BACKEND_CORS_ALLOWED_URL)`
-    );
-}
-
+initializeCors();
+app.use(corsMiddleware);
 app.use(express.json());
-
-// ---------------------------
-// Middleware: log incoming requests
-// ---------------------------
-app.use((req, res, next) => {
-    if (!BACKEND_DEBUG_REQUESTS) return next();
-    const start = Date.now();
-    res.on("finish", () => {
-        const duration = Date.now() - start;
-        logger.info(
-            `${req.method} ${req.originalUrl} -> ${res.statusCode} (${duration}ms)`
-        );
-    });
-    next();
-});
+app.use(requestLogger);
 
 // ---------------------------
 // GET halachas by date
@@ -104,19 +69,20 @@ app.get("/api", (req, res) => {
     return res.status(200).json({ result: "Ok!" });
 });
 
-app.get("/api/halachas/:date", async (req, res) => {
-    const dateParam = req.params.date;
-    const date = new Date(dateParam);
-    logger.debug(`Fetching halachot for date: ${dateParam}`);
-    logger.debug(dateParam);
-    logger.debug(date);
+app.get(
+    "/api/halachas/:date",
+    asyncHandler(async (req, res) => {
+        const dateParam = req.params.date;
+        const date = new Date(dateParam);
+        logger.debug(`Fetching halachot for date: ${dateParam}`);
+        logger.debug(dateParam);
+        logger.debug(date);
 
-    if (isNaN(date.getTime())) {
-        logger.warn(`Invalid date format received: "${dateParam}"`);
-        return res.status(400).json({ error: "Invalid date format" });
-    }
+        if (isNaN(date.getTime())) {
+            logger.warn(`Invalid date format received: "${dateParam}"`);
+            return res.status(400).json({ error: "Invalid date format" });
+        }
 
-    try {
         const halachot = await halachaCache.get(date);
 
         if (BACKEND_DEBUG_RESULTS) logger.debug(halachot);
@@ -124,37 +90,31 @@ app.get("/api/halachas/:date", async (req, res) => {
             `Returned ${halachot.length} halachot for date ${dateParam}`
         );
         return res.json(halachot);
-    } catch (err) {
-        const error = err as Error;
-        logger.error(
-            `Error fetching halachot for date ${dateParam}: ${error.message}`
-        );
-        logger.error(error);
-        return res.status(500).json({ error: "Internal server error" });
-    }
-});
+    })
+);
 
 // ---------------------------
 // GET available dates (optionally by month)
 // ---------------------------
-app.get("/api/available-dates", async (req, res) => {
-    const month = req.query.month as string | undefined;
+app.get(
+    "/api/available-dates",
+    asyncHandler(async (req, res) => {
+        const month = req.query.month as string | undefined;
 
-    if (!month)
-        return res
-            .status(400)
-            .json({ error: "Month query parameter is required" });
+        if (!month)
+            return res
+                .status(400)
+                .json({ error: "Month query parameter is required" });
 
-    try {
         const dates = await availableHalachotCache.get(month);
         return res.json({ dates });
-    } catch (err) {
-        const error = err as Error;
-        logger.error(`Error fetching available dates: ${error.message}`);
-        logger.error(error);
-        return res.status(500).json({ error: "Internal server error" });
-    }
-});
+    })
+);
+
+// ---------------------------
+// Error handling middleware (must be last)
+// ---------------------------
+app.use(errorHandler);
 
 // ---------------------------
 // Start server
