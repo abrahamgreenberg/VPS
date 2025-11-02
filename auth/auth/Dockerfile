@@ -9,10 +9,11 @@ COPY package.json pnpm-lock.yaml* ./
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
 
+# Only copy source in production (dev uses bind mount)
 COPY . .
 
 RUN pnpm prisma generate
 RUN pnpm build && ls -la dist/
 
-# CMD ["sh", "-c", "pnpm prisma migrate deploy && node dist/server.js"]
-CMD ["node", "dist/server.js"]
+# Use dev script in development, otherwise default to production
+CMD ["sh", "-c", "if [ \"$NODE_ENV\" = 'development' ]; then pnpm dev; else node dist/server.js; fi"]
