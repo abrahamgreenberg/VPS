@@ -9,10 +9,10 @@ choice=${choice:-2}
 
 case $choice in
     1)
-        ./deploy_live.sh
+        ./scripts/deploy_live.sh
         ;;
     2)
-        ./deploy_staging.sh
+        ./scripts/deploy_staging.sh
         ;;
     *)
         echo "Invalid choice. Exiting."
