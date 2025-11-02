@@ -24,7 +24,8 @@ const halachaCache = new CacheManager(
     async (date: Date) => {
         const halachas = await prisma.halacha.findMany({
             where: { date: date },
-            include: { lines: true },
+            include: { lines: { orderBy: [{ id: "asc" }] } },
+            orderBy: [{ chapterNumber: "asc" }, { halachaNumber: "asc" }],
         });
         return halachas;
     },
@@ -44,7 +45,6 @@ const availableHalachotCache = new CacheManager(
                     lt: end,
                 },
             },
-            include: { lines: true },
         });
 
         const dates = [
