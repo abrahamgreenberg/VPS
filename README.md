@@ -32,10 +32,11 @@
 - [x] switch to alpine base image for docker containers
   - [x] use pnpm store for other node based containers
   - [x] make scripts for peninei to automate deploying in staging & in production
-- [ ] Build nodejs reverse proxy with authentication on admin pannels (e.g nginx proxy manager, pgadmin)
+- [ ] Build nodejs reverse proxy with authentication on admin pannels (e.g nginx proxy manager, pgadmin) (port auth to typescript)
   - [ ] Npm setup:
     - [ ] Authenticated routes: req -> npm (ssl) -> auth server -> service
-- [ ] Build nodejs reverse proxy with authentication on admin pannels (e.g nginx proxy manager, pgadmin) - [ ] Unauthenticated routes: req -> npm (ssl) -> service
+- [ ] Build nodejs reverse proxy with authentication on admin pannels (e.g nginx proxy manager, pgadmin)
+- [ ] Unauthenticated routes: req -> npm (ssl) -> service
 - [ ] ability to download halacha locally
 
 <br/>_(at this point peninei halacha scraper is able to be advertised as a service 🎉)_

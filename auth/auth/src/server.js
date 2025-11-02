@@ -1,167 +1,110 @@
 import express from "express";
-import session from "express-session";
-import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import { PrismaClient } from "@prisma/client";
-import cookieParser from "cookie-parser";
 
-const prisma = new PrismaClient();
 const app = express();
+const prisma = new PrismaClient();
 
-const PORT = process.env.PORT;
-const DOMAIN = process.env.DOMAIN;
+// TODO: FIX POLLING & INITIAL LOAD
+// Implement dynamic HostMap loading and updating from the database
+// IMPLEMENT GOOGLE AUTHENTCIATION MIDDLEWARE
+// IMPLEMENT WHITELIST CHECKING MIDDLEWARE
+// IMPLEMENT JWT AUTHENTICATION MIDDLEWARE
+// authentication on admin route
+// auto refreshing cache every hour?
+// DONE :D
 
-// Trust proxy if behind a reverse proxy (e.g., nginx, Heroku)
-app.set("trust proxy", 1);
+// Dynamic HostMap that will be populated from database
+const HostMap = new Map();
 
-app.use(cookieParser());
+// Load/reload websites from database into HostMap
+const reloadHostMap = async () => {
+  try {
+    const websites = await prisma.website.findMany();
 
-// 🔐 Session setup
-app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            secure: process.env.NODE_ENV === "production", // true if HTTPS
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        },
-    })
-);
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-// 🧠 Passport setup
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((obj, done) => done(null, obj));
-
-// 🪪 Google OAuth setup
-passport.use(
-    new GoogleStrategy(
-        {
-            clientID: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: `https://auth.${DOMAIN}/auth/callback`,
-        },
-        (accessToken, refreshToken, profile, done) => done(null, profile)
-    )
-);
-
-// Helper for base64url encoding/decoding
-function encodeState(obj) {
-    return Buffer.from(JSON.stringify(obj)).toString("base64url");
-}
-function decodeState(str) {
-    return JSON.parse(Buffer.from(str, "base64url").toString());
-}
-
-// 🧭 Login route
-app.get("/auth/login", (req, res, next) => {
-    const origin = req.query.origin;
-    const nextUrl = req.query.next || "/";
-    const state = encodeState({ origin, next: nextUrl });
-    passport.authenticate("google", {
-        scope: ["email", "profile"],
-        state,
-    })(req, res, next);
-});
-
-// 🧭 Callback
-app.get(
-    "/auth/callback",
-    passport.authenticate("google", {
-        failureRedirect: "/auth/failure",
-        session: true,
-    }),
-    async (req, res) => {
-        let state;
-        try {
-            state = decodeState(req.query.state);
-        } catch {
-            return res.status(400).send("Invalid state");
-        }
-        const { origin, next: nextUrl } = state || {};
-        if (!origin) return res.status(400).send("Missing origin");
-
-        // Redirect to the original subdomain and path after login
-        const redirectUrl = `https://${origin}${nextUrl || "/"}`;
-        return res.redirect(redirectUrl);
-    }
-);
-
-app.get("/auth/failure", (req, res) =>
-    res.status(401).send("Authentication Failed")
-);
-app.get("/auth/logout", (req, res) => {
-    req.logout(() => res.redirect("/"));
-});
-
-// 🧱 Auth Middleware
-const proxyCache = {};
-const requireAuth = async (req, res, next) => {
-    // Debug session/cookie
-    console.log("Session:", req.session);
-    console.log("Cookies:", req.cookies);
-
-    const host = req.headers.host?.replace(/:\d+$/, "");
-    const subdomain = host?.split(".")[0];
-
-    if (!host || !subdomain) return res.status(400).send("Bad request");
-
-    // Skip for auth subdomain
-    if (subdomain === "auth") return next();
-    console.log(`🏠 Incoming request for ${subdomain}`);
-
-    // Find site in DB
-    const site = await prisma.website.findUnique({
-        where: { subdomain },
+    // Clear and repopulate map
+    HostMap.clear();
+    websites.forEach((website) => {
+      HostMap.set(website.subdomain, {
+        target: `http://${website.targetService}:${website.targetPort}`,
+        whitelistRequired: website.whitelistRequired,
+        ...website,
+      });
     });
 
-    if (!site) return res.status(404).send("Unknown site");
-    console.log(`🌐 Incoming request for site:`, site);
-
-    // If whitelist required → ensure user authenticated + whitelisted
-    console.log("Whitelist required:", site.whitelistRequired);
-    if (site.whitelistRequired) {
-        if (!req.isAuthenticated?.() || !req.user?.emails?.[0]?.value) {
-            // Store original url (including path/query) as state
-            const originalUrl = encodeURIComponent(req.originalUrl);
-            return res.redirect(
-                `https://auth.${DOMAIN}/auth/login?origin=${host}&next=${originalUrl}`
-            );
-        }
-
-        const email = req.user.emails[0].value;
-        const user = await prisma.userWhitelist.findUnique({
-            where: { email },
-        });
-        if (!user) {
-            console.log("User not whitelisted:", email);
-            return res.status(403).send("Not authorized");
-        }
-
-        console.log(`✅ Authenticated and authorized user: ${email}`);
-    }
-
-    // Proxy to service
-    const target = `http://${site.targetService}:${site.targetPort}`;
-    console.log(`🔀 Proxying request for ${subdomain} to ${target}`);
-
-    // Cache proxy middleware per target for efficiency
-    if (!proxyCache[target]) {
-        proxyCache[target] = createProxyMiddleware({
-            target,
-            changeOrigin: true,
-            // Optionally, add more proxy options here
-        });
-    }
-    return proxyCache[target](req, res, next);
+    console.log(`HostMap reloaded with ${websites.length} websites`);
+    return { success: true, count: websites.length, timestamp: new Date() };
+  } catch (error) {
+    console.error("Error reloading HostMap:", error);
+    return { success: false, error: error.message };
+  }
 };
 
-// 🧩 Use the middleware for all other routes
-app.use(requireAuth);
+// Manual refresh endpoint - can be triggered from Portainer or any HTTP client
+app.get("/admin/refresh-hostmap", async (req, res) => {
+  const result = await reloadHostMap();
+  res.json({
+    message: result.success
+      ? "HostMap refreshed successfully"
+      : "Failed to refresh HostMap",
+    ...result,
+  });
+});
 
-// 🚀 Start server
-app.listen(PORT, () => console.log(`✅ Proxy running on port ${PORT}`));
+// Health check endpoint
+app.get("/admin/health", (req, res) => {
+  res.json({
+    status: "healthy",
+    hostmapSize: HostMap.size,
+    uptime: process.uptime(),
+  });
+});
+
+const authMiddleware = (req, res, next) => {
+  const host = req.headers.host;
+  const protocol = req.headers["x-forwarded-proto"] || "http";
+  const originalUrl = `${protocol}://${host}${req.originalUrl}`;
+
+  console.log("Original URL:", originalUrl);
+  console.log("Host:", host);
+  console.log("Path:", req.originalUrl);
+  console.log("Protocol:", protocol);
+  console.log("Host", host);
+  console.log("Host name from headers:", req.headers.hostname);
+
+  return next();
+};
+
+app.use(authMiddleware);
+
+app.use(
+  "/",
+  createProxyMiddleware({
+    target: "http://test-nodejs-app:4001",
+    changeOrigin: true,
+    logLevel: "debug",
+    router: (req) => {
+      const host = req.headers.host;
+      const hostWithoutPort = host.split(":")[0];
+      const website = HostMap.get(hostWithoutPort);
+
+      if (website) {
+        console.log(`Redirecting to ${website.target} for host ${host}`);
+        return website.target;
+      }
+
+      console.log(`No mapping found for ${hostWithoutPort}, using default`);
+      return "http://test-nodejs-app:4002";
+    },
+  })
+);
+
+// Initialize HostMap before starting server
+reloadHostMap().then(() => {
+  app.listen(5050, () => {
+    console.log("Reverse proxy running on port 5050");
+    console.log(
+      "Manual refresh available at: http://localhost:5050/admin/refresh-hostmap"
+    );
+  });
+});

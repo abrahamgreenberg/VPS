@@ -3,11 +3,16 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+RUN corepack enable && corepack prepare pnpm@latest-9 --activate
+
+COPY package.json pnpm-lock.yaml* ./
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN npx prisma generate
+RUN pnpm prisma generate
+RUN pnpm build && ls -la dist/
 
-CMD ["sh", "-c", "npx prisma migrate deploy && node src/server.js"]
+# CMD ["sh", "-c", "pnpm prisma migrate deploy && node dist/server.js"]
+CMD ["node", "dist/server.js"]
