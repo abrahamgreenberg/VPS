@@ -25,21 +25,19 @@
 
 ### Stage 2: Security basic
 
+-   [x] Add rate limiting to pneinei halacha scraper to prevent abuse.
+    -   [x] make pnpm package store docker container
+    -   [x] fix not working when deployed
+-   [x] Add caching to peninei halacha scraper to improve performance and reduce load on the server.
+-   [ ] switch to alpine base image for docker containers
+    -   [ ] use pnpm store for other node based containers
+    -   [ ] make scripts for peninei to automate deploying in staging & in production
 -   [ ] Build nodejs reverse proxy with authentication on admin pannels (e.g nginx proxy manager, pgadmin)
     -   [ ] Npm setup:
         -   [ ] Authenticated routes: req -> npm (ssl) -> auth server -> service
         -   [ ] Unauthenticated routes: req -> npm (ssl) -> service
--   [x] Add rate limiting to pneinei halacha scraper to prevent abuse.
 
-    -   [x] Add rate limiting to penienei halacha frontend
-    -   [x] make pnpm package store docker container
-    -   [x] fix not working when deployed
-
--   [ ] switch to alpine base image for docker containers
-    -   [ ] use pnpm store for other node based containers
-    -   [ ] make scripts for peninei to automate deploying in staging & in production
--   [x] Add caching to peninei halacha scraper to improve performance and reduce load on the server.
-        <br/>_(at this point peninei halacha scraper is able to be advertised as a service 🎉)_
+<br/>_(at this point peninei halacha scraper is able to be advertised as a service 🎉)_
 
 ### Stage 3: Security+
 
