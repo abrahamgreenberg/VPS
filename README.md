@@ -31,11 +31,13 @@
         -   [ ] Unauthenticated routes: req -> npm (ssl) -> service
 -   [x] Add rate limiting to pneinei halacha scraper to prevent abuse.
 
-    -   [ ] Add rate limiting to penienei halacha frontend
-    -   [ ] make pnpm package store docker container
-    -   [ ] fix not working when deployed
+    -   [x] Add rate limiting to penienei halacha frontend
+    -   [x] make pnpm package store docker container
+    -   [x] fix not working when deployed
 
 -   [ ] switch to alpine base image for docker containers
+    -   [ ] use pnpm store for other node based containers
+    -   [ ] make scripts for peninei to automate deploying in staging & in production
 -   [x] Add caching to peninei halacha scraper to improve performance and reduce load on the server.
         <br/>_(at this point peninei halacha scraper is able to be advertised as a service 🎉)_
 
