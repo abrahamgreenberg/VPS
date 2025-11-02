@@ -3,7 +3,7 @@
 # Navigate to the project directory
 # get name split of current directory
 PARENT_DIR_NAME=$(basename "$(dirname "$PWD")")
-echo $PARENT_DIR_NAME
+
 
 if [ $PARENT_DIR_NAME != "vps" ]; then
     if [ ! -d "../../vps/peninei" ]; then
@@ -29,15 +29,15 @@ choice=${choice:-3}
 
 case $choice in
     1)
-        echo "Deploying backend to staging environment..."
+        echo "Deploying backend to live environment..."
         docker compose -f docker-compose.yml up -d --build backend
         ;;
     2)
-        echo "Deploying frontend to staging environment..."
+        echo "Deploying frontend to live environment..."
         docker compose -f docker-compose.yml up -d --build frontend
         ;;
     3)
-        echo "Deploying both backend and frontend to staging environment..."
+        echo "Deploying both backend and frontend to live environment..."
         docker compose -f docker-compose.yml up -d --build
         ;;
     *)
