@@ -3,14 +3,14 @@ import express from "express";
 import { PrismaClient } from "@prisma/client";
 import scheduler from "./scheduled/index.js";
 import { createLogger } from "./logger.js";
-import { CacheManager } from "./utils/CacheManager.ts";
-import { asyncHandler, errorHandler } from "./middleware/errorHandler.ts";
-import { corsMiddleware, initializeCors } from "./middleware/cors.ts";
-import { requestLogger } from "./middleware/requestLogger.ts";
+import { CacheManager } from "./utils/CacheManager.js";
+import { asyncHandler, errorHandler } from "./middleware/errorHandler.js";
+import { corsMiddleware, initializeCors } from "./middleware/cors.js";
+import { requestLogger } from "./middleware/requestLogger.js";
 import {
     rateLimiter,
     initializeRateLimiter,
-} from "./middleware/rateLimiter.ts";
+} from "./middleware/rateLimiter.js";
 
 scheduler(); // start scheduled jobs
 

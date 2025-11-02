@@ -13,7 +13,10 @@ COPY . .
 
 RUN pnpm prisma generate
 
-RUN pnpm build
+RUN pnpm build && ls -la dist/
+
+# Remove dev dependencies after build to reduce image size
+RUN pnpm prune --prod
 
 
 # If you see Prisma migration errors in production:
