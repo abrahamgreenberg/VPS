@@ -1,6 +1,8 @@
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "127.0.0.1:${BACKEND_API_PORT}:${BACKEND_API_PORT}"
     env_file: 
@@ -24,6 +26,7 @@ services:
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
       args:
         VITE_FRONTEND_API_URL: ${VITE_FRONTEND_API_URL}
     ports:

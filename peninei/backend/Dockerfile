@@ -6,14 +6,14 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest-9 --activate
 
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
 
 COPY . .
 
 RUN pnpm prisma generate
 
 
-# EXPOSE $BACKEND_API_PORT
 
 # If you see Prisma migration errors in production:
 # 1. Connect to the running backend container:
@@ -23,4 +23,4 @@ RUN pnpm prisma generate
 #    or, if DB is empty and you want to reset:
 #    pnpm prisma migrate reset
 
-CMD ["sh", "-c", "pnpm prisma migrate deploy && node src/server.js"]
+CMD ["sh", "-c", "pnpm prisma migrate deploy && pnpm start"]
