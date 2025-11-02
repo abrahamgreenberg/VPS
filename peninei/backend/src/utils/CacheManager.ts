@@ -53,6 +53,7 @@ export class CacheManager<T, K = string> {
         }
         this.logger.debug(`Cache miss for key: ${normalizedKey}`);
         const value = await this.setter(key);
+        this.logger.info(`Setting cache for key: ${normalizedKey}`);
         this.cache.set(normalizedKey, { value, timestamp: Date.now() });
         return value;
     }
