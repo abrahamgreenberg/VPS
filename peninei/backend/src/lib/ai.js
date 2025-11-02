@@ -30,7 +30,7 @@ const main = async (halachaObj) => {
                         content: `You are an expert hebrew to english translator.
 You translate religious texts with high accuracy and attention to detail, translating nuances and context effectively.
 For example references to Jewish law -> Halacha, God -> Hashem, etc.
-Make sure to preserve punctuation and commas.
+Make sure to preserve punctuation (such as full stops and commas).
 Respond only with JSON in the specified schema. Just output raw JSON with no code blocks. Ensure the JSON is valid.`,
                     },
                     {
