@@ -30,15 +30,15 @@ choice=${choice:-3}
 case $choice in
     1)
         echo "Deploying backend to staging environment..."
-        docker compose -f docker-compose.yml up -d --build backend -p='vps_staging'
+        docker compose -f docker-compose.yml -p peninei_staging up -d --build backend
         ;;
     2)
         echo "Deploying frontend to staging environment..."
-        docker compose -f docker-compose.yml up -d --build frontend -p='vps_staging'
+        docker compose -f docker-compose.yml -p peninei_staging up -d --build frontend
         ;;
     3)
         echo "Deploying both backend and frontend to staging environment..."
-        docker compose -f docker-compose.yml up -d --build -p='vps_staging'
+        docker compose -f docker-compose.yml -p peninei_staging up -d --build
         ;;
     *)
         echo "Invalid choice. Exiting."
