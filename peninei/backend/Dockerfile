@@ -13,6 +13,7 @@ COPY . .
 
 RUN pnpm prisma generate
 
+RUN pnpm build
 
 
 # If you see Prisma migration errors in production:
