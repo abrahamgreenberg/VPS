@@ -29,8 +29,8 @@
     -   [x] make pnpm package store docker container
     -   [x] fix not working when deployed
 -   [x] Add caching to peninei halacha scraper to improve performance and reduce load on the server.
--   [ ] switch to alpine base image for docker containers
-    -   [ ] use pnpm store for other node based containers
+-   [x] switch to alpine base image for docker containers
+    -   [x] use pnpm store for other node based containers
     -   [ ] make scripts for peninei to automate deploying in staging & in production
 -   [ ] Build nodejs reverse proxy with authentication on admin pannels (e.g nginx proxy manager, pgadmin)
     -   [ ] Npm setup:

@@ -52,8 +52,8 @@ const main = async () => {
     });
 
     // Hourly AI parser job - processes halachot that need AI parsing (skip 4 AM)
-    schedule.scheduleJob("0 0-3,5-23 * * *", async () => {
-        logger.info("Scheduled hourly AI parser job triggered");
+    schedule.scheduleJob("0 10,16,22 * * *", async () => {
+        logger.info("Scheduled AI parser job triggered");
 
         try {
             await parse_halachot_with_ai();
