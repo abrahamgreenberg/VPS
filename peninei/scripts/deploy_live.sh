@@ -13,6 +13,10 @@ if [ $PARENT_DIR_NAME != "vps" ]; then
     cd ../../vps/peninei
 fi
 
+echo "Updating repository..."
+git pull origin main
+git checkout main
+
 # Ask the user what to deploy
 echo "What would you like to deploy?"
 echo "1) Backend"
