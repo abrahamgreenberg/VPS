@@ -6,7 +6,7 @@
     "background_color": "#ffffff",
     "theme_color": "#7c3aed",
     "description": "Daily halacha from Peninei Halacha.",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "icons": [
         {
             "src": "/logo_256.png",
