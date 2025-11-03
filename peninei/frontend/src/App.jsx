@@ -21,14 +21,13 @@ export default function App() {
             setLoading(true);
             setError(null);
             try {
-                // Add one day to selectedDate to fix off-by-one bug
-                const corrected = new Date(selectedDate);
-                corrected.setDate(corrected.getDate() + 1);
-                const isoDate = corrected.toISOString().split("T")[0];
+                selectedDate.setHours(6,0,0,0)
+                const isoDate = selectedDate.toISOString().split("T")[0];
                 const res = await api.get(`/halachas/${isoDate}`);
                 setHalachot(res.data);
             } catch (err) {
                 setError("Failed to load halacha for selected date.");
+                console.error(err);
             } finally {
                 setLoading(false);
             }

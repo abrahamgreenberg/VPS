@@ -28,10 +28,7 @@ export default function CalendarSelector({ selectedDate, onDateChange }) {
         fetchAvailableDates();
     }, [month]);
 
-    // Convert available date strings to Date objects
     const availableDateObjs = availableDates.map((d) => new Date(d));
-
-    // Helper to format date as YYYY-MM-DD (no timezone correction needed)
     function toBackendDateString(date) {
         return (
             date.getFullYear() +
@@ -41,6 +38,9 @@ export default function CalendarSelector({ selectedDate, onDateChange }) {
             String(date.getDate()).padStart(2, "0")
         );
     }
+
+    if(loading)
+        return <div>Loading...</div>;
 
     return (
         <div className="flex flex-col items-center">

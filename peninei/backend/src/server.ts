@@ -1,16 +1,13 @@
 // server.ts
 import express from "express";
 import { PrismaClient } from "@prisma/client";
-import scheduler from "./scheduled/index.js";
-import { createLogger } from "./logger.js";
-import { CacheManager } from "./utils/CacheManager.js";
-import { asyncHandler, errorHandler } from "./middleware/errorHandler.js";
-import { corsMiddleware, initializeCors } from "./middleware/cors.js";
-import { requestLogger } from "./middleware/requestLogger.js";
-import {
-    rateLimiter,
-    initializeRateLimiter,
-} from "./middleware/rateLimiter.js";
+import scheduler from "./scheduled/index";
+import { createLogger } from "./logger";
+import { CacheManager } from "./utils/CacheManager";
+import { asyncHandler, errorHandler } from "./middleware/errorHandler";
+import { corsMiddleware, initializeCors } from "./middleware/cors";
+import { requestLogger } from "./middleware/requestLogger";
+import { rateLimiter, initializeRateLimiter } from "./middleware/rateLimiter";
 
 scheduler(); // start scheduled jobs
 
@@ -45,11 +42,25 @@ const availableHalachotCache = new CacheManager(
                     lt: end,
                 },
             },
+            orderBy: [{ date: "asc" }],
         });
-
+        // logger.debug(`Available halachot for month:` + halachot.join(", "));
+        logger.debug(
+            halachot.map((h) => {
+                h.date.setHours(6, 0, 0, 0);
+                return h.date.toISOString().split("T")[0];
+            })
+        );
         const dates = [
-            ...new Set(halachot.map((e) => e.date.toISOString().split("T")[0])),
+            ...new Set(
+                halachot.map((e) => {
+                    e.date.setHours(6, 0, 0, 0);
+                    return e.date.toISOString().split("T")[0];
+                })
+            ),
         ];
+
+        logger.debug(dates);
 
         return dates;
     },
