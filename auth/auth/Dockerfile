@@ -13,7 +13,9 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
 COPY . .
 
 RUN pnpm prisma generate
-RUN pnpm build && ls -la dist/
+RUN pnpm build
+
 
 # Use dev script in development, otherwise default to production
-CMD ["sh", "-c", "if [ \"$NODE_ENV\" = 'development' ]; then pnpm dev; else node dist/server.js; fi"]
+# CMD ["sh", "-c", "if [ \"$NODE_ENV\" = 'development' ]; then pnpm dev; else node dist/server.js; fi"]
+CMD ["node", "dist/server.js"]

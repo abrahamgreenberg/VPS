@@ -1,18 +1,21 @@
 services:
   auth:
     build: ./auth
-    command: pnpm dev
     env_file:
       - .env
     networks:
       - proxy-network
     environment:
       AUTH_PORT: ${AUTH_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
     ports:
       - "127.0.0.1:${AUTH_PORT}:${AUTH_PORT}"
     volumes:
       - ./auth:/app
-      - /app/node_modules
 
 networks:
   proxy-network:
