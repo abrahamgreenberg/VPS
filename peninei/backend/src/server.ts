@@ -8,7 +8,7 @@ import { asyncHandler, errorHandler } from "./middleware/errorHandler";
 import { corsMiddleware, initializeCors } from "./middleware/cors";
 import { requestLogger } from "./middleware/requestLogger";
 import { rateLimiter, initializeRateLimiter } from "./middleware/rateLimiter";
-import { DateSchema, MonthYearSchema } from "./schema";
+import { DateSchema, MonthYearSchema, SyncRequestSchema } from "./schema";
 
 scheduler(); // start scheduled jobs
 
@@ -145,6 +145,73 @@ app.get(
     })
 );
 
+const SYNC_PREV_DAY = 2;
+const SYNC_NEXT_DAY = 3;
+
+app.post(
+    "/api/halachot/sync",
+    asyncHandler(async (req, res) => {
+        const {
+            data: clientHalachotObj,
+            success,
+            error,
+        } = SyncRequestSchema.safeParse(req.body);
+        if (!success) {
+            logger.warn(
+                `Invalid sync request received: "${JSON.stringify(req.body)}"`
+            );
+            return res.status(400).json({ error });
+        }
+        const { clientHalachot } = clientHalachotObj;
+
+        const now = new Date();
+        now.setHours(6, 0, 0, 0);
+        const start = new Date(
+            Date.UTC(
+                now.getUTCFullYear(),
+                now.getUTCMonth(),
+                now.getUTCDate() - SYNC_PREV_DAY
+            )
+        );
+        const end = new Date(
+            Date.UTC(
+                now.getUTCFullYear(),
+                now.getUTCMonth(),
+                now.getUTCDate() + SYNC_NEXT_DAY + 1
+            )
+        );
+
+        const halachotInWindow = await prisma.halacha.findMany({
+            where: {
+                date: {
+                    gte: start,
+                    lt: end,
+                },
+            },
+        });
+
+        const clientMap = new Map(
+            clientHalachot.map((halacha) => [halacha[0], halacha[1]])
+        );
+        const serverMap = new Map(
+            halachotInWindow.map((halacha) => [halacha.id, halacha])
+        );
+
+        const toDelete = Array.from(clientMap.keys()).filter(
+            (id) => !serverMap.has(id)
+        );
+
+        const toCreateOrUpdate = halachotInWindow.filter((halacha) => {
+            const clientVersion = clientMap.get(halacha.id);
+            return !clientVersion || clientVersion < halacha.version;
+        });
+
+        res.json({
+            toDelete,
+            toCreateOrUpdate,
+        });
+    })
+);
 // ---------------------------
 // Error handling middleware (must be last)
 // ---------------------------

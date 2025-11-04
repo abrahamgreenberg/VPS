@@ -64,7 +64,11 @@ export const parse_halachot_with_ai = async () => {
                 // Update halacha with English title
                 await prisma.halacha.update({
                     where: { id: halacha.id },
-                    data: { enTitle: aiResult.enTitle, parseWithAi: false },
+                    data: {
+                        enTitle: aiResult.enTitle,
+                        parseWithAi: false,
+                        version: halacha.version + 1,
+                    },
                 });
 
                 // Create new translation lines

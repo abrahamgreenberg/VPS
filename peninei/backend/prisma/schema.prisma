@@ -27,6 +27,7 @@ model Halacha {
   bookId        Int?
   book          Book?         @relation(fields: [bookId], references: [id])
   lines         HalachaLine[] // relation to line-by-line translation
+  version       Int           @default(1)
 
   @@index([date])
 }

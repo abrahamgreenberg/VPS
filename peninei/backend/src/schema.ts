@@ -3,7 +3,7 @@ import { z } from "zod";
 export const DateSchema = z
     .string()
     .regex(/^\d{2}-\d{2}-\d{4}$/, {
-        message: "Date must be in dd-mm-yyyy format",
+        error: "Date must be in dd-mm-yyyy format",
     })
     .transform((date) => {
         const [day, month, year] = date.split("-").map(Number);
@@ -12,9 +12,13 @@ export const DateSchema = z
     .refine((date) => !isNaN(date.getTime()), { message: "Invalid date" });
 
 export const MonthYearSchema = z.string().regex(/^(0[1-9]|1[0-2])-\d{4}$/, {
-    message: "Month must be in mm-yyyy format",
+    error: "Month must be in mm-yyyy format",
 });
 
-export const SyncRequestSchema = z.object({
-    clientHalachot: z.array(z.tuple([z.number(), z.number()])),
-});
+export const SyncRequestSchema = z
+    .object({
+        clientHalachot: z.array(z.tuple([z.number(), z.number()])),
+    })
+    .refine((data) => Array.isArray(data.clientHalachot), {
+        error: "clientHalachot must be an array",
+    });
