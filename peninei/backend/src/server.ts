@@ -36,15 +36,18 @@ const availableHalachotCache = new CacheManager(
         const start = new Date(Date.UTC(year, m - 1, 1));
         const end = new Date(Date.UTC(year, m, 1));
         const halachot = await prisma.halacha.findMany({
+            select: {
+                date: true,
+            },
             where: {
                 date: {
                     gte: start,
                     lt: end,
                 },
             },
+            distinct: ["date"],
             orderBy: [{ date: "asc" }],
         });
-        // logger.debug(`Available halachot for month:` + halachot.join(", "));
         logger.debug(
             halachot.map((h) => {
                 h.date.setHours(6, 0, 0, 0);
