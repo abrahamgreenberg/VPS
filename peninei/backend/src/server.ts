@@ -72,6 +72,46 @@ const availableHalachotCache = new CacheManager(
     "availableHalachotCache"
 );
 
+const SYNC_PREV_DAY = 2;
+const SYNC_NEXT_DAY = 3;
+
+const syncCache = new CacheManager(
+    async () => {
+        const now = new Date();
+        now.setHours(6, 0, 0, 0);
+        const start = new Date(
+            Date.UTC(
+                now.getUTCFullYear(),
+                now.getUTCMonth(),
+                now.getUTCDate() - SYNC_PREV_DAY
+            )
+        );
+        const end = new Date(
+            Date.UTC(
+                now.getUTCFullYear(),
+                now.getUTCMonth(),
+                now.getUTCDate() + SYNC_NEXT_DAY + 1
+            )
+        );
+
+        const halachotInWindow = await prisma.halacha.findMany({
+            where: {
+                date: {
+                    gte: start,
+                    lt: end,
+                },
+            },
+        });
+        const serverMap = new Map(
+            halachotInWindow.map((halacha) => [halacha.id, halacha])
+        );
+
+        return { serverMap, halachotInWindow };
+    },
+    12 * 60 * 60 * 1000,
+    "syncCache"
+);
+
 // ---------------------------
 // Middleware
 // ---------------------------
@@ -145,9 +185,6 @@ app.get(
     })
 );
 
-const SYNC_PREV_DAY = 2;
-const SYNC_NEXT_DAY = 3;
-
 app.post(
     "/api/halachot/sync",
     asyncHandler(async (req, res) => {
@@ -164,37 +201,12 @@ app.post(
         }
         const { clientHalachot } = clientHalachotObj;
 
-        const now = new Date();
-        now.setHours(6, 0, 0, 0);
-        const start = new Date(
-            Date.UTC(
-                now.getUTCFullYear(),
-                now.getUTCMonth(),
-                now.getUTCDate() - SYNC_PREV_DAY
-            )
-        );
-        const end = new Date(
-            Date.UTC(
-                now.getUTCFullYear(),
-                now.getUTCMonth(),
-                now.getUTCDate() + SYNC_NEXT_DAY + 1
-            )
-        );
-
-        const halachotInWindow = await prisma.halacha.findMany({
-            where: {
-                date: {
-                    gte: start,
-                    lt: end,
-                },
-            },
-        });
-
         const clientMap = new Map(
             clientHalachot.map((halacha) => [halacha[0], halacha[1]])
         );
-        const serverMap = new Map(
-            halachotInWindow.map((halacha) => [halacha.id, halacha])
+
+        const { serverMap, halachotInWindow } = await syncCache.get(
+            "halacha-sync"
         );
 
         const toDelete = Array.from(clientMap.keys()).filter(
