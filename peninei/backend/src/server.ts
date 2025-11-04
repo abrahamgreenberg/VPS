@@ -8,6 +8,7 @@ import { asyncHandler, errorHandler } from "./middleware/errorHandler";
 import { corsMiddleware, initializeCors } from "./middleware/cors";
 import { requestLogger } from "./middleware/requestLogger";
 import { rateLimiter, initializeRateLimiter } from "./middleware/rateLimiter";
+import { DateSchema, MonthYearSchema } from "./schema";
 
 scheduler(); // start scheduled jobs
 
@@ -93,10 +94,13 @@ app.get(
     "/api/halachas/:date",
     asyncHandler(async (req, res) => {
         const dateParam = req.params.date;
-        const date = new Date(dateParam);
+        const { data: date, success, error } = DateSchema.safeParse(dateParam);
+        if (!success) {
+            logger.warn(`Invalid date format received: "${dateParam}"`);
+            return res.status(400).json({ error });
+        }
+
         logger.debug(`Fetching halachot for date: ${dateParam}`);
-        logger.debug(dateParam);
-        logger.debug(date);
 
         if (isNaN(date.getTime())) {
             logger.warn(`Invalid date format received: "${dateParam}"`);
@@ -119,7 +123,17 @@ app.get(
 app.get(
     "/api/available-dates",
     asyncHandler(async (req, res) => {
-        const month = req.query.month as string | undefined;
+        const monthParam = req.query.month;
+
+        const {
+            data: month,
+            success,
+            error,
+        } = MonthYearSchema.safeParse(monthParam);
+        if (!success) {
+            logger.warn(`Invalid month format received: "${monthParam}"`);
+            return res.status(400).json({ error });
+        }
 
         if (!month)
             return res
