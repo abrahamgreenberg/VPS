@@ -106,7 +106,7 @@ const syncCache = new CacheManager(
             halachotInWindow.map((halacha) => [halacha.id, halacha])
         );
 
-        return { serverMap, halachotInWindow };
+        return { serverMap, halachotInWindow } as const;
     },
     12 * 60 * 60 * 1000,
     "syncCache"
@@ -232,7 +232,7 @@ app.use(errorHandler);
 // ---------------------------
 // Start server
 // ---------------------------
-const PORT = process.env.BACKEND_API_PORT || 5002;
-app.listen(PORT, () => {
+const PORT = process.env.BACKEND_API_PORT || "5002";
+app.listen(5002, "0.0.0.0", () => {
     logger.info(`Server running on http://localhost:${PORT}`);
 });

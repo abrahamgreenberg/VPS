@@ -21,9 +21,10 @@ export default function App() {
             setLoading(true);
             setError(null);
             try {
-                selectedDate.setHours(6,0,0,0)
+                selectedDate.setHours(6, 0, 0, 0);
                 const isoDate = selectedDate.toISOString().split("T")[0];
                 const res = await api.get(`/halachas/${isoDate}`);
+                console.log(res.data);
                 setHalachot(res.data);
             } catch (err) {
                 setError("Failed to load halacha for selected date.");

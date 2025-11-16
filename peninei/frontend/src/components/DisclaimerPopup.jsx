@@ -6,19 +6,21 @@ export default function DisclaimerPopup({ show, setShow }) {
         <div>
             <div className="max-w-xl w-full pointer-events-auto">
                 <button
-                    className="w-full flex items-center justify-center gap-2 bg-white/60 backdrop-blur border border-yellow-400 text-yellow-900 font-semibold py-2 px-4 rounded-2xl shadow-lg hover:bg-yellow-100/80 transition-all duration-200"
+                    className={`w-full flex items-center justify-center gap-2 bg-white/60 backdrop-blur border border-yellow-400 text-yellow-900 font-semibold py-2 px-4 ${
+                        show ? "rounded-t-2xl" : "rounded-2xl"
+                    } shadow-lg md:hover:bg-yellow-100/80 transition-all duration-200`}
                     onClick={() => setShow((v) => !v)}
                     aria-expanded={show}
                     style={{ fontSize: "1.15rem", letterSpacing: "0.01em" }}
                 >
                     <FaExclamationTriangle className="text-yellow-500 text-xl drop-shadow" />
                     Disclaimer
-                    <span className="ml-2 text-base">{show ? "▲" : "▼"}</span>
+                    <span className="ml-2 text-base">{show ? "▼" : "▲"}</span>
                 </button>
                 <div
                     className={`overflow-hidden transition-all duration-500 ${
                         show ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-                    } bg-white/80 backdrop-blur border border-yellow-400 rounded-2xl shadow-lg px-6 py-4 text-yellow-900`}
+                    } bg-white/80 backdrop-blur border border-yellow-400 rounded-b-2xl shadow-lg px-6  text-yellow-900`}
                     style={{
                         boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.18)",
                     }}
