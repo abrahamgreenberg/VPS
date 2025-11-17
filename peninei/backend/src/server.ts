@@ -10,12 +10,34 @@ import { requestLogger } from "./middleware/requestLogger";
 import { rateLimiter, initializeRateLimiter } from "./middleware/rateLimiter";
 import { DateSchema, MonthYearSchema, SyncRequestSchema } from "./schema";
 
+import swaggerUi from "swagger-ui-express";
+import swaggerJsdoc from "swagger-jsdoc";
+
 scheduler(); // start scheduled jobs
 
 const logger = createLogger("server");
 const app = express();
 const prisma = new PrismaClient();
 
+// Swagger setup
+const swaggerOptions = {
+    definition: {
+        openapi: "3.0.0",
+        info: {
+            title: "Peninei Halacha API",
+            version: "1.0.0",
+            description: "API documentation for Peninei Halacha backend",
+        },
+        servers: [
+            {
+                url: "http://localhost:5002",
+            },
+        ],
+    },
+    apis: [__filename], // You can add more files here for annotation-based docs
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 const BACKEND_DEBUG_RESULTS = process.env.BACKEND_DEBUG_RESULTS === "true";
 
 const halachaCache = new CacheManager(
@@ -101,12 +123,16 @@ const syncCache = new CacheManager(
                     lt: end,
                 },
             },
+            include: { lines: { orderBy: [{ id: "asc" }] } },
         });
         const serverMap = new Map(
             halachotInWindow.map((halacha) => [halacha.id, halacha])
         );
 
-        return { serverMap, halachotInWindow } as const;
+        return {
+            serverMapObj: Object.fromEntries(serverMap),
+            halachotInWindow,
+        } as const;
     },
     12 * 60 * 60 * 1000,
     "syncCache"
@@ -122,9 +148,114 @@ app.use(rateLimiter);
 app.use(express.json());
 app.use(requestLogger);
 
+// Swagger UI route
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // ---------------------------
 // GET halachas by date
 // ---------------------------
+/**
+ * @openapi
+ * /api:
+ *   get:
+ *     summary: Health check or test endpoint
+ *     responses:
+ *       200:
+ *         description: API is up and running
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: string
+ *                   example: Ok!
+ *
+ * /api/halachas/{date}:
+ *   get:
+ *     summary: Get halachot by date
+ *     parameters:
+ *       - in: path
+ *         name: date
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Date in YYYY-MM-DD format
+ *     responses:
+ *       200:
+ *         description: List of halachot for the date
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       400:
+ *         description: Invalid date format
+ *
+ * /api/available-dates:
+ *   get:
+ *     summary: Get available halacha dates for a month
+ *     parameters:
+ *       - in: query
+ *         name: month
+ *         schema:
+ *           type: string
+ *           pattern: '^\\d{4}-(0[1-9]|1[0-2])$'
+ *         required: true
+ *         description: Month in YYYY-MM format
+ *     responses:
+ *       200:
+ *         description: List of available dates for the month
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 dates:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                     example: 2025-11-16
+ *       400:
+ *         description: Invalid month format
+ *
+ * /api/halachot/sync:
+ *   post:
+ *     summary: Sync halachot between client and server
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               clientHalachot:
+ *                 type: array
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: number
+ *                 example: [[1,2],[2,3]]
+ *     responses:
+ *       200:
+ *         description: Sync result
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 toDelete:
+ *                   type: array
+ *                   items:
+ *                     type: number
+ *                 toCreateOrUpdate:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       400:
+ *         description: Invalid sync request
+ */
 app.get("/api", (req, res) => {
     logger.info("Log!");
     return res.status(200).json({ result: "Ok!" });
@@ -188,11 +319,13 @@ app.get(
 app.post(
     "/api/halachot/sync",
     asyncHandler(async (req, res) => {
+        logger.info("Received sync request");
         const {
             data: clientHalachotObj,
             success,
             error,
         } = SyncRequestSchema.safeParse(req.body);
+        logger.debug(`Sync request body: ${JSON.stringify(req.body)}`);
         if (!success) {
             logger.warn(
                 `Invalid sync request received: "${JSON.stringify(req.body)}"`
@@ -205,22 +338,30 @@ app.post(
             clientHalachot.map((halacha) => [halacha[0], halacha[1]])
         );
 
-        const { serverMap, halachotInWindow } = await syncCache.get(
+        const { serverMapObj, halachotInWindow } = await syncCache.get(
             "halacha-sync"
         );
+        const serverMap = new Map(Object.entries(serverMapObj));
 
         const toDelete = Array.from(clientMap.keys()).filter(
-            (id) => !serverMap.has(id)
+            (id) => !serverMap.has(id.toString())
         );
 
-        const toCreateOrUpdate = halachotInWindow.filter((halacha) => {
+        const toUpdate = halachotInWindow.filter((halacha) => {
             const clientVersion = clientMap.get(halacha.id);
-            return !clientVersion || clientVersion < halacha.version;
+            return clientVersion < halacha.version;
+        });
+
+        const toCreate = halachotInWindow.filter((halacha) => {
+            const clientVersion = clientMap.get(halacha.id);
+            return !clientVersion;
         });
 
         res.json({
             toDelete,
-            toCreateOrUpdate,
+            toCreate,
+            toUpdate,
+            toUpdateIds: toUpdate.map((h) => h.id),
         });
     })
 );

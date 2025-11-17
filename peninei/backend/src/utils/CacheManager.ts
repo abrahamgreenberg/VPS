@@ -10,6 +10,38 @@ type CacheValue<T> = {
     timestamp: number;
 };
 
+type HasNever<T> = [T] extends [never] ? true : false;
+
+type NotMapDeep<T> = T extends Map<any, any>
+    ? never
+    : T extends object
+    ? {
+          [K in keyof T]: NotMapDeep<T[K]>;
+      } extends infer O
+        ? HasNever<O[keyof O]> extends true
+            ? never
+            : O
+        : never
+    : T;
+type c = {
+    a: {
+        b: {
+            c: {
+                age: [number, number];
+                d: {
+                    e: {
+                        f: {
+                            q: Map<string, number>;
+                        };
+                    };
+                };
+            };
+        };
+    };
+};
+
+type test3 = NotMapDeep<c>;
+
 export class CacheManager<T, K = string> {
     private cache: Map<string, CacheValue<T>> = new Map();
 
