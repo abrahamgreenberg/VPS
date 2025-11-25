@@ -95,7 +95,7 @@ const availableHalachotCache = new CacheManager(
 );
 
 const SYNC_PREV_DAY = 2;
-const SYNC_NEXT_DAY = 3;
+const SYNC_NEXT_DAY = 7;
 
 const syncCache = new CacheManager(
     async () => {
@@ -116,7 +116,7 @@ const syncCache = new CacheManager(
             )
         );
 
-        const halachotInWindow = await prisma.halacha.findMany({
+        const dbHalachot = await prisma.halacha.findMany({
             where: {
                 date: {
                     gte: start,
@@ -125,6 +125,14 @@ const syncCache = new CacheManager(
             },
             include: { lines: { orderBy: [{ id: "asc" }] } },
         });
+        const halachotInWindow: typeof dbHalachot & { dateString: string }[] =
+            dbHalachot.map((halacha) => {
+                halacha.date.setHours(6, 0, 0, 0);
+                return {
+                    dateString: halacha.date.toISOString().split("T")[0],
+                    ...halacha,
+                };
+            });
         const serverMap = new Map(
             halachotInWindow.map((halacha) => [halacha.id, halacha])
         );
