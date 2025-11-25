@@ -2,16 +2,17 @@ import React, { useEffect, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { api } from "../utils";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 export default function CalendarSelector({ selectedDate, onDateChange }) {
-    const [availableDates, setAvailableDates] = useState([]);
+    const [apiAvailableDates, setApiAvailableDates] = useState(null);
     const [loading, setLoading] = useState(true);
     const [month, setMonth] = useState(() => {
         const d = selectedDate || new Date();
         return new Date(d.getFullYear(), d.getMonth(), 1);
     });
     const [open, setOpen] = useState(false);
-
+    const { clientHalachot } = useLocalStorage();
     useEffect(() => {
         async function fetchAvailableDates() {
             setLoading(true);
@@ -20,13 +21,16 @@ export default function CalendarSelector({ selectedDate, onDateChange }) {
                     month.getMonth() + 1
                 ).padStart(2, "0")}`;
                 const res = await api.get(`/available-dates?month=${ym}`);
-                setAvailableDates(res.data.dates || []);
+                setApiAvailableDates(res.data.dates || null);
             } finally {
                 setLoading(false);
             }
         }
         fetchAvailableDates();
     }, [month]);
+
+    const availableDates =
+        apiAvailableDates || clientHalachot?.map((h) => h.dateString);
 
     const availableDateObjs = availableDates.map((d) => new Date(d));
     function toBackendDateString(date) {
@@ -39,8 +43,7 @@ export default function CalendarSelector({ selectedDate, onDateChange }) {
         );
     }
 
-    if(loading)
-        return <div>Loading...</div>;
+    if (loading) return <div>Loading...</div>;
 
     return (
         <div className="flex flex-col items-center">

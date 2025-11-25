@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getTodayISODate, api } from "./utils";
 import HalachaCard from "./components/HalachaCard";
 import DisclaimerPopup from "./components/DisclaimerPopup";
 import CalendarSelector from "./components/CalendarSelector";
+import { useLocalStorage } from "./hooks/useLocalStorage";
 
+// TODO: FIX CLIENT HALACHOT/SYNCING
 export default function App() {
-    const [halachot, setHalachot] = useState(null);
+    const [apiHalachot, setApiHalachot] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showWarning, setShowWarning] = useState(false);
@@ -13,40 +15,27 @@ export default function App() {
         const today = getTodayISODate();
         return new Date(today);
     });
-    const [displayMode, setDisplayMode] = useState("both"); // "he", "en", "both"
-    const [clientHalachot, setClientHalachot] = useState(() => {
-        const stored = localStorage.getItem("halachot");
-        return stored ? JSON.parse(stored) : [];
-    });
+    const [displayMode, setDisplayMode] = useState("both");
+    const { clientHalachot, updateClientHalachot } = useLocalStorage();
+    const hasSynced = useRef(false);
 
     useEffect(() => {
         const fetchHalacha = async () => {
             setLoading(true);
             setError(null);
+            selectedDate.setHours(6, 0, 0, 0);
+            const isoDate = selectedDate.toISOString().split("T")[0];
+
             try {
-                selectedDate.setHours(6, 0, 0, 0);
-                const isoDate = selectedDate.toISOString().split("T")[0];
                 const res = await api.get(`/halachas/${isoDate}`);
                 console.log(res.data);
-                setHalachot(res.data);
+                setApiHalachot(res.data);
             } catch (err) {
-                // TODO: PROPERLY GET THE FILTER
-                // MAKE THIS A HOOK SO I CAN USE IN THE CALENDAR
-                console.log(clientHalachot);
-                const halachotByDate = clientHalachot.filter((h) => {
-                    console.log(h.date.split("T")[0]);
-                    console.log(selectedDate.toISOString().split("T")[0]);
-
-                    return (
-                        h.date.split("T")[0] ===
-                        selectedDate.toISOString().split("T")[0]
-                    );
-                });
-                console.log("halachot by date", halachotByDate);
-                setHalachot(halachotByDate);
-                // setError("Failed to load halacha for selected date.");
+                console.log(isoDate);
                 console.error(err);
             } finally {
+                console.log("-----iso date----");
+                console.log(isoDate);
                 setLoading(false);
             }
         };
@@ -55,6 +44,13 @@ export default function App() {
 
     useEffect(() => {
         const syncHalachot = async () => {
+            // Prevent double-execution in Strict Mode
+            if (hasSynced.current) {
+                return;
+            }
+            hasSynced.current = true;
+            console.log("Starting syncHalachot...");
+
             const lastSync = localStorage.getItem("halachaLastSync");
             const today = new Date();
             today.setHours(6, 0, 0, 0);
@@ -63,7 +59,10 @@ export default function App() {
                 return;
             }
             try {
-                const clientHalachotReq = clientHalachot.map((h) => [
+                // Read fresh from localStorage to avoid stale closure
+                const stored = localStorage.getItem("halachot");
+                const currentHalachot = stored ? JSON.parse(stored) : [];
+                const clientHalachotReq = currentHalachot.map((h) => [
                     h.id,
                     h.version,
                 ]);
@@ -72,26 +71,26 @@ export default function App() {
                 });
                 console.log("Syncing halachot with backend...");
                 console.log(res.data);
-                console.log(clientHalachot);
+                console.log(currentHalachot);
 
-                const modified = clientHalachot
-                    .filter(
-                        (h) =>
-                            res.data.toDelete.includes(h.id) ||
-                            res.data.toUpdateIds.includes(h.id)
-                    )
-                    .concat(res.data.toCreate)
-                    .concat(res.data.toUpdate);
-
-                localStorage.setItem("halachot", JSON.stringify(modified));
-                setClientHalachot(modified);
+                updateClientHalachot(res.data);
                 localStorage.setItem("halachaLastSync", today.toISOString());
             } catch (err) {
                 console.error("Failed to sync halachot:", err);
             }
         };
         syncHalachot();
-    }, []);
+    }, [updateClientHalachot]);
+
+    console.log("LOADINGGGGGG");
+    console.log(clientHalachot);
+    // Use API halachot if available, otherwise fall back to client halachot
+    const halachot =
+        apiHalachot ||
+        clientHalachot.filter((h) => {
+            const isoDate = selectedDate.toISOString().split("T")[0];
+            return h.dateString === isoDate;
+        });
 
     return (
         <div
