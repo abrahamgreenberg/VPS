@@ -37,12 +37,13 @@
     - [ ] Authenticated routes: req -> npm (ssl) -> auth server -> service
 - [ ] Build nodejs reverse proxy with authentication on admin pannels (e.g nginx proxy manager, pgadmin)
 - [ ] Unauthenticated routes: req -> npm (ssl) -> service
-- [ ] ability to download halacha locally
+- [x] ability to download halacha locally
 
 <br/>_(at this point peninei halacha scraper is able to be advertised as a service 🎉)_
 
 ### Stage 3: Security+
 
+- [ ] bugfix, clicking twice breaks my ui :/
 - [ ] Make reverse proxy in go for 🔥 better performance
   - [ ] Npm setup:
     - [ ] Authenticated routes: req -> npm (ssl) -> node js auth -> go proxy -> auth server -> service
