@@ -1,0 +1,13 @@
+<svg width="1600" height="520" viewBox="0 0 1600 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder banner image">
+  <defs>
+    <linearGradient id="bannerGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d6e6df"/>
+      <stop offset="100%" stop-color="#ead8bf"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="520" fill="url(#bannerGrad)"/>
+  <circle cx="230" cy="110" r="56" fill="#ffffff" fill-opacity="0.55"/>
+  <circle cx="1400" cy="420" r="74" fill="#ffffff" fill-opacity="0.45"/>
+  <rect x="320" y="150" width="960" height="220" rx="20" fill="#fff9ee" fill-opacity="0.72"/>
+  <text x="800" y="280" text-anchor="middle" font-size="54" font-family="Palatino, serif" fill="#3d3d3d">PLACEHOLDER BANNER IMAGE</text>
+</svg>

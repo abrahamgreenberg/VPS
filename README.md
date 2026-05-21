@@ -7,6 +7,9 @@
 - **Proxy:** Nginx / Nginx Proxy Manager
 - **Frontend:** Vite + React.js + Tailwind
 
+DNS: Namecheap
+Hosted on: Vultr
+
 ## Road Map
 
 ### Current deployed containers
