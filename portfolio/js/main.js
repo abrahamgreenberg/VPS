@@ -21,6 +21,9 @@ const writingPages = new Set([
   "article-1.html",
   "article-2.html",
   "article-3.html",
+  "article-4.html",
+  "article-5.html",
+  "article-6.html",
 ]);
 const writingLink = document.querySelector(".writing-link");
 if (writingLink && writingPages.has(pageName)) {

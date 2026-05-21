@@ -1,89 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>First-Year Writing Portfolio</title>
-    <link rel="stylesheet" href="css/styles.css" />
-    <script defer src="js/main.js"></script>
-  </head>
-  <body>
-    <header class="nav-shell">
-      <div class="container nav">
-        <a class="brand" href="index.html">Abraham Greenberg</a>
-        <button class="nav-toggle" type="button" aria-expanded="false" aria-label="Toggle menu">Menu</button>
-        <nav class="nav-links" aria-label="Primary">
-          <a href="index.html">Home</a>
-          <a href="about.html">About</a>
-          <div class="nav-item has-dropdown">
-            <a class="writing-link" href="writing.html" aria-haspopup="true" aria-expanded="false">Writing</a>
-            <div class="dropdown" aria-label="Writing pages">
-              <a href="writing.html">Writing Overview</a>
-              <a href="article-1.html">Article 1: Literacy Narrative</a>
-              <a href="article-2.html">Article 2: Rhetorical Analysis</a>
-              <a href="article-3.html">Article 3: Final Argument</a>
-            </div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>First-Year Writing Portfolio - Abraham Greenberg</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script defer src="js/main.js"></script>
+</head>
+
+<body>
+  <header class="nav-shell">
+    <div class="container nav">
+      <a class="brand" href="index.html">Abraham Greenberg</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-label="Toggle menu">Menu</button>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <div class="nav-item has-dropdown">
+          <a class="writing-link" aria-haspopup="true" aria-expanded="false">Writing</a>
+          <div class="dropdown" aria-label="Writing pages">
+            <a href="article-1.html">Personal Narrative</a>
+            <a href="article-2.html">Exploratory Essay</a>
+            <a href="article-3.html">Rogerian Response</a>
+            <a href="article-4.html">Showcase: The Race</a>
+            <a href="article-5.html">Showcase: Peer Review Response Letter</a>
+            <a href="article-6.html">Showcase: Arch of Titus Essay</a>
           </div>
-        </nav>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <p class="kicker">First-Year Writing Portfolio</p>
+          <h1>A collection of my writing journey.</h1>
+          <p>
+            Hi, my name is Abraham Greenberg. Welcome to my FYWR portfolio. This site showcases my major writing
+            assignments including a personal narrative, exploratory essay and a rogerian response. Each sample includes
+            a short process statement, references and plenty of images to make your experience that much more
+            captivating.
+          </p>
+          <div class="button-row">
+
+            <a class="button primary" href="about.html">Read My Reflection</a>
+          </div>
+        </div>
+
+        <aside class="profile-card">
+          <img src="assets/profile-picture.avif" alt="Placeholder profile portrait" />
+          <h3>Abraham Greenberg</h3>
+          <p>First-Year Student | FYWR Class</p>
+        </aside>
       </div>
-    </header>
+    </section>
 
-    <main>
-      <section class="hero">
-        <div class="container hero-grid">
-          <div>
-            <p class="kicker">First-Year Writing Portfolio</p>
-            <h1>A collection of my writing journey.</h1>
+    <!-- // TODO: WORK ON THIS LATER -->
+    <section class="section">
+      <div class="container">
+        <h2>Featured Portfolio Sections</h2>
+        <div class="card-grid">
+          <article class="card">
+            <h3>Major Assignment 1</h3>
             <p>
-              Hi, my name is Abraham Greenberg. Welcome to my FYWR portfolio. This site showcases my major writing assignments including a personal narrative, exploratory essay and a rogerian response. Each sample includes a short process statement, references and plenty of images to make your experience that much more captivating. 
+              Add a short summary of the assignment, your process, and what revisions improved
+              the final version.
             </p>
-            <div class="button-row">
-              <a class="button primary" href="writing.html">View Writing Samples</a>
-              <a class="button secondary" href="about.html">Read My Reflection</a>
-            </div>
-          </div>
-
-          <aside class="profile-card">
-            <img src="assets/profile-picture.avif" alt="Placeholder profile portrait" />
-            <h3>Abraham Greenberg</h3>
-            <p>First-Year Student | FYWR Class</p>
-          </aside>
+          </article>
+          <article class="card">
+            <h3>Major Assignment 2</h3>
+            <p>
+              Use this space to share your claim, evidence strategy, and what feedback changed in
+              your draft cycle.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Final Reflection</h3>
+            <p>
+              Explain how your writing evolved. Mention one challenge, one breakthrough, and one
+              goal you are taking to future courses.
+            </p>
+          </article>
         </div>
-      </section>
+      </div>
+    </section>
+  </main>
 
-      <!-- // TODO: WORK ON THIS LATER -->
-      <section class="section">
-        <div class="container">
-          <h2>Featured Portfolio Sections</h2>
-          <div class="card-grid">
-            <article class="card">
-              <h3>Major Assignment 1</h3>
-              <p>
-                Add a short summary of the assignment, your process, and what revisions improved
-                the final version.
-              </p>
-            </article>
-            <article class="card">
-              <h3>Major Assignment 2</h3>
-              <p>
-                Use this space to share your claim, evidence strategy, and what feedback changed in
-                your draft cycle.
-              </p>
-            </article>
-            <article class="card">
-              <h3>Final Reflection</h3>
-              <p>
-                Explain how your writing evolved. Mention one challenge, one breakthrough, and one
-                goal you are taking to future courses.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-    </main>
+  <footer>
+    <div class="container">&copy; <span id="year"></span> Abraham Greenberg. All rights reserved.</div>
+  </footer>
+</body>
 
-    <footer>
-      <div class="container">&copy; <span id="year"></span> Abraham Greenberg. All rights reserved.</div>
-    </footer>
-  </body>
 </html>

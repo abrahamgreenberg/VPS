@@ -122,6 +122,10 @@ a {
   background: var(--surface);
 }
 
+a.writing-link {
+  cursor: pointer;
+}
+
 .nav-links a.active,
 .nav-item>a.active {
   color: var(--surface);
@@ -208,6 +212,8 @@ a {
   color: var(--muted);
   font-size: 1.05rem;
 }
+
+
 
 .button-row {
   margin-top: 1.4rem;
