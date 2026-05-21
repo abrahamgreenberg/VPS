@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Abraham Greenberg - Article Title</title>
+    <title>Abraham Greenberg - [Article Title]</title>
     <link rel="stylesheet" href="css/styles.css" />
     <script defer src="js/main.js"></script>
 </head>
@@ -32,59 +32,59 @@
 
     <main class="container">
         <section class="page-header">
-            <p class="kicker">Assignment Label</p>
-        </section>
-
-        <section class="article-intro">
-            <p>"Insert your guiding quote here." <br /><em>Source</em></p>
-            <p>
-                Add a short introduction to your essay here. Explain the context, stakes, and what the reader should
-                expect.
-            </p>
+            <p class="kicker">[Assignment Type]</p>
         </section>
 
         <figure class="article-banner">
-            <img src="assets/article-banner-placeholder.avif" alt="Descriptive banner alt text" />
+            <img src="assets/article-1-banner.avif" alt="[Describe banner image]" />
             <figcaption>
-                Caption text with image credit. For example: Photo by Name on Source.
+                [Image caption and credit]
             </figcaption>
         </figure>
 
-        <article class="content-panel sample-card">
-            <h2>Article Title</h2>
+        <section class="article-intro">
+            <p class="article-date"><time datetime="2026-01-01">[Month Day, Year]</time></p>
 
-            <p class="lead">
-                Opening paragraph. This lead uses the drop-cap styling and sets the tone for your narrative or argument.
-            </p>
+            <p class="quote-block">"[Opening quote text]"<br /><em>[Quote source]</em></p>
 
-            <p>
-                Body paragraph one. Continue developing your main idea with concrete details and clear transitions.
-            </p>
+            <p class="intro-opening">[Brief introduction to the topic, context, and purpose of this article.]</p>
+        </section>
 
-            <p>
-                Body paragraph two. Add supporting examples, reflection, or analysis depending on the assignment.
-            </p>
+        <article class="content-panel sample-card essay-article">
+            <h2>[Article Heading]</h2>
 
-            <p class="standout-line">Insert one key line or turning-point quote here.</p>
+            <p class="lead">[Lead paragraph. This gets the larger style and drop cap.]</p>
 
-            <p>
-                Body paragraph three. Expand on your central point and keep the flow moving toward your conclusion.
-            </p>
+            <p>[Body paragraph one.]</p>
+            <p>[Body paragraph two.]</p>
+            <p class="standout-line">[Optional standout line or key quote.]</p>
+            <p>[Body paragraph three.]</p>
+            <p>[Conclusion paragraph.]</p>
 
-            <p>
-                Closing paragraph. End with your takeaway, insight, or final reflection.
-            </p>
+            <!-- FOR REFENRCES -->
+            <sup><a href="#ref3-3">[3]</a></sup>
+
+            <!-- USE right/left FOR Images -->
+            <figure class="image-aside right">
+                <img src="assets/inline-placeholder.svg" alt="Placeholder evidence image for final argument" />
+                <figcaption>Figure 1. Placeholder image for evidence or contextual data.</figcaption>
+            </figure>
 
             <details class="references">
                 <summary>Process Statement</summary>
                 <section>
-                    <p>
-                        Describe your drafting process, major revisions, and how feedback influenced your final piece.
-                    </p>
-                    <p>
-                        Mention any strategies, writing goals, and what you would improve in a future version.
-                    </p>
+                    <p>[Describe your drafting/revision process.]</p>
+                    <p>[Explain what changed after feedback and why.]</p>
                 </section>
+            </details>
+
+            <details class="references">
+                <summary>References</summary>
+                <ol>
+                    <li id="ref3-1">Author, G. Building claims from evidence. University Writing Press, 2025.</li>
+                    <li id="ref3-2">Author, H. Argument structure and revision. Composition Notes, 9(1), 2026.</li>
+                    <li id="ref3-3">Author, I. Counterargument strategies for students. Pedagogy Reports, 2024.</li>
+                </ol>
             </details>
         </article>
     </main>

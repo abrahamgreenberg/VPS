@@ -336,6 +336,9 @@ a {
 
 .sample-card p.lead {
   color: #282622;
+  font-size: clamp(1.16rem, 1.4vw, 1.32rem);
+  line-height: 1.88;
+  text-indent: 0;
 }
 
 .sample-card p:not(.lead):not(.standout-line) {
@@ -386,7 +389,61 @@ a {
 }
 
 .article-intro {
-  margin-bottom: 1.9rem;
+  margin: 0 auto 1.9rem;
+}
+
+.article-intro p {
+  font-family: "Iowan Old Style", "Georgia", "Times New Roman", serif;
+  font-size: clamp(1.02rem, 1.1vw, 1.12rem);
+  line-height: 1.75;
+  color: var(--muted);
+  max-width: 72ch;
+  margin: 0 auto 0.95rem;
+}
+
+.article-intro p:first-child {
+  color: var(--muted);
+}
+
+.article-intro p.intro-opening {
+  padding-left: 0.85rem;
+  border-left: 3px solid #d8c8a8;
+  text-indent: 0;
+}
+
+.article-intro p.quote-block em {
+  display: block;
+  margin-top: 0.35rem;
+  text-align: right;
+  font-family: "Avenir Next", "Gill Sans", "Trebuchet MS", sans-serif;
+  font-size: 0.93rem;
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
+.sample-card p .quote-block {
+  display: block;
+  margin: 0.8rem auto;
+  padding: 0.85rem 1rem;
+  border-left: 4px solid var(--accent-2);
+  background: linear-gradient(90deg, #fbf2e3 0%, #fff8ef 100%);
+  border-radius: 10px;
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+  text-indent: 0;
+  max-width: 70ch;
+}
+
+.essay-article>p:not(.standout-line) {
+  font-size: clamp(1.16rem, 1.4vw, 1.32rem);
+  line-height: 1.88;
+  max-width: 74ch;
+}
+
+.essay-article>p:not(.lead):not(.standout-line) {
+  text-indent: 0;
 }
 
 .article-intro::after {
@@ -488,6 +545,16 @@ section {
   background: #fff8ec;
   border: 1px solid #eadcbf;
   border-radius: 12px;
+}
+
+.article-date {
+  margin: 0.45rem 0 0;
+  font-family: "Avenir Next", "Gill Sans", "Trebuchet MS", sans-serif;
+  font-size: 0.84rem;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .references summary {
@@ -611,6 +678,15 @@ footer {
   .sample-card p.lead::first-letter {
     font-size: 3.2rem;
     margin-right: 0.4rem;
+  }
+
+  .essay-article>p:not(.standout-line) {
+    font-size: 1.1rem;
+    line-height: 1.85;
+  }
+
+  .essay-article>p:not(.lead):not(.standout-line) {
+    text-indent: 0;
   }
 
   .card-grid {
