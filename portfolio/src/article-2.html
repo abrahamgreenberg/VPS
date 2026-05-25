@@ -3,22 +3,19 @@ layout: layouts/base.njk
 title: "Abraham Greenberg - Exploratory Essay"
 ---
 {% from "components/link.njk" import link %}
+{% from "components/banner.njk" import banner %}
+{% from "components/photo.njk" import photo %}
 
 <main class="container">
     <section class="page-header">
         <p class="kicker">Exploratory Essay</p>
     </section>
 
-    <figure class="article-banner">
-        <img src="assets/article-2-banner.avif" alt="[Describe banner image]" />
-        <figcaption>
-            Nike ZoomX Shoes; Photo by {{
-            link("https://unsplash.com/@zoshuacolah?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
-            "Zoshua Colah") }} on {{
-            link("https://unsplash.com/photos/a-pair-of-shoes-on-display-in-a-glass-case-wB7d407CPjU?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
-            "Unsplash") }}
-        </figcaption>
-    </figure>
+    {{ banner("assets/article-2-banner.avif", "Nike ZoomX Shoes; Photo by " ~
+    link("https://unsplash.com/@zoshuacolah?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText", "Zoshua
+    Colah") ~ " on " ~
+    link("https://unsplash.com/photos/a-pair-of-shoes-on-display-in-a-glass-case-wB7d407CPjU?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
+    "Unsplash"), "[Describe banner image]") }}
 
     <section class="article-intro">
         <p class="article-date"><time datetime="2026-03-12">March 12, 2026</time></p>
@@ -72,15 +69,11 @@ title: "Abraham Greenberg - Exploratory Essay"
             acceptable?
         </p>
         <p class="standout-line"> Why do we watch sports? Is it for the game or for the athlete? </p>
-        <figure class="image-aside right">
-            <img src="assets/football.avif" alt="An old tennis racquet" />
-            <figcaption>Figure 1. A football player; Photo by {{
-                link("https://unsplash.com/@concoyne?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
-                "Connor Coyne") }} on {{
-                link("https://unsplash.com/photos/white-and-blue-soccer-ball-on-green-grass-field-OgqWLzWRSaI?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
-                "Unsplash") }}
-            </figcaption>
-        </figure>
+        {{ photo("assets/football.avif", "Figure 1. A football player; Photo by " ~
+        link("https://unsplash.com/@concoyne?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
+        "Connor Coyne") ~ " on " ~
+        link("https://unsplash.com/photos/white-and-blue-soccer-ball-on-green-grass-field-OgqWLzWRSaI?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
+        "Unsplash"), "right", "An old tennis racquet") }}
         <p>
             There was another time when the appearance of technology in sports made some people uncomfortable. On 1
             September 2016, FIFA successfully conducted its first official test of Video Assistant Referees (VAR)
@@ -169,15 +162,11 @@ title: "Abraham Greenberg - Exploratory Essay"
             that
             people love?
         </p>
-        <figure class="image-aside right">
-            <img src="assets/robots.avif" alt="An old tennis racquet" />
-            <figcaption>Figure 2. Robots fighting (not what BattleBots actually looks like) Photo by {{
-                link("https://unsplash.com/@tdponcet?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
-                "Theo") }} on {{
-                link("https://unsplash.com/photos/a-couple-of-toy-robots-standing-on-top-of-a-wooden-table-kqv37CRVnVc?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
-                "Unsplash") }}
-            </figcaption>
-        </figure>
+        {{ photo("assets/robots.avif", "Figure 2. Robots fighting (not what BattleBots actually looks like) Photo by " ~
+        link("https://unsplash.com/@tdponcet?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
+        "Theo") ~ " on " ~
+        link("https://unsplash.com/photos/a-couple-of-toy-robots-standing-on-top-of-a-wooden-table-kqv37CRVnVc?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
+        "Unsplash"), "right", "An old tennis racquet") }}
         <p>
             BattleBots<sup><a href="#ref2-2">(BattleBots)</a></sup> describes itself as “An intense, fast-moving,
             family-friendly, fight-fest starring robots
@@ -238,10 +227,8 @@ title: "Abraham Greenberg - Exploratory Essay"
             reasons. When it came to VAR, fans' biggest gripe was how long it took only to be told that the goal was
             offside or there was a foul in the end; perhaps Hawk-Eye solved this.
         </p>
-        <figure class="image-aside left">
-            <img src="assets/old-tennis.avif" alt="An old tennis racquet" />
-            <figcaption>Figure 3. An old tennis racquet (ITHF collection). </figcaption>
-        </figure>
+        {{ photo("assets/old-tennis.avif", "Figure 3. An old tennis racquet (ITHF collection).", "left", "An old tennis
+        racquet") }}
         <p>
             A modern tennis racquet also looks nothing like its ancestor from 100 years ago. “Development of such an
             essential and personal piece of equipment has been no simple task over the years. Rather, tennis

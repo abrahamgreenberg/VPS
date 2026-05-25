@@ -1,0 +1,2 @@
+{% macro image(src, caption, alt="") %}<img src="{{ src }}" alt="{{ alt }}" />{% if caption %}
+<figcaption>{{ caption | safe }}</figcaption>{% endif %}{% endmacro %}

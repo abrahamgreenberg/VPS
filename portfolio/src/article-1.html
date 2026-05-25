@@ -3,6 +3,8 @@ layout: layouts/base.njk
 title: "Abraham Greenberg - Personal Narrative"
 ---
 {% from "components/link.njk" import link %}
+{% from "components/banner.njk" import banner %}
+{% from "components/photo.njk" import photo %}
 
 <main class="container">
   <section class="page-header">
@@ -10,15 +12,11 @@ title: "Abraham Greenberg - Personal Narrative"
 
   </section>
 
-  <figure class="article-banner">
-    <img src="assets/article-1-banner.avif" alt="Placeholder banner for literacy narrative" />
-    <figcaption>The Rock of Gibraltar; Photo by {{
-      link("https://unsplash.com/@miqul?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText", "Michal
-      Mrozek") }} on {{
-      link("https://unsplash.com/photos/moutanin-and-city-scenery-Fz3vBE8XoHc?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
-      "Unsplash") }}
-    </figcaption>
-  </figure>
+  {{ banner("assets/article-1-banner.avif", "The Rock of Gibraltar; Photo by " ~
+  link("https://unsplash.com/@miqul?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText", "Michal
+  Mrozek") ~ " on " ~
+  link("https://unsplash.com/photos/moutanin-and-city-scenery-Fz3vBE8XoHc?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
+  "Unsplash"), "Placeholder banner for literacy narrative") }}
 
   <section class="article-intro">
     <p class="article-date"><time datetime="2026-03-12">March 12, 2026</time></p>
@@ -64,12 +62,10 @@ title: "Abraham Greenberg - Personal Narrative"
       built like a tank. The two bookshelves formed a rough gradient, with new prayer books at the top, growing older
       as you went down. The new ones were colored in a tacky, shiny blue plastic cover with a golden-yellow, old-style
       font. </p>
-    <figure class="image-aside right">
-      <img src="assets/shul-picture.avif" alt="Picture of my shul" />
-      <figcaption>Figure 1. Picture of my shul. {{
-        link("https://commons.wikimedia.org/wiki/File:Inside_Flemish_Synagogue_Gibraltar.jpg", "Moshi Anahory") }}, {{
-        link("https://creativecommons.org/licenses/by-sa/2.0", "CC BY-SA 2.0") }}, via Wikimedia Commons</figcaption>
-    </figure>
+    {{ photo("assets/shul-picture.avif", "Figure 1. Picture of my shul. " ~
+    link("https://commons.wikimedia.org/wiki/File:Inside_Flemish_Synagogue_Gibraltar.jpg", "Moshi Anahory") ~ ", " ~
+    link("https://creativecommons.org/licenses/by-sa/2.0", "CC BY-SA 2.0") ~ ", via Wikimedia Commons", "right",
+    "Picture of my shul") }}
     <p>The minute I walked in, my skin felt one hundred eye balls point in my direction. You would think someone like
       Winston Churchill or Elvis Presley walked into the room. People flashed a friendly smile, and there were firm
       handshakes here and there, with people asking how I had been and saying they were pleased to see me. I had

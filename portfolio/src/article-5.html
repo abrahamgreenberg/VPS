@@ -3,22 +3,18 @@ layout: layouts/base.njk
 title: "Abraham Greenberg - Showcase: Peer Review Response Letter"
 ---
 {% from "components/link.njk" import link %}
+{% from "components/banner.njk" import banner %}
 
 <main class="container">
     <section class="page-header">
         <p class="kicker">Showcase: Peer review</p>
     </section>
 
-    <figure class="article-banner">
-        <img src="assets/article-5-banner.avif" alt="[Describe banner image]" />
-        <figcaption>
-            Photo of friends in library; Photo by {{
-            link("https://unsplash.com/@ageing_better?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
-            "Centre for Ageing Better") }} on {{
-            link("https://unsplash.com/photos/two-men-studying-books-in-a-library-wdJ2ueQlRpo?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
-            "Unsplash") }}
-        </figcaption>
-    </figure>
+    {{ banner("assets/article-5-banner.avif", "Photo of friends in library; Photo by " ~
+    link("https://unsplash.com/@ageing_better?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
+    "Centre for Ageing Better") ~ " on " ~
+    link("https://unsplash.com/photos/two-men-studying-books-in-a-library-wdJ2ueQlRpo?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
+    "Unsplash"), "[Describe banner image]") }}
 
     <section class="article-intro">
         <p class="article-date"><time datetime="2026-02-24">February 24, 2026</time></p>

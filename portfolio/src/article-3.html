@@ -3,22 +3,19 @@ layout: layouts/base.njk
 title: "Abraham Greenberg - Rogerian Response"
 ---
 {% from "components/link.njk" import link %}
+{% from "components/banner.njk" import banner %}
+{% from "components/photo.njk" import photo %}
 
 <main class="container">
   <section class="page-header">
     <p class="kicker">Rogerian Response</p>
   </section>
 
-  <figure class="article-banner">
-    <img src="assets/article-3-banner.avif" alt="[Describe banner image]" />
-    <figcaption>
-      A picture of some Challah for Shabbos; Photo by {{
-      link("https://unsplash.com/@svebar15?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
-      "Svetlana B") }} on {{
-      link("https://unsplash.com/photos/brown-bread-on-white-paper-y60g_hGnKQM?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
-      "Unsplash") }}
-    </figcaption>
-  </figure>
+  {{ banner("assets/article-3-banner.avif", "A picture of some Challah for Shabbos; Photo by " ~
+  link("https://unsplash.com/@svebar15?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText", "Svetlana
+  B") ~ " on " ~
+  link("https://unsplash.com/photos/brown-bread-on-white-paper-y60g_hGnKQM?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
+  "Unsplash"), "[Describe banner image]") }}
 
   <section class="article-intro">
     <p class="article-date"><time datetime="2026-05-21">May 21, 2026</time></p>
@@ -70,10 +67,8 @@ title: "Abraham Greenberg - Rogerian Response"
       I concede this was written two years ago, but I would urge you to reassess whether such a statement still
       holds.
     </p>
-    <figure class="image-aside left">
-      <img src="assets/shabbos-schedule.avif" alt="Shabbos schedule" />
-      <figcaption>Figure 1. Shabbos schedule.<sup><a href="#ref3-6">(YU)</a></sup> </figcaption>
-    </figure>
+    {{ photo("assets/shabbos-schedule.avif", 'Figure 1. Shabbos schedule.<sup><a href="#ref3-6">(YU)</a></sup>', "left",
+    "Shabbos schedule") }}
     <p>When I reflect on my time in Yeshiva in Israel, there was nothing particularly special about the programming
       available. The food was average, there weren’t many shiurim in the afternoon, and I was probably a lot more
       bored than I like to admit. Here is the schedule for the Achdus Shabbaton, which features thirteen minyanim,
