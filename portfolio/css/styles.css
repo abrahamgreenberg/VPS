@@ -358,6 +358,7 @@ a.writing-link {
   margin-right: auto;
 }
 
+
 .sample-card p.lead {
   color: #282622;
   font-size: clamp(1.16rem, 1.4vw, 1.32rem);
@@ -379,11 +380,11 @@ a.writing-link {
 }
 
 .sample-card p.standout-line {
-  margin-top: 1.2rem;
+  margin-top: 0;
   margin-bottom: 1.2rem;
   padding: 0.85rem 1rem;
-  border-left: 4px solid var(--accent-2);
-  background: linear-gradient(90deg, #fbf2e3 0%, #fff8ef 100%);
+  border-left: 4px solid var(--accent);
+  background: linear-gradient(90deg, #e3f2fb 0%, #eff8ff 100%);
   border-radius: 10px;
   font-style: italic;
   font-weight: 600;
@@ -556,6 +557,14 @@ section {
 }
 
 .references section p {
+  font-family: "Iowan Old Style", "Georgia", "Times New Roman", serif;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--muted);
+}
+
+.references li {
+  font-family: "Iowan Old Style", "Georgia", "Times New Roman", serif;
   font-size: 1rem;
   line-height: 1.75;
   color: var(--muted);

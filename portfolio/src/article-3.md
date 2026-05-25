@@ -25,11 +25,11 @@ articleIntro: >-
 
 <p class="lead">Dear Aiden Harrow,</p>
 
-I will be the first to testify to some of the frustrations stated in your article “Out of Town, Out of Luck”{{ ref("ref3-3", "Harow") }}. As a fellow out-of-towner, spending Shabbos on campus can feel very isolating. I feel it every Thursday when my peers show up to class, suitcase in one hand, Uber in the other, itching to return home and spend the weekend with their families. I sometimes envy the fact that they don’t have to think about returning to campus until Monday morning, while I will be stuck in my dorm room for the next four days. On quiet weeks, it can feel like YU cobbled together some cold chicken and bread rolls just so they could accommodate all those “out-of-towners” who didn’t have anywhere to go for Shabbos.
+I will be the first to testify to some of the frustrations stated in your article “Out of Town, Out of Luck” {{ ref("ref3-3", "Harow") }}. As a fellow out-of-towner, spending Shabbos on campus can feel very isolating. I feel it every Thursday when my peers show up to class, suitcase in one hand, Uber in the other, itching to return home and spend the weekend with their families. I sometimes envy the fact that they don’t have to think about returning to campus until Monday morning, while I will be stuck in my dorm room for the next four days. On quiet weeks, it can feel like YU cobbled together some cold chicken and bread rolls just so they could accommodate all those “out-of-towners” who didn’t have anywhere to go for Shabbos.
 
 In any case, your argument is built around Yeshiva University’s readiness to start building up a better on-campus Shabbos and Yom Tov experience. I think we both understand the importance of this. Not only does it affect YU's reputation throughout the wider community, for example, I would love to bring friends over to see some of the best that YU has to offer, but, as you said, it has a very deep and personal significance for us out-of-towners. Frankly, at the moment, the majority of students who will likely stay in for chag will do so only out of necessity.
 
-As you do, I also reminisce about Shabbasim in my Yeshiva in Israel. I remember fondly eating meals in Rebbeim’s houses and some of the Shabbos shenanigans. Friends and family form a core part of the essence of Shabbos, as Rabbi Lord Jonathan Sacks says, “Shabbat is a celebration of the Jewish home, and the home is the matrix of Judaism“{{ ref("ref3-5", "Sacks") }}. We both seem to agree on one thing: the stark contradiction between the quality of Shabbos in our respective Israeli Yeshivas and at YU is something we ought to fix.
+As you do, I also reminisce about Shabbasim in my Yeshiva in Israel. I remember fondly eating meals in Rebbeim’s houses and some of the Shabbos shenanigans. Friends and family form a core part of the essence of Shabbos, as Rabbi Lord Jonathan Sacks says, “Shabbat is a celebration of the Jewish home, and the home is the matrix of Judaism“ {{ ref("ref3-5", "Sacks") }}. We both seem to agree on one thing: the stark contradiction between the quality of Shabbos in our respective Israeli Yeshivas and at YU is something we ought to fix.
 
 Yet, I don’t agree with placing the entire blame on YU's administration: “But, YU did not concede. Instead, they doubled down.” I think the root of the problem is the fact that in Israel, we’re all “out-of-towners,” yet at YU, only some of us are. So when YU offers us extended programming and the opportunity to learn in Yeshiva, it is up to the student body to band together and make the most of it. In your article, you state:
 
@@ -39,11 +39,11 @@ Yet, I don’t agree with placing the entire blame on YU's administration: “Bu
 
 I concede this was written two years ago, but I would urge you to reassess whether such a statement still holds.
 
-{{ photo("assets/shabbos-schedule.avif", "Figure 1. Shabbos schedule." ~ ref("ref3-6", "YU"), "left", "Shabbos schedule") }}
+{{ photo("assets/shabbos-schedule.avif", "Figure 1. Shabbos schedule. " ~ ref("ref3-6", "YU"), "left", "Shabbos schedule") }}
 
 When I reflect on my time in Yeshiva in Israel, there was nothing particularly special about the programming available. The food was average, there weren’t many shiurim in the afternoon, and I was probably a lot more bored than I like to admit. Here is the schedule for the Achdus Shabbaton, which features thirteen minyanim, four shiurim from multiple Rebeim, and plenty of learning opportunities. The only thing missing is the students! This is a problem at YU, but it’s not YU’s problem. It's ours.
 
-Another important reason I believe YU wants to keep students on campus is that it typically falls early in the year, between mid-September and mid-October. A study conducted by Arnfrid Pinto{{ ref("ref3-4", "Pinto") }} states:
+Another important reason I believe YU wants to keep students on campus is that it typically falls early in the year, between mid-September and mid-October. A study conducted by {{ ref("ref3-4", "Arnfrid Pinto", false) }} states:
 
 {% call quoteblock() %}Key moments, such as introduction week, mentorship programs, and inclusive activities, play a pivotal role in establishing a sense of community and belonging.{% endcall %}
 
