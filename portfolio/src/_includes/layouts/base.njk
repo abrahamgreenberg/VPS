@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script defer src="js/main.js"></script>
+</head>
+
+<body>
+  <header class="nav-shell">
+    <div class="container nav">
+      <a class="brand" href="index.html">Abraham Greenberg</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-label="Toggle menu">Menu</button>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <div class="nav-item has-dropdown">
+          <a class="writing-link" aria-haspopup="true" aria-expanded="false">Writing</a>
+          <div class="dropdown" aria-label="Writing pages">
+            {% for link in navLinks %}
+            <a href="{{ link.url }}">{{ link.title }}</a>
+            {% endfor %}
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  {{ content | safe }}
+
+  <footer>
+    <div class="container">&copy; <span id="year"></span> Abraham Greenberg. All rights reserved.</div>
+  </footer>
+</body>
+
+</html>
