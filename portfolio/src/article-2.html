@@ -3,6 +3,8 @@ layout: layouts/base.njk
 title: "Abraham Greenberg - Exploratory Essay"
 ---
 {% from "components/link.njk" import link %}
+{% from "components/ref.njk" import ref %}
+{% from "components/biblio.njk" import biblio %}
 {% from "components/banner.njk" import banner %}
 {% from "components/photo.njk" import photo %}
 
@@ -56,7 +58,7 @@ title: "Abraham Greenberg - Exploratory Essay"
             running
             tech people were using to get faster times, namely air bubbles, special foam, and most importantly, a
             carbon
-            plate<sup><a href="#ref2-11">(Nike)</a></sup>. What people didn’t like was the fact that it felt as if
+            plate{{ ref("ref2-11", "Nike") }}. What people didn’t like was the fact that it felt as if
             Kipchoge “cheated”. He used a pair
             of
             so-called “super-shoes” that helped him run such a fast time. To add fuel to the fire, these shoes were
@@ -78,7 +80,7 @@ title: "Abraham Greenberg - Exploratory Essay"
             There was another time when the appearance of technology in sports made some people uncomfortable. On 1
             September 2016, FIFA successfully conducted its first official test of Video Assistant Referees (VAR)
             during
-            the friendly match between Italy and France in Bari<sup><a href="#ref2-8">(INSIDE FIFA)</a></sup>. FIFA
+            the friendly match between Italy and France in Bari{{ ref("ref2-8", "INSIDE FIFA") }}. FIFA
             has since adopted VAR across
             many of
             its major leagues, including the World Cup, Premier League, and Champions League<sup><a
@@ -108,7 +110,7 @@ title: "Abraham Greenberg - Exploratory Essay"
             is when I'm playing with friends in a barely legal game of basketball, in a light-hearted atmosphere
             where
             missing hoops is ok. “Goals are often celebrated twice now – once when the ball enters the net and again
-            when the VAR check confirms that the goal will stand“<sup><a href="#ref2-1">(AnalyiSport)</a></sup>. Not
+            when the VAR check confirms that the goal will stand“{{ ref("ref2-1", "AnalyiSport") }}. Not
             to mention the extended time it
             takes for a decision, sometimes up to five minutes. This added tension seems unnecessary and takes away
             a
@@ -363,9 +365,8 @@ title: "Abraham Greenberg - Exploratory Essay"
                     link("https://chatgpt.com/c/69c4769b-c150-832e-9355-51a5e3269bee") }}.
                     Accessed 25 March 2026.
                 </li>
-                <li id="ref2-7">Evolve Tennis. <em>“A Brief History and Evolution of Tennis Racquets.”</em> Evolve
-                    Tennis,
-                    2026. Accessed 21 May 2026.</li>
+                {{ biblio("ref2-7", "Evolve Tennis.", "A Brief History and Evolution of Tennis Racquets.", "Evolve
+                Tennis, 2026. Accessed 21 May 2026.") }}
                 <li id="ref2-8">INSIDE FIFA. <em>“FIFA holds successful first official “semi-live” tests with Video
                         Assistant Referees (VARs).”</em> INSIDE FIFA, 02 September 2016,
                     {{

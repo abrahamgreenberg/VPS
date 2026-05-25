@@ -3,6 +3,8 @@ layout: layouts/base.njk
 title: "Abraham Greenberg - Rogerian Response"
 ---
 {% from "components/link.njk" import link %}
+{% from "components/ref.njk" import ref %}
+{% from "components/biblio.njk" import biblio %}
 {% from "components/banner.njk" import banner %}
 {% from "components/photo.njk" import photo %}
 
@@ -26,7 +28,7 @@ title: "Abraham Greenberg - Rogerian Response"
     <p class="intro-opening">Trust. One of the key things you need to make an arugment. As the "elephant" example
       explains, if you don't have the other person's elephant, then you will never be able to have a successful
       response. While Fred Rogers is a legendary example of this, I also tried to build trust when responding to an
-      article in the YU Commentator titled "Out of Town"<sup><a href="#ref3-3">(Harow)</a></sup>. It argued that YU's
+      article in the YU Commentator titled "Out of Town"{{ ref("ref3-3", "Harow") }}. It argued that YU's
       schedule was pitted against
       international students by "forcing them" to stay. I thought otherwise.</p>
   </section>
@@ -37,7 +39,7 @@ title: "Abraham Greenberg - Rogerian Response"
 
     <p class="lead">Dear Aiden Harrow, </p>
     <p>I will be the first to testify to some of the frustrations stated in your article “Out of Town, Out of
-      Luck”<sup><a href="#ref3-3">(Harow)</a></sup>.
+      Luck”{{ ref("ref3-3", "Harow") }}.
       As a fellow out-of-towner, spending Shabbos on campus can feel very isolating. I feel it every Thursday when my
       peers show up to class, suitcase in one hand, Uber in the other, itching to return home and spend the weekend
       with their families. I sometimes envy the fact that they don’t have to think about returning to campus until
@@ -53,7 +55,7 @@ title: "Abraham Greenberg - Rogerian Response"
     <p>As you do, I also reminisce about Shabbasim in my Yeshiva in Israel. I remember fondly eating meals in
       Rebbeim’s houses and some of the Shabbos shenanigans. Friends and family form a core part of the essence of
       Shabbos, as Rabbi Lord Jonathan Sacks says, “Shabbat is a celebration of the Jewish home, and the home is the
-      matrix of Judaism“<sup><a href="#ref3-5">(Sacks)</a></sup>. We both seem to agree on one thing: the stark
+      matrix of Judaism“{{ ref("ref3-5", "Sacks") }}. We both seem to agree on one thing: the stark
       contradiction between the quality of Shabbos
       in our respective Israeli Yeshivas and at YU is something we ought to fix. </p>
     <p> Yet, I don’t agree with placing the entire blame on YU's administration: “But, YU did not concede. Instead,
@@ -155,7 +157,7 @@ title: "Abraham Greenberg - Rogerian Response"
         <li id="ref3-5">Sacks, Rabbi Jonathan. <em>“Shabbat At Home.”</em> Orthodox Union, 09 Jul 2009,
           {{ link("https://www.ou.org/life/torah/a_shabbat_home/") }}. Accessed 12 May 2026.
         </li>
-        <li id="ref3-6">YU. <em>Parshas Behar-Bechukosai. Shabbos Schedule for YU.</em> May 2026.</li>
+        {{ biblio("ref3-6", "YU.", "Parshas Behar-Bechukosai. Shabbos Schedule for YU.", "May 2026.") }}
 
 
         <!-- <li id="ref3-1">Author, G. Building claims from evidence. University Writing Press, 2025.</li>
