@@ -1,0 +1,42 @@
+{% macro ref(refid, text) %}<sup><a href="#{{ refid }}">({{ text }})</a></sup>{% endmacro %}
+
+{% macro biblio(id, author, name, reference) %}<li id="{{ id }}">{{ author }} <em>“{{ name }}.”</em> {{ reference | safe }}</li>{% endmacro %}
+
+
+{% macro summary(title, wrapper="section") %}<details class="references">
+  <summary>{{ title }}</summary>
+  {% if wrapper == "ol" %}
+  <ol>
+    {{ caller() }}
+  </ol>
+  {% elif wrapper == "ul" %}
+  <ul>
+    {{ caller() }}
+  </ul>
+  {% else %}
+  <section>
+    {{ caller() }}
+  </section>
+  {% endif %}
+</details>{% endmacro %}
+
+{% macro references() %}<details class="references">
+  <summary>References</summary>
+  <ol>
+    {{ caller() }}
+  </ol>
+</details>{% endmacro %}
+
+{% macro process() %}<details class="references">
+  <summary>Process Statement</summary>
+  <section>
+    {{ caller() }}
+  </section>
+</details>{% endmacro %}
+
+{% macro bibliography() %}<details class="references">
+  <summary>Bibliography</summary>
+  <ol>
+    {{ caller() }}
+  </ol>
+</details>{% endmacro %}

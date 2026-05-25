@@ -12,6 +12,8 @@ articleIntro: >-
     This is a submission for a class I took called Arch of Titus with Prof. Steven Fine. This essay was one trying to tackle the question, why are there some many differing accounts to do with Titus' death? More midrashic interpretations suggest a divine retribution, while historical accounts lean towards political intrigue. The reason I have included it is I try to deploy some exploratory techniques discussed. Although the essay is structured more traditionally as a whole with an opening thesis and queries, its resolution attempts to build some exploratory techniquues within it.
 ---
 
+{% from "components/summary.njk" import references %}
+
 ## Tales of Titus
 
 ### A Death Divided by Accounts
@@ -38,12 +40,9 @@ A Jewish scholar gazing into the same engraving of Titus on the back of an eagle
 
 So why the wildly different stories? Because there are two different narratives. Titus the hero versus Titus HaRasha. Titus the peace maker versus Titus the warlord. Titus the divine versus Titus who was taken down by the Gnat. These fundamental assumptions and worldviews lead to very different outcomes. To the Roman, Titus’death was a natural step in the “Roman” way of politics, and Titus’ natural progression from leader to Divine. To the Jew, Titus’ death is a punishment that is exact, immediate, and humiliating, brought about by divine retribution.
 
-<details class="references">
-  <summary>References</summary>
-  <ol>
+{% call references() %}
     <li id="ref6-1">Bible. Vayikra 10. Al Hatora. https://mg.alhatorah.org/Full/Vayikra/10.1#e0n6.</li>
     <li id="ref6-2">Bulley, Tony, dir. 2017. Imperium - Vespasian: The Path to Power. https://www.youtube.com/watch?v=bUdotxA0ws8.</li>
     <li id="ref6-3">Fine, Steven. n.d. “Why was Titus killed by a gnat? Reflections on a rabbinic legend.” In Emet Le-Ya'akov: Facing the Truths of History: Essays in Honor of Jacob J. Schacter, edited by Zev Eleff and Shaul Seidler-Feller, 544 - 568. Boston: Academic Studies Press. Accessed April 22, 2026. https://repository.yu.edu/items/0a97b365-55c4-4a81-a15f-689ec50f9833.</li>
     <li id="ref6-4">Weiss, Yosaif A. 2008. A Daily Dose of Torah: [Limud Yomi]: A Torah Theme for Every Day of Every Week from All Areas of Torah Literature, Collected for Daily Study: Series Two. Rahway: Mesorah Publications.</li>
-  </ol>
-</details>
+{% endcall %}

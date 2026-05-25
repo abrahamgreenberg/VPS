@@ -15,9 +15,8 @@ articleIntro: >-
   Trust. One of the key things you need to make an arugment. As the "elephant" example explains, if you don't have the other person's elephant, then you will never be able to have a successful response. While Fred Rogers is a legendary example of this, I also tried to build trust when responding to an article in the YU Commentator titled "Out of Town"<sup><a href="#ref3-3">(Harow)</a></sup>. It argued that YU's schedule was pitted against international students by "forcing them" to stay. I thought otherwise.
 ---
 {% from "components/link.njk" import link %}
-{% from "components/ref.njk" import ref %}
-{% from "components/biblio.njk" import biblio %}
-{% from "components/photo.njk" import photo %}
+{% from "components/image.njk" import photo %}
+{% from "components/summary.njk" import references, ref, biblio %}
 
 ## Response to 'Out of Town, Out of Luck'
 
@@ -62,14 +61,11 @@ We out-of-towners have an extra stake in building a thriving and supportive comm
 Kind regards,  
 Abi Greenberg
 
-<details class="references">
-  <summary>References</summary>
-  <ol>
+{% call references() %}
     <li id="ref3-1">Cellini, Stephanie Riegg, and Kathryn J. Blanchard. <em>“How does virtual learning impact students in higher education? | Brookings.”</em> Brookings Institution, 13 August 2021, {{ link("https://www.brookings.edu/articles/how-does-virtual-learning-impact-students-in-higher-education/") }}. Accessed 12 May 2026.</li>
     <li id="ref3-2">Dearth-Wesley, Tracy, et al. <em>“School Activity Participation and Sense of Belonging among U.S. College Students.”</em> Journal of American College Health, vol. Aug, no. 2025, 2025, pp. 1 - 10. EBSCOhost, {{ link("https://doi.org/10.1080/07448481.2025.2555600") }}. Accessed 17 May 2026.</li>
     <li id="ref3-3">Harow, Aiden. <em>“Out of Town, Out of Luck.”</em> The Yeshiva University Observer, 26 Aug 2024, {{ link("https://yuobserver.org/2024/08/out-of-town-out-of-luck/") }}. Accessed 12 May 2026.</li>
     <li id="ref3-4">Pinto, Arnfrid Farbu, et al. <em>“Beyond the first week: sustaining the feeling of social inclusion and sense of belonging for students.”</em> International Journal of Qualitative Studies on Health & Well-Being, vol. 19, no. 1, 2024, pp. 1-11. EBSCOhost, {{ link("https://doi.org/10.1080/17482631.2024.2421032") }}. Accessed 12 May 2026.</li>
     <li id="ref3-5">Sacks, Rabbi Jonathan. <em>“Shabbat At Home.”</em> Orthodox Union, 09 Jul 2009, {{ link("https://www.ou.org/life/torah/a_shabbat_home/") }}. Accessed 12 May 2026.</li>
     {{ biblio("ref3-6", "YU.", "Parshas Behar-Bechukosai. Shabbos Schedule for YU.", "May 2026.") }}
-  </ol>
-</details>
+{% endcall %}

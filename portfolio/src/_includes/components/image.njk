@@ -1,2 +1,10 @@
 {% macro image(src, caption, alt="") %}<img src="{{ src if src[0] == "/" else "/" + src }}" alt="{{ alt }}" />{% if caption %}
 <figcaption>{{ caption | safe }}</figcaption>{% endif %}{% endmacro %}
+
+{% macro banner(src, caption, alt="") %}<figure class="article-banner">
+  {{ image(src, caption, alt) }}
+</figure>{% endmacro %}
+
+{% macro photo(src, caption, side, alt="") %}<figure class="image-aside {{ side }}">
+  {{ image(src, caption, alt) }}
+</figure>{% endmacro %}

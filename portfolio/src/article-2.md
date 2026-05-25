@@ -16,9 +16,9 @@ articleIntro: >-
     Ahh, the exploratory essay. This assignment gave me the opportunity to choose a more "contraversial" topic and see both sides. I decided to explore sports and how much of an influence techonology should have on it. Such a topic is important to discuss, especially in an already technology filled world. I understand why some people view sports as something this is a human accomplishment, and should therefore have no technological influence. But how aware are we of technology's already creeping influence on sports?
 ---
 {% from "components/link.njk" import link %}
-{% from "components/ref.njk" import ref %}
-{% from "components/biblio.njk" import biblio %}
-{% from "components/photo.njk" import photo %}
+{% from "components/image.njk" import photo %}
+{% from "components/summary.njk" import references, process, ref, biblio %}
+{% from "components/standout.njk" import standout %}
 
 ## Faster by Design
 
@@ -28,7 +28,7 @@ articleIntro: >-
 
 What generated the greatest controversy by far was the fact that Kipchoge was kitted out with a fresh pair of “Nike Air Zoom Alphafly NEXT%” shoes. These shoes introduced the world to the latest and greatest running tech people were using to get faster times, namely air bubbles, special foam, and most importantly, a carbon plate{{ ref("ref2-11", "Nike") }}. What people didn’t like was the fact that it felt as if Kipchoge “cheated”. He used a pair of so-called “super-shoes” that helped him run such a fast time. To add fuel to the fire, these shoes were not yet available for purchase by the public. For some, this unfairly available technological boost crossed the line. Others argued that even with all these edges, no one else could match Kipchoge, and the run was indeed fair. This argument raised questions I needed to resolve: How much of a technology boost should be acceptable?
 
-<p class="standout-line">Why do we watch sports? Is it for the game or for the athlete?</p>
+{{ standout("Why do we watch sports? Is it for the game or for the athlete?") }}
 
 {{ photo("assets/football.avif", "Figure 1. A football player; Photo by " ~
 link("https://unsplash.com/@concoyne?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
@@ -44,7 +44,7 @@ This rejection of ultra-technical games really resonates with me. Humans are mes
 
 But how much does this new technology affect athletes' performance? In the NYT article, Buckingham<sup><a href="#ref2-5">(Buckingham)</a></sup> pointed out a measurable drop in red cards, but I found that many of the arguments against VAR, like this one, seem to be about subjective calls, such as red cards or offside goals. I can understand why football spectators would be annoyed to see a goal retroactively taken away from their favorite team, but I wanted to explore a more objective way to assess any recent technological impact on sports. In fact, I initially didn’t think a new pair of shoes could make that much of a difference in Kipchoge’s run.
 
-<p class="standout-line">I was very surprised to find that, in fact, the answer is that they do.</p>
+{{ standout("I was very surprised to find that, in fact, the answer is that they do.") }}
 
 In a study, Muniz-Pardos<sup><a href="#ref2-10">(Muniz-Pardos)</a></sup> makes the bold claim that all recent record-breaking runs, including Kipchoge's, were only possible because of all the new shoe technology, especially carbon plates. The most damning evidence is a giant table of recent world records set in the past five years, since carbon-plated shoes were first used. Pretty much every record from 5k to 10k to the half-marathon was set with carbon-plated shoes <sup><a href="#ref2-10">(Muniz-Pardos, 373)</a></sup>. The article goes on to explore how they even help in the first place. To run quicker, you can either improve your biomechanics (how you run) or minimize the energy you lose with every stride. Previous studies suggest that flexibility in the forefoot or metatarsophalangeal joints (or as you may know them, “toes”) increases energy losses during running. Carbon-plated shoes reduce this flexibility, thereby lowering energy expenditure and allowing people to run faster and further.
 
@@ -60,7 +60,7 @@ BattleBots<sup><a href="#ref2-2">(BattleBots)</a></sup> describes itself as “A
 
 Yet this didn’t feel in the spirit of what I wanted to answer; my focus on this piece was on how human athletes have been enhanced by sport. While the question of “robot athletics” remains fascinating, I wanted to refine my question to focus on the human. What is an example of a positive impact for viewers that has come about due to human athletes using new technology? Is there a sport that has changed so fundamentally because of technology that we are unaware of how much it has?
 
-<p class="standout-line">Is there a sport that has changed so fundamentally because of technology that we are unaware of how much it has?</p>
+{{ standout("Is there a sport that has changed so fundamentally because of technology that we are unaware of how much it has?") }}
 
 ChatGPT<sup><a href="#ref2-6">(ChatGPT)</a></sup> says there is: Tennis! ChatGPT pointed out a few ways in which tennis has really developed in the past century, most significantly, racquet technology and Hawk-Eye. Hawk-Eye is a technology that uses high-speed cameras to predict the ball's motion and provide a quick resolution to players' challenges <sup><a href="#ref2-13">(TennisHQ)</a></sup>. It provides a much more accurate call than humans; it has an error of only 2.6mm and displays graphics of the call that show the system's thought process. This sentiment around Hawk-Eye is totally different from that of VAR. While I could find criticisms of Hawk-Eye and some of its potentially faulty calls, it generally seemed much more widely accepted and loved than VAR. The biggest praise for Hawk-Eye has been that it has led to significantly fewer disputed rulings and has delivered them in a fraction of the time compared to human judgment. Hawk-Eye also seemed to become significantly more accepted as “the future” during COVID. Human line judges were not allowed due to social distancing, so Hawk-Eye was a key technology that even made tournaments possible in the first place.
 
@@ -78,19 +78,14 @@ Secondly, and perhaps more importantly, is the level of transparency. Modern ten
 
 I think this helps us determine how much of a technology boost is acceptable. A BattleBots fan would tell you to forget athletes altogether and build a weaponized super-ultra-monster robot that literally demolishes its competition. A football or running fan would reject any technological influence whatsoever. Tennis seems to sit somewhere in the middle. What seems clear is not a single answer but a principle: if audiences know exactly what they’re watching and the tech being used is transparent, then almost any level of technological influence is ok. Perhaps one day we’ll have cyborg racing, with people using power suits that double their speed.
 
-<p class="standout-line">If this is communicated properly, then I believe there will always be people excited to line up.</p>
+{{ standout("If this is communicated properly, then I believe there will always be people excited to line up.") }}
 
-<details class="references">
-  <summary>Process Statement</summary>
-  <section>
-    <p>Kipchoge’s run still genuinely fascinates me to this day. There was a lot of controversy at the time, and eventually, world athletics allowed carbon-plated shoes, imposing strict limits on stack height (how tall the shoe is) to try to limit their influence. Note, the effectiveness of this regulation is often questioned. Additionally, I’ve never been a fan of football (soccer), but I remember a lot of my friends complaining about VAR when it first came out. It was these two questions that really sparked my interest in the topic for me: how much modern sports are helped by athletes? Does that even matter?</p>
-    <p>I used Grammarly assistant lightly. I only used it to point out places where my phraseology could be better, and tried my own rewrites before using its suggestions. I also did not listen to all its suggestions. My hope is that this will still carry my voice while presenting my opinions and research more effectively. The only research that used GenAI was stated and cited in the paper. Finally, something I found extremely helpful was Google Docs' ability to manage citations. It has a feature that lets me paste a URL and try to find any existing citations for that website. Otherwise, it is fairly easy to manually cite and manage citations. All in all, I really enjoyed exploring this topic and had great fun researching it.</p>
-  </section>
-</details>
+{% call process() %}
+  <p>Kipchoge’s run still genuinely fascinates me to this day. There was a lot of controversy at the time, and eventually, world athletics allowed carbon-plated shoes, imposing strict limits on stack height (how tall the shoe is) to try to limit their influence. Note, the effectiveness of this regulation is often questioned. Additionally, I’ve never been a fan of football (soccer), but I remember a lot of my friends complaining about VAR when it first came out. It was these two questions that really sparked my interest in the topic for me: how much modern sports are helped by athletes? Does that even matter?</p>
+  <p>I used Grammarly assistant lightly. I only used it to point out places where my phraseology could be better, and tried my own rewrites before using its suggestions. I also did not listen to all its suggestions. My hope is that this will still carry my voice while presenting my opinions and research more effectively. The only research that used GenAI was stated and cited in the paper. Finally, something I found extremely helpful was Google Docs' ability to manage citations. It has a feature that lets me paste a URL and try to find any existing citations for that website. Otherwise, it is fairly easy to manually cite and manage citations. All in all, I really enjoyed exploring this topic and had great fun researching it.</p>
+{% endcall %}
 
-<details class="references">
-  <summary>References</summary>
-  <ol>
+{% call references() %}
     <li id="ref2-1">AnalyiSport. <em>“What is VAR (Video Assistant Referee)?”</em> AnalyiSport, 14 March 2023, {{ link("https://analyisport.com/insights/what-is-var-video-assistant-referee/") }}. Accessed 16 March 2026.</li>
     <li id="ref2-2">BattleBots. <em>“Home.”</em> BattleBots, 2026, {{ link("https://battlebots.com/") }}. Accessed 25 March 2026.</li>
     <li id="ref2-3">BattleBots. <em>2022 Design Rules.</em> no. 2022.0, 2022. BattleBots, {{ link("https://battlebots.com/wp-content/uploads/2022/09/BattleBots-Design-Rules.2022.0.pdf") }}. Accessed 25 March 2026.</li>
@@ -104,5 +99,4 @@ I think this helps us determine how much of a technology boost is acceptable. A 
     <li id="ref2-11">Nike. <em>“Nike Air Zoom Alphafly NEXT%.”</em> Nike, 2026, {{ link("https://www.nike.com/vn/running/alphafly") }}. Accessed 16 March 2026.</li>
     <li id="ref2-12">Philofer, Aron. <em>“Hawk-Eye Wins Over Players, Fans and Officials.”</em> New York Times, 6 Sep 2008, {{ link("https://archive.nytimes.com/straightsets.blogs.nytimes.com/2008/09/06/hawk-eye-wins-over-fans-officials-and-players/") }}. Accessed 21 May 2026.</li>
     <li id="ref2-13">TennisHQ. <em>“How Hawk-Eye Technology is Changing the Game: A Closer Look at Tennis and Beyond.”</em> TennisHQ.co.uk, 29 January 2024, {{ link("https://www.tennishq.co.uk/blogs/news/how-hawk-eye-technology-is-changing-the-game-a-closer-look-at-tennis-and-beyond") }}. Accessed 07 April 2026.</li>
-  </ol>
-</details>
+{% endcall %}

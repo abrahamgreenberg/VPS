@@ -8,6 +8,8 @@ pageIntro: >-
   I'm an international student from Gibraltar, studying Computer Science at Yeshiva University. Overall, I've had a really productive and enjoyable first semester. I love all things coding and math, and love going for long runs on the weekend!
 ---
 
+{% from "components/summary.njk" import summary %}
+
 ## On Writing
 
 <p class="lead">My heart actually sank when I heard that I would have to take another writing class. I immediately thought of my experiences taking my English GCSE<sup><a href="#a-1">1</a></sup> in high school. The terrors of studying English literature: Ok, but did he actually mean that when he wrote it?</p>
@@ -26,10 +28,7 @@ During my exploratory essay, I enjoyed being able to say, “I don’t know, let
 
 I still recognize the tremendous value in such work, but I’ve tried it, and it wasn’t for me. I feel like I’ve discovered the mathematical solution to writing, a new style that I was never exposed to. That is why I can confidently say that I am grateful for my FYWR course, and actually hope to continue writing, with plenty of math and coding, of course.
 
-<details class="references">
-  <summary>Footnotes</summary>
-  <ol>
+{% call summary("Footnotes", "ol") %}
     <li id="a-1">A GCSE or General Certificate of Secondary Education is a qualification you get at 16 in the British system. You tend to cover a much broader range of subjects including maths, english language and literature, a foreign language, etc... Typically students take 7 - 9 GCSEs.</li>
     <li id="a-2">An A-Level or Advanced Level is the final qualification you get from secondary school at age 18. It is a more advanced qualification than a GCSE. Typically students take 3 to 4 A-Levels, covering a much more narrow spectrum of subjects.</li>
-  </ol>
-</details>
+{% endcall %}
