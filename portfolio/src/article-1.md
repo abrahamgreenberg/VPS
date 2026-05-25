@@ -42,9 +42,25 @@ I dare not think what my neighbors would’ve thought if they could see me throu
 
 “But,” here comes the bad bit, “I have no clue how finances are going to work, I need to get a visa, not to mention I haven’t even applied yet!” It’s fair to say things weren’t looking too great. What happened next is a bit of a blur, but a few days later, in what was probably one of the most stressful moments of my life, I sat down in front of my laptop and nervously typed out “Withdrawal from the University of Birmingham…”
 
+
+
+<!-- Photo by <a href="https://unsplash.com/@meshkati?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Seyed Mostafa Meshkati</a> on <a href="https://unsplash.com/photos/a-computer-keyboard-with-a-red-enter-button-hK_nfzpXVHs?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+       -->
+
 My heart was racing, and my breathing had sped up. My eyes darted all over the screen, scanning left to right to left, probably at least ten times, as I proofread the email again and again. This was it; once I pressed send, there was no going back. The stakes were enormous; What if YU didn’t work out? It’s not like I could write a second email titled “Please take me back!” What would I do for the rest of my year, G-d help me if I were stuck here for any longer than I had to be. My hand was going to shake itself off as my finger moved closer and closer to the enter key.
 
+
+
 {{ standout("Click.") }}
+
+
+{{ photo("assets/enter.avif", "Figure 2. An enter key. Photo by " ~
+link("https://unsplash.com/@meshkati?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
+"Seyed Mostafa Meshkati") ~ " on " ~
+link("https://unsplash.com/photos/a-computer-keyboard-with-a-red-enter-button-hK_nfzpXVHs?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
+"Unsplash"), "left",
+"Enter key") }}
+
 
 That evening, I was staring at a patch of the wall in my synagogue that was lit by the sun's rays. My breathing was more controlled, but my heart rate had only dropped slightly, still at an uneasy pace from my earlier decision. The wall was covered in a white, tessellating, oddly shaped leaf pattern with an intricate design inside. My eyes were fixated on a small crack that had started to develop in the wall. How long has that pattern been there for? How long will I be here for?
 

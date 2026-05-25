@@ -33,9 +33,8 @@ As you do, I also reminisce about Shabbasim in my Yeshiva in Israel. I remember 
 
 Yet, I don’t agree with placing the entire blame on YU's administration: “But, YU did not concede. Instead, they doubled down.” I think the root of the problem is the fact that in Israel, we’re all “out-of-towners,” yet at YU, only some of us are. So when YU offers us extended programming and the opportunity to learn in Yeshiva, it is up to the student body to band together and make the most of it. In your article, you state:
 
-{% call quoteblock() %}Instead of trying to clumsily rush an initiative of relatively seismic proportions to conclusion with a single stroke, YU could have turned to carrot instead of stick, rebuilding our trust in its ability to provide worthwhile Shabbos programming…{% endcall %}
-
-{{ ref("ref3-3", "Harow") }}
+{% call quoteblock() %}Instead of trying to clumsily rush an initiative of relatively seismic proportions to conclusion with a single stroke, YU could have turned to carrot instead of stick, rebuilding our trust in its ability to provide worthwhile Shabbos programming… {{ ref("ref3-3", "Harow") }}
+{% endcall %}
 
 I concede this was written two years ago, but I would urge you to reassess whether such a statement still holds.
 

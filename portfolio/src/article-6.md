@@ -9,7 +9,7 @@ bannerCaption: >-
 articleDateIso: "2026-04-22"
 articleDateDisplay: "April 22, 2026"
 articleIntro: >-
-    This is a submission for a class I took called Arch of Titus with Prof. Steven Fine. This essay was one trying to tackle the question, why are there some many differing accounts to do with Titus' death? More midrashic interpretations suggest a divine retribution, while historical accounts lean towards political intrigue. The reason I have included it is I try to deploy some exploratory techniques discussed. Although the essay is structured more traditionally with a thesis-based approach, its resolution attempts to build some exploratory techniquues within it. Also note that the reference format was chicago, hence the use of "Bibliography" and not "References".
+    This is a submission for a class I took called Arch of Titus with Prof. Steven Fine. This essay was one trying to tackle the question, why are there some many differing accounts to do with Titus' death? More midrashic interpretations suggest a divine retribution, while historical accounts lean towards political intrigue. The reason I have included it is I try to deploy some exploratory techniques discussed. Although the essay is structured more traditionally with a thesis-based approach, its resolution attempts to build some exploratory techniquues within it. Also note that the reference format for the assignment was chicago, not MLA, hence the use of the term "Bibliography" and not "References".
 ---
 
 {% from "components/link.njk" import link %}
