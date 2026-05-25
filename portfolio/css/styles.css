@@ -537,7 +537,7 @@ a.writing-link {
   line-height: 0;
 }
 
-.sample-card sup a {
+.sample-card a {
   color: var(--accent);
   font-weight: 700;
 }

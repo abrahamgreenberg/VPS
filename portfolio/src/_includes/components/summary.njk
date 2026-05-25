@@ -1,4 +1,4 @@
-{% macro ref(refid, text) %}<sup><a href="#{{ refid }}">({{ text }})</a></sup>{% endmacro %}
+{% macro ref(refid, text, wrap=true) %}<a href="#{{ refid }}" >{% if wrap %}({{ text }}){% else %}<sup>{{ text }}</sup>{% endif %}</a>{% endmacro %}
 
 {% macro biblio(id, author, name, reference) %}<li id="{{ id }}">{{ author }} <em>“{{ name }}.”</em> {{ reference | safe }}</li>{% endmacro %}
 

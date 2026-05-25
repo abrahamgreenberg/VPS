@@ -1,1 +1,3 @@
 {% macro standout(text) %}<p class="standout-line">{{ text | safe }}</p>{% endmacro %}
+
+{% macro quoteblock() %}<p class="quote-block">{{ caller() }}</p>{% endmacro %}

@@ -17,6 +17,7 @@ articleIntro: >-
 {% from "components/link.njk" import link %}
 {% from "components/photo.njk" import photo %}
 {% from "components/summary.njk" import references, ref, biblio %}
+{% from "components/standout.njk" import quoteblock %}
 
 ## Response to 'Out of Town, Out of Luck'
 
@@ -32,29 +33,29 @@ As you do, I also reminisce about Shabbasim in my Yeshiva in Israel. I remember 
 
 Yet, I don’t agree with placing the entire blame on YU's administration: “But, YU did not concede. Instead, they doubled down.” I think the root of the problem is the fact that in Israel, we’re all “out-of-towners,” yet at YU, only some of us are. So when YU offers us extended programming and the opportunity to learn in Yeshiva, it is up to the student body to band together and make the most of it. In your article, you state:
 
-<p class="quote-block">Instead of trying to clumsily rush an initiative of relatively seismic proportions to conclusion with a single stroke, YU could have turned to carrot instead of stick, rebuilding our trust in its ability to provide worthwhile Shabbos programming…</p>
+{% call quoteblock() %}Instead of trying to clumsily rush an initiative of relatively seismic proportions to conclusion with a single stroke, YU could have turned to carrot instead of stick, rebuilding our trust in its ability to provide worthwhile Shabbos programming…{% endcall %}
 
-<sup><a href="#ref3-3">(Harow)</a></sup>
+{{ ref("ref3-3", "Harow") }}
 
 I concede this was written two years ago, but I would urge you to reassess whether such a statement still holds.
 
-{{ photo("assets/shabbos-schedule.avif", 'Figure 1. Shabbos schedule.<sup><a href="#ref3-6">(YU)</a></sup>', "left", "Shabbos schedule") }}
+{{ photo("assets/shabbos-schedule.avif", "Figure 1. Shabbos schedule." ~ ref("ref3-6", "YU"), "left", "Shabbos schedule") }}
 
 When I reflect on my time in Yeshiva in Israel, there was nothing particularly special about the programming available. The food was average, there weren’t many shiurim in the afternoon, and I was probably a lot more bored than I like to admit. Here is the schedule for the Achdus Shabbaton, which features thirteen minyanim, four shiurim from multiple Rebeim, and plenty of learning opportunities. The only thing missing is the students! This is a problem at YU, but it’s not YU’s problem. It's ours.
 
-Another important reason I believe YU wants to keep students on campus is that it typically falls early in the year, between mid-September and mid-October. A study conducted by Arnfrid Pinto<sup><a href="#ref3-4">(Pinto)</a></sup> states:
+Another important reason I believe YU wants to keep students on campus is that it typically falls early in the year, between mid-September and mid-October. A study conducted by Arnfrid Pinto{{ ref("ref3-4", "Pinto") }} states:
 
-<p class="quote-block">Key moments, such as introduction week, mentorship programs, and inclusive activities, play a pivotal role in establishing a sense of community and belonging.</p>
+{% call quoteblock() %}Key moments, such as introduction week, mentorship programs, and inclusive activities, play a pivotal role in establishing a sense of community and belonging.{% endcall %}
 
 The article goes on to explore how connections made during induction week can have a lasting impact on a student's experience throughout university, primarily by increasing their sense of belonging at the institution.
 
 In fact, I wholeheartedly agree with your resentment towards online learning. I’m sure you won’t be surprised to hear that it is backed up by many studies, such as one that finds:
 
-<p class="quote-block">… bachelor’s degree students in online programs perform worse on nearly all test score measures, including math, reading, writing, and English, relative to their counterparts in similar on-campus programs <sup><a href="#ref3-1">(Cellini and Blanchard)</a></sup>.</p>
+{% call quoteblock() %}… bachelor’s degree students in online programs perform worse on nearly all test score measures, including math, reading, writing, and English, relative to their counterparts in similar on-campus programs {{ ref("ref3-1", "Cellini and Blanchard") }}.{% endcall %}
 
 This year, unlike when you wrote the article, Rosh Hashanah and the following week fall in the period of dropping classes. This is a crucial time that will determine the quality of the upcoming semester. A bad online class will not necessarily mean a bad in-person class, so having online classes won’t allow students to properly assess a course. The simplest solution to all this seems clear: have in-person classes.
 
-I can attest that by spending many Shabbasos on campus in my first semester, I have already felt a much closer connection to YU. With a strong start to the year, perhaps that will positively influence Shabbasim throughout the year. And it’s not just me who would say so. In a detailed study, featured in the Journal for American College Health, people who participated in at least 1 or more activities on campus felt a significantly stronger sense of belonging to their university <sup><a href="#ref3-2">(Dearth-Wesley et al.)</a></sup>. Aiden, if this is telling us anything, it's that YU should be making even more people stay for Shabbat and Yom Tov. One of the things I love the most about YU is its amazing community. Why would we not want to further improve it with well-attended Shabbasos?
+I can attest that by spending many Shabbasos on campus in my first semester, I have already felt a much closer connection to YU. With a strong start to the year, perhaps that will positively influence Shabbasim throughout the year. And it’s not just me who would say so. In a detailed study, featured in the Journal for American College Health, people who participated in at least 1 or more activities on campus felt a significantly stronger sense of belonging to their university {{ ref("ref3-2", "Dearth-Wesley et al.") }}. Aiden, if this is telling us anything, it's that YU should be making even more people stay for Shabbat and Yom Tov. One of the things I love the most about YU is its amazing community. Why would we not want to further improve it with well-attended Shabbasos?
 
 We out-of-towners have an extra stake in building a thriving and supportive community, as you said: “YU is trying to keep out-of-towners in for chag because it relies on us just as much as we rely on it”. Ultimately, Rosh Hashanah this year will only be its best if you stay, whether you’re an out-of-towner or not. So please feel free to join us!
 
@@ -62,10 +63,10 @@ Kind regards,
 Abi Greenberg
 
 {% call references() %}
-    <li id="ref3-1">Cellini, Stephanie Riegg, and Kathryn J. Blanchard. <em>“How does virtual learning impact students in higher education? | Brookings.”</em> Brookings Institution, 13 August 2021, {{ link("https://www.brookings.edu/articles/how-does-virtual-learning-impact-students-in-higher-education/") }}. Accessed 12 May 2026.</li>
-    <li id="ref3-2">Dearth-Wesley, Tracy, et al. <em>“School Activity Participation and Sense of Belonging among U.S. College Students.”</em> Journal of American College Health, vol. Aug, no. 2025, 2025, pp. 1 - 10. EBSCOhost, {{ link("https://doi.org/10.1080/07448481.2025.2555600") }}. Accessed 17 May 2026.</li>
-    <li id="ref3-3">Harow, Aiden. <em>“Out of Town, Out of Luck.”</em> The Yeshiva University Observer, 26 Aug 2024, {{ link("https://yuobserver.org/2024/08/out-of-town-out-of-luck/") }}. Accessed 12 May 2026.</li>
-    <li id="ref3-4">Pinto, Arnfrid Farbu, et al. <em>“Beyond the first week: sustaining the feeling of social inclusion and sense of belonging for students.”</em> International Journal of Qualitative Studies on Health & Well-Being, vol. 19, no. 1, 2024, pp. 1-11. EBSCOhost, {{ link("https://doi.org/10.1080/17482631.2024.2421032") }}. Accessed 12 May 2026.</li>
-    <li id="ref3-5">Sacks, Rabbi Jonathan. <em>“Shabbat At Home.”</em> Orthodox Union, 09 Jul 2009, {{ link("https://www.ou.org/life/torah/a_shabbat_home/") }}. Accessed 12 May 2026.</li>
+  {{ biblio("ref3-1", "Cellini, Stephanie Riegg, and Kathryn J. Blanchard.", "How does virtual learning impact students in higher education? | Brookings", "Brookings Institution, 13 August 2021, " ~ link("https://www.brookings.edu/articles/how-does-virtual-learning-impact-students-in-higher-education/") ~ ". Accessed 12 May 2026.") }}
+  {{ biblio("ref3-2", "Dearth-Wesley, Tracy, et al.", "School Activity Participation and Sense of Belonging among U.S. College Students", "Journal of American College Health, vol. Aug, no. 2025, 2025, pp. 1 - 10. EBSCOhost, " ~ link("https://doi.org/10.1080/07448481.2025.2555600") ~ ". Accessed 17 May 2026.") }}
+  {{ biblio("ref3-3", "Harow, Aiden.", "Out of Town, Out of Luck", "The Yeshiva University Observer, 26 Aug 2024, " ~ link("https://yuobserver.org/2024/08/out-of-town-out-of-luck/") ~ ". Accessed 12 May 2026.") }}
+  {{ biblio("ref3-4", "Pinto, Arnfrid Farbu, et al.", "Beyond the first week: sustaining the feeling of social inclusion and sense of belonging for students", "International Journal of Qualitative Studies on Health & Well-Being, vol. 19, no. 1, 2024, pp. 1-11. EBSCOhost, " ~ link("https://doi.org/10.1080/17482631.2024.2421032") ~ ". Accessed 12 May 2026.") }}
+  {{ biblio("ref3-5", "Sacks, Rabbi Jonathan.", "Shabbat At Home", "Orthodox Union, 09 Jul 2009, " ~ link("https://www.ou.org/life/torah/a_shabbat_home/") ~ ". Accessed 12 May 2026.") }}
     {{ biblio("ref3-6", "YU.", "Parshas Behar-Bechukosai. Shabbos Schedule for YU.", "May 2026.") }}
 {% endcall %}
