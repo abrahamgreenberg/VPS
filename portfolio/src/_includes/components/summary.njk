@@ -1,4 +1,5 @@
-{% macro ref(refid, text, wrap=true) %}<a href="#{{ refid }}" >{% if wrap %}({{ text }}){% else %}<sup>{{ text }}</sup>{% endif %}</a>{% endmacro %}
+// can you account for wrap + super
+{% macro ref(refid, text, wrap=true, super=false) %}{% set content %}{% if wrap %}({{ text }}){% else %}{{ text }}{% endif %}{% endset %}<a href="#{{ refid }}" >{% if super %}<sup>{{ content | trim }}</sup>{% else %}{{ content | trim }}{% endif %}</a>{% endmacro %}
 
 {% macro biblio(id, author, name, reference) %}<li id="{{ id }}">{{ author }} <em>“{{ name }}.”</em> {{ reference | safe }}</li>{% endmacro %}
 

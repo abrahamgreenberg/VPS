@@ -34,9 +34,9 @@ A midrash can solve this issue for us. Titus was indeed punished immediately in 
 
 There is another teaching from the sages that further explains their reasoning:
 
-{% call quoteblock() %}Even things that you consider wholly unnecessary for the creation of the world, like fleas, gnats, and flies, are integral to the creation of the world. The Holy One, blessed be He, carries out His missions through everything, even through the snake, scorpion, gnat, and frog.{% endcall %}
+{% call quoteblock() %}Even things that you consider wholly unnecessary for the creation of the world, like fleas, gnats, and flies, are integral to the creation of the world. The Holy One, blessed be He, carries out His missions through everything, even through the snake, scorpion, gnat, and frog. {{ ref("ref6-3", "5", false) }}
+{% endcall %}
 
-{{ ref("ref6-3", "5", false) }}
 
 A Jewish scholar gazing into the same engraving of Titus on the back of an eagle would have seen the persecutor of a violent and cruel war. Rome had terrorized the Judeans for years before the rebellion, collecting excessive taxes and impoverishing the population. The Judeans were constantly under the watchful eye of the Romans, who gave harsh punishment for anyone who disagreed with the Roman powers. During the Jewish Rebellion, the Romans besieged Jerusalem, and Josephus describes scenes of cannibalism that took place. Titus was a proud, boastful, and cruel warlord. He totally desecrated the temple and marched all the way to Rome, proudly boasting about the prized menorah he stole. A gnat is as humiliating as you can get for a Roman dictator who needs to be taken down a few notches.
 
