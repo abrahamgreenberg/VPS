@@ -2,51 +2,52 @@
 layout: layouts/base.njk
 title: "Abraham Greenberg - Showcase: The Race"
 ---
+{% from "components/link.njk" import link %}
 
 <main class="container">
-        <section class="page-header">
-            <p class="kicker">Showcase: I am a Camera</p>
-        </section>
+    <section class="page-header">
+        <p class="kicker">Showcase: I am a Camera</p>
+    </section>
 
-        <figure class="article-banner">
-            <img src="assets/article-4-banner.avif" alt="[Describe banner image]" />
-            <figcaption>
-                Runners go off at start line; Photo by <a target="_blank" rel="noopener noreferrer"
-                    href="https://unsplash.com/@stewardesign?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Steward
-                    Masweneng</a> on <a target="_blank" rel="noopener noreferrer"
-                    href="https://unsplash.com/photos/a-group-of-people-posing-for-a-photo-QITAaHY1voY?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+    <figure class="article-banner">
+        <img src="assets/article-4-banner.avif" alt="[Describe banner image]" />
+        <figcaption>
+            Runners go off at start line; Photo by {{
+            link("https://unsplash.com/@stewardesign?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
+            "Steward Masweneng") }} on {{
+            link("https://unsplash.com/photos/a-group-of-people-posing-for-a-photo-QITAaHY1voY?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
+            "Unsplash") }}
+        </figcaption>
+    </figure>
 
-            </figcaption>
-        </figure>
-
-        <section class="article-intro">
-            <p class="article-date"><time datetime="2026-02-08">February 8, 2026</time></p>
-
-
-
-            <p class="intro-opening">This is submission for one of my weekly writings assignments, titled <em>I am a
-                    camera</em>. It is a short piece discussing the feelings that went through my mind lining up on the
-                start line of the Tel Aviv Marathon.</p>
-        </section>
-
-        <article class="content-panel sample-card essay-article">
-            <h2>The Race</h2>
+    <section class="article-intro">
+        <p class="article-date"><time datetime="2026-02-08">February 8, 2026</time></p>
 
 
-            <p class="lead">Waiting in the starting area, everyone was dressed in brightly coloured blue or pink or
-                yellow, with neon running shoes. Some runners were leaning slowly on random objects, while others were
-                performing their own silly dances. The man to the left of me had a serious frown while he was having a
-                hard time with the touchscreen on his watch. He was blasting rock music so loud I could hear the drum
-                line and guitar solo. There was a group to my right who were casually sipping water between
-                conversations about what they wanted to order from the fancy restaurant they planned to go to after.
-            </p>
-            <p>As the giant red clock counted down, my stomach grumbled but I couldn’t bring myself to eat anymore.
-                THIRTY SECONDS, my mouth felt dry like sandpaper, despite me drinking like a camel ten minutes earlier.
-                I shook my feet to keep my legs from falling dead asleep. TEN SECONDS, the safety pins I used to hang
-                the number on my shirt were starting to bother me, and I fought the urge to scratch them. FIVE SECONDS,
-                I felt my lungs expand to twice the size as I inhaled. The buzzer sounded, and I turned left to wish the
-                man good luck before I put my headphones in. I blinked, he was already blazing off ten yards ahead of
-                me.</p>
 
-        </article>
-    </main>
+        <p class="intro-opening">This is submission for one of my weekly writings assignments, titled <em>I am a
+                camera</em>. It is a short piece discussing the feelings that went through my mind lining up on the
+            start line of the Tel Aviv Marathon.</p>
+    </section>
+
+    <article class="content-panel sample-card essay-article">
+        <h2>The Race</h2>
+
+
+        <p class="lead">Waiting in the starting area, everyone was dressed in brightly coloured blue or pink or
+            yellow, with neon running shoes. Some runners were leaning slowly on random objects, while others were
+            performing their own silly dances. The man to the left of me had a serious frown while he was having a
+            hard time with the touchscreen on his watch. He was blasting rock music so loud I could hear the drum
+            line and guitar solo. There was a group to my right who were casually sipping water between
+            conversations about what they wanted to order from the fancy restaurant they planned to go to after.
+        </p>
+        <p>As the giant red clock counted down, my stomach grumbled but I couldn’t bring myself to eat anymore.
+            THIRTY SECONDS, my mouth felt dry like sandpaper, despite me drinking like a camel ten minutes earlier.
+            I shook my feet to keep my legs from falling dead asleep. TEN SECONDS, the safety pins I used to hang
+            the number on my shirt were starting to bother me, and I fought the urge to scratch them. FIVE SECONDS,
+            I felt my lungs expand to twice the size as I inhaled. The buzzer sounded, and I turned left to wish the
+            man good luck before I put my headphones in. I blinked, he was already blazing off ten yards ahead of
+            me.</p>
+
+    </article>
+</main>
