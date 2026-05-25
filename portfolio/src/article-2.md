@@ -16,7 +16,7 @@ articleIntro: >-
     Ahh, the exploratory essay. This assignment gave me the opportunity to choose a more "contraversial" topic and see both sides. I decided to explore sports and how much of an influence techonology should have on it. Such a topic is important to discuss, especially in an already technology filled world. I understand why some people view sports as something this is a human accomplishment, and should therefore have no technological influence. But how aware are we of technology's already creeping influence on sports?
 ---
 {% from "components/link.njk" import link %}
-{% from "components/image.njk" import photo %}
+{% from "components/photo.njk" import photo %}
 {% from "components/summary.njk" import references, process, ref, biblio %}
 {% from "components/standout.njk" import standout %}
 

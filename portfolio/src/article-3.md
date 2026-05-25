@@ -15,7 +15,7 @@ articleIntro: >-
   Trust. One of the key things you need to make an arugment. As the "elephant" example explains, if you don't have the other person's elephant, then you will never be able to have a successful response. While Fred Rogers is a legendary example of this, I also tried to build trust when responding to an article in the YU Commentator titled "Out of Town"<sup><a href="#ref3-3">(Harow)</a></sup>. It argued that YU's schedule was pitted against international students by "forcing them" to stay. I thought otherwise.
 ---
 {% from "components/link.njk" import link %}
-{% from "components/image.njk" import photo %}
+{% from "components/photo.njk" import photo %}
 {% from "components/summary.njk" import references, ref, biblio %}
 
 ## Response to 'Out of Town, Out of Luck'

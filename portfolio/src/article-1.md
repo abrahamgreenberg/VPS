@@ -14,7 +14,7 @@ articleQuoteSource: "Professor Puretz on Canvas"
 articleIntro: >-
   In this essay, I reflect on a period of my life when I thought I would be "stuck" at home. I had to go through a series of tough decisions that could have potentially grave consequences. While on reflection the stakes may not have been as high as I thought at the time, I hope this narrative is able to put you through my eyes and see what exactly that process looked like.
 ---
-{% from "components/image.njk" import photo %}
+{% from "components/photo.njk" import photo %}
 {% from "components/link.njk" import link %}
 {% from "components/summary.njk" import process, ref %}
 {% from "components/standout.njk" import standout %}
