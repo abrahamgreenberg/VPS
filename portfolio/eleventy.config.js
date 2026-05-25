@@ -14,5 +14,6 @@ export default function (eleventyConfig) {
         // Process .html files in src/ with Nunjucks so layouts and template
         // tags work, while preserving the existing .html output extensions.
         htmlTemplateEngine: "njk",
+        markdownTemplateEngine: "njk",
     };
 }

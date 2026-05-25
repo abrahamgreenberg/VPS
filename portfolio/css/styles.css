@@ -435,6 +435,16 @@ a.writing-link {
   text-indent: 0;
 }
 
+.article-intro p.quote-block {
+  max-width: 68ch;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-style: italic;
+  text-indent: 0;
+}
+
 .article-intro p.quote-block em {
   display: block;
   margin-top: 0.35rem;
@@ -445,19 +455,17 @@ a.writing-link {
   letter-spacing: 0.02em;
 }
 
-.sample-card p .quote-block {
-  display: block;
-  margin: 0.8rem auto;
-  padding: 0.85rem 1rem;
-  border-left: 4px solid var(--accent-2);
-  background: linear-gradient(90deg, #fbf2e3 0%, #fff8ef 100%);
-  border-radius: 10px;
+.essay-article>p.quote-block {
+  margin: 0rem auto 0.35rem;
+  padding: 0.15rem 0 0.15rem 1.1rem;
+  border-left: 3px solid #d8c8a8;
   font-style: italic;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.75;
   letter-spacing: 0.01em;
   text-indent: 0;
   max-width: 70ch;
+  color: #4f483d;
 }
 
 .essay-article>p:not(.standout-line) {
@@ -466,7 +474,7 @@ a.writing-link {
   max-width: 74ch;
 }
 
-.essay-article>p:not(.lead):not(.standout-line) {
+.essay-article>p:not(.lead):not(.standout-line):not(.quote-block) {
   text-indent: 0;
 }
 

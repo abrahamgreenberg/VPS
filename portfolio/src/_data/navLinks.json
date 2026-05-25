@@ -1,26 +1,26 @@
 [
     {
         "title": "Personal Narrative",
-        "url": "article-1.html"
+        "url": "/article-1/"
     },
     {
         "title": "Exploratory Essay",
-        "url": "article-2.html"
+        "url": "/article-2/"
     },
     {
         "title": "Rogerian Response",
-        "url": "article-3.html"
+        "url": "/article-3/"
     },
     {
         "title": "Showcase: The Race",
-        "url": "article-4.html"
+        "url": "/article-4/"
     },
     {
         "title": "Showcase: Peer Review Response Letter",
-        "url": "article-5.html"
+        "url": "/article-5/"
     },
     {
         "title": "Showcase: Arch of Titus Essay",
-        "url": "article-6.html"
+        "url": "/article-6/"
     }
 ]

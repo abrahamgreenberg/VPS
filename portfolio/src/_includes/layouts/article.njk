@@ -1,0 +1,25 @@
+---
+layout: layouts/base.njk
+---
+{% from "components/banner.njk" import banner %}
+
+<main class="container">
+  <section class="page-header">
+    <p class="kicker">{{ articleType }}</p>
+  </section>
+
+  {{ banner(bannerSrc, bannerCaption, bannerAlt) }}
+
+  <section class="article-intro">
+    <p class="article-date"><time datetime="{{ articleDateIso }}">{{ articleDateDisplay }}</time></p>
+
+    {% if articleQuote %}
+    <p class="quote-block">{{ articleQuote | safe }}{% if articleQuoteSource %}<br /><em>{{ articleQuoteSource | safe }}</em>{% endif %}</p>
+    {% endif %}
+    <p class="intro-opening">{{ articleIntro | safe }}</p>
+  </section>
+
+  <article class="content-panel sample-card essay-article">
+    {{ content | safe }}
+  </article>
+</main>

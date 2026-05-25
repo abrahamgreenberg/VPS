@@ -1,0 +1,18 @@
+---
+layout: layouts/base.njk
+---
+
+<main class="container">
+  <section class="page-header">
+    <p class="kicker">{{ pageType }}</p>
+  </section>
+
+  <section class="article-intro">
+    <p class="article-date"><time datetime="{{ pageDateIso }}">{{ pageDateDisplay }}</time></p>
+    <p class="intro-opening">{{ pageIntro | safe }}</p>
+  </section>
+
+  <article class="content-panel sample-card essay-article">
+    {{ content | safe }}
+  </article>
+</main>
