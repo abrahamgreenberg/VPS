@@ -1,0 +1,50 @@
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    environment:
+      COLLECTIONS: "crowdsecurity/traefik"
+    networks:
+      - default
+    volumes:
+      - crowdsec_config:/etc/crowdsec/
+      - crowdsec_data:/var/lib/crowdsec/data/
+      - /var/log/traefik:/var/log/traefik:ro # Mount traefik logs
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=false"
+
+  bouncer:
+    image: crowdsecurity/traefik-bouncer:latest
+    environment:
+      CROWDSEC_BOUNCER_API_KEY_FILE: /run/secrets/crowdsec_bouncer_api_key
+      CROWDSEC_AGENT_HOST: crowdsec:8080
+    networks:
+      - default
+    secrets:
+      - crowdsec_bouncer_api_key
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.middlewares.crowdsec-bouncer.forwardauth.address=http://bouncer:8080/api/v1/forward"
+        - "traefik.http.middlewares.crowdsec-bouncer.forwardauth.trustForwardHeader=true"
+
+volumes:
+  crowdsec_config:
+  crowdsec_data:
+
+networks:
+  default:
+
+secrets:
+  crowdsec_bouncer_api_key:
+    external: true

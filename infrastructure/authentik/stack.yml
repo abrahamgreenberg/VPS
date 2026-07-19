@@ -1,0 +1,78 @@
+services:
+  server:
+    image: authentik/server:latest
+    command: server
+    networks:
+      - proxy-network
+      - database-network
+    secrets:
+      - postgresql_password
+      - authentik_secret_key
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: authentik_db
+      AUTHENTIK_POSTGRESQL__USER: postgres
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD_FILE: /run/secrets/postgresql_password
+      AUTHENTIK_SECRET_KEY_FILE: /run/secrets/authentik_secret_key
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "true"
+    volumes:
+      - authentik_media:/media
+      - authentik_templates:/templates
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.authentik.rule=Host(`auth.your-domain.com`)"
+        - "traefik.http.routers.authentik.service=authentik-server"
+        - "traefik.http.services.authentik-server.loadbalancer.server.port=9000"
+        - "traefik.http.routers.authentik.entrypoints=websecure"
+        - "traefik.http.routers.authentik.tls.certresolver=le"
+
+  worker:
+    image: authentik/server:latest
+    command: worker
+    networks:
+      - database-network
+    secrets:
+      - postgresql_password
+      - authentik_secret_key
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: authentik_db
+      AUTHENTIK_POSTGRESQL__USER: postgres
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD_FILE: /run/secrets/postgresql_password
+      AUTHENTIK_SECRET_KEY_FILE: /run/secrets/authentik_secret_key
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "true"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - authentik_media:/media
+      - authentik_templates:/templates
+
+  database:
+    image: postgres:15-alpine
+    networks:
+      - database-network
+    secrets:
+      - postgresql_password
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: authentik
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgresql_password
+    volumes:
+      - authentik_db:/var/lib/postgresql/data
+
+volumes:
+  authentik_db:
+  authentik_media:
+  authentik_templates:
+
+networks:
+  proxy-network:
+    external: true
+  database-network:
+    external: true
+
+secrets:
+  postgresql_password:
+    external: true
+  authentik_secret_key:
+    external: true
