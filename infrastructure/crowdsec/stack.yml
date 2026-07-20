@@ -20,31 +20,31 @@ services:
       labels:
         - "traefik.enable=false"
 
-  bouncer:
-    image: crowdsecurity/traefik-bouncer:latest
-    environment:
-      CROWDSEC_BOUNCER_API_KEY_FILE: /run/secrets/crowdsec_bouncer_api_key
-      CROWDSEC_AGENT_HOST: crowdsec:8080
-    networks:
-      - crowdsec-net
-      - proxy-network
-    secrets:
-      - crowdsec_bouncer_api_key
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.crowdsec-bouncer.rule=Host(`bouncer.abrahamgreenberg.co.uk`)" # Dummy rule
-        - "traefik.http.routers.crowdsec-bouncer.entrypoints=websecure"
-        - "traefik.http.routers.crowdsec-bouncer.tls=true"
-        - "traefik.http.routers.crowdsec-bouncer.tls.certresolver=letsencrypt"
-        - "traefik.http.services.crowdsec-bouncer.loadbalancer.server.port=8080"
-        - "traefik.http.middlewares.crowdsec-bouncer.forwardauth.address=http://bouncer:8080/api/v1/forwardAuth"
-        - "traefik.http.middlewares.crowdsec-bouncer.forwardauth.trustForwardHeader=true"
+#  bouncer:
+#    image: crowdsecurity/traefik-bouncer:latest
+#    environment:
+#      CROWDSEC_BOUNCER_API_KEY_FILE: /run/secrets/crowdsec_bouncer_api_key
+#      CROWDSEC_AGENT_HOST: crowdsec:8080
+#    networks:
+#      - crowdsec-net
+#      - proxy-network
+#    secrets:
+#      - crowdsec_bouncer_api_key
+#    deploy:
+#      mode: replicated
+#      replicas: 1
+#      placement:
+#        constraints:
+#          - node.role == manager
+#      labels:
+#        - "traefik.enable=true"
+#        - "traefik.http.routers.crowdsec-bouncer.rule=Host(`bouncer.abrahamgreenberg.co.uk`)" # Dummy rule
+#        - "traefik.http.routers.crowdsec-bouncer.entrypoints=websecure"
+#        - "traefik.http.routers.crowdsec-bouncer.tls=true"
+#        - "traefik.http.routers.crowdsec-bouncer.tls.certresolver=letsencrypt"
+#        - "traefik.http.services.crowdsec-bouncer.loadbalancer.server.port=8080"
+#        - "traefik.http.middlewares.crowdsec-bouncer.forwardauth.address=http://bouncer:8080/api/v1/forwardAuth"
+#        - "traefik.http.middlewares.crowdsec-bouncer.forwardauth.trustForwardHeader=true"
 
 volumes:
   crowdsec_db:
