@@ -22,8 +22,6 @@ services:
       # Persistent storage for the Let's Encrypt certificate (acme.json)
       - traefik-certs:/certs
 
-    secrets:
-      - traefik_dashboard_auth
 
     command:
       # HTTP EntryPoint
@@ -75,9 +73,8 @@ services:
         - "traefik.http.routers.dashboard.tls=true"
         - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
 
-        # Basic-auth middleware
-        - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/run/secrets/traefik_dashboard_auth"
-        - "traefik.http.routers.dashboard.middlewares=dashboard-auth@swarm"
+        
+        - "traefik.http.routers.dashboard.middlewares=crowdsec-bouncer@docker,authentik@docker"
 
         # Service hint (dashboard has no compose "service", so Traefik needs the port explicitly)
         - "traefik.http.services.traefik.loadbalancer.server.port=8080"
@@ -103,6 +100,3 @@ networks:
   proxy-network:
     external: true
 
-secrets:
-  traefik_dashboard_auth:
-    external: true

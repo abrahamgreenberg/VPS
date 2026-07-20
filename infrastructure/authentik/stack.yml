@@ -1,64 +1,95 @@
+version: "3.8"
+
 services:
-  server:
-    image: authentik/server:latest
-    command: server
-    networks:
-      - proxy-network
-      - database-network
-    secrets:
-      - postgresql_password
-      - authentik_secret_key
+  postgres:
+    image: postgres:12-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    volumes:
+      - authentik_db:/var/lib/postgresql/data
     environment:
-      AUTHENTIK_POSTGRESQL__HOST: authentik_db
-      AUTHENTIK_POSTGRESQL__USER: postgres
-      AUTHENTIK_POSTGRESQL__NAME: authentik
-      AUTHENTIK_POSTGRESQL__PASSWORD_FILE: /run/secrets/postgresql_password
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+      POSTGRES_DB: authentik
+    secrets:
+      - postgres_password
+      - postgres_user
+    networks:
+      - authentik-internal
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    networks:
+      - authentik-internal
+
+  server:
+    image: ghcr.io/goauthentik/server:latest
+    restart: unless-stopped
+    command: server
+    environment:
       AUTHENTIK_SECRET_KEY_FILE: /run/secrets/authentik_secret_key
-      AUTHENTIK_ERROR_REPORTING__ENABLED: "true"
+      AUTHENTIK_POSTGRESQL__HOST: postgres
+      AUTHENTIK_POSTGRESQL__USER_FILE: /run/secrets/postgres_user
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD_FILE: /run/secrets/postgres_password
+      AUTHENTIK_REDIS__HOST: redis
     volumes:
       - authentik_media:/media
       - authentik_templates:/templates
+    secrets:
+      - postgres_password
+      - postgres_user
+      - authentik_secret_key
+    networks:
+      - authentik-internal
+      - proxy-network
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.authentik.rule=Host(`auth.your-domain.com`)"
-        - "traefik.http.routers.authentik.service=authentik-server"
-        - "traefik.http.services.authentik-server.loadbalancer.server.port=9000"
+        - "traefik.http.routers.authentik.rule=Host(`auth.abrahamgreenberg.co.uk`)"
         - "traefik.http.routers.authentik.entrypoints=websecure"
-        - "traefik.http.routers.authentik.tls.certresolver=le"
+        - "traefik.http.routers.authentik.tls=true"
+        - "traefik.http.routers.authentik.tls.certresolver=letsencrypt"
+        - "traefik.http.services.authentik.loadbalancer.server.port=9000"
+        # Forward Auth
+        - "traefik.http.middlewares.authentik.forwardauth.address=http://tasks.server:9000/outpost.goauthentik.io/auth/traefik"
+        - "traefik.http.middlewares.authentik.forwardauth.trustForwardHeader=true"
+        - "traefik.http.middlewares.authentik.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid"
+
 
   worker:
-    image: authentik/server:latest
+    image: ghcr.io/goauthentik/server:latest
+    restart: unless-stopped
     command: worker
-    networks:
-      - database-network
-    secrets:
-      - postgresql_password
-      - authentik_secret_key
     environment:
-      AUTHENTIK_POSTGRESQL__HOST: authentik_db
-      AUTHENTIK_POSTGRESQL__USER: postgres
-      AUTHENTIK_POSTGRESQL__NAME: authentik
-      AUTHENTIK_POSTGRESQL__PASSWORD_FILE: /run/secrets/postgresql_password
       AUTHENTIK_SECRET_KEY_FILE: /run/secrets/authentik_secret_key
-      AUTHENTIK_ERROR_REPORTING__ENABLED: "true"
+      AUTHENTIK_POSTGRESQL__HOST: postgres
+      AUTHENTIK_POSTGRESQL__USER_FILE: /run/secrets/postgres_user
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD_FILE: /run/secrets/postgres_password
+      AUTHENTIK_REDIS__HOST: redis
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - authentik_media:/media
       - authentik_templates:/templates
-
-  database:
-    image: postgres:15-alpine
-    networks:
-      - database-network
     secrets:
-      - postgresql_password
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_DB: authentik
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgresql_password
-    volumes:
-      - authentik_db:/var/lib/postgresql/data
+      - postgres_password
+      - postgres_user
+      - authentik_secret_key
+    networks:
+      - authentik-internal
 
 volumes:
   authentik_db:
@@ -66,13 +97,16 @@ volumes:
   authentik_templates:
 
 networks:
+  authentik-internal:
+    driver: overlay
+    attachable: true
   proxy-network:
-    external: true
-  database-network:
     external: true
 
 secrets:
-  postgresql_password:
+  postgres_user:
+    external: true
+  postgres_password:
     external: true
   authentik_secret_key:
     external: true
