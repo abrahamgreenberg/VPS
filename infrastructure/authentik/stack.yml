@@ -37,13 +37,17 @@ services:
   server:
     image: ghcr.io/goauthentik/server:latest
     restart: unless-stopped
-    command: server
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        export AUTHENTIK_SECRET_KEY=$(cat /run/secrets/authentik_secret_key)
+        export AUTHENTIK_POSTGRESQL__USER=$(cat /run/secrets/postgres_user)
+        export AUTHENTIK_POSTGRESQL__PASSWORD=$(cat /run/secrets/postgres_password)
+        exec /lifecycle/ak server
     environment:
-      AUTHENTIK_SECRET_KEY_FILE: /run/secrets/authentik_secret_key
       AUTHENTIK_POSTGRESQL__HOST: postgres
-      AUTHENTIK_POSTGRESQL__USER_FILE: /run/secrets/postgres_user
       AUTHENTIK_POSTGRESQL__NAME: authentik
-      AUTHENTIK_POSTGRESQL__PASSWORD_FILE: /run/secrets/postgres_password
       AUTHENTIK_REDIS__HOST: redis
     volumes:
       - authentik_media:/media
@@ -72,13 +76,17 @@ services:
   worker:
     image: ghcr.io/goauthentik/server:latest
     restart: unless-stopped
-    command: worker
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        export AUTHENTIK_SECRET_KEY=$(cat /run/secrets/authentik_secret_key)
+        export AUTHENTIK_POSTGRESQL__USER=$(cat /run/secrets/postgres_user)
+        export AUTHENTIK_POSTGRESQL__PASSWORD=$(cat /run/secrets/postgres_password)
+        exec /lifecycle/ak worker
     environment:
-      AUTHENTIK_SECRET_KEY_FILE: /run/secrets/authentik_secret_key
       AUTHENTIK_POSTGRESQL__HOST: postgres
-      AUTHENTIK_POSTGRESQL__USER_FILE: /run/secrets/postgres_user
       AUTHENTIK_POSTGRESQL__NAME: authentik
-      AUTHENTIK_POSTGRESQL__PASSWORD_FILE: /run/secrets/postgres_password
       AUTHENTIK_REDIS__HOST: redis
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
