@@ -41,9 +41,9 @@ services:
       - /bin/sh
       - -c
       - |
-        export AUTHENTIK_SECRET_KEY=$(cat /run/secrets/authentik_secret_key)
-        export AUTHENTIK_POSTGRESQL__USER=$(cat /run/secrets/postgres_user)
-        export AUTHENTIK_POSTGRESQL__PASSWORD=$(cat /run/secrets/postgres_password)
+        export AUTHENTIK_SECRET_KEY=$$(cat /run/secrets/authentik_secret_key)
+        export AUTHENTIK_POSTGRESQL__USER=$$(cat /run/secrets/postgres_user)
+        export AUTHENTIK_POSTGRESQL__PASSWORD=$$(cat /run/secrets/postgres_password)
         exec /lifecycle/ak server
     environment:
       AUTHENTIK_POSTGRESQL__HOST: postgres
@@ -80,9 +80,9 @@ services:
       - /bin/sh
       - -c
       - |
-        export AUTHENTIK_SECRET_KEY=$(cat /run/secrets/authentik_secret_key)
-        export AUTHENTIK_POSTGRESQL__USER=$(cat /run/secrets/postgres_user)
-        export AUTHENTIK_POSTGRESQL__PASSWORD=$(cat /run/secrets/postgres_password)
+        export AUTHENTIK_SECRET_KEY=$$(cat /run/secrets/authentik_secret_key)
+        export AUTHENTIK_POSTGRESQL__USER=$$(cat /run/secrets/postgres_user)
+        export AUTHENTIK_POSTGRESQL__PASSWORD=$$(cat /run/secrets/postgres_password)
         exec /lifecycle/ak worker
     environment:
       AUTHENTIK_POSTGRESQL__HOST: postgres
