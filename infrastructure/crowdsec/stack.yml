@@ -21,15 +21,13 @@ services:
         - "traefik.enable=false"
 
   bouncer:
-   image: crowdsecurity/traefik-bouncer:latest
+   image: fbonalair/traefik-crowdsec-bouncer:latest
    environment:
-     CROWDSEC_BOUNCER_API_KEY_FILE: /run/secrets/crowdsec_bouncer_api_key
+     CROWDSEC_BOUNCER_API_KEY: ${CROWDSEC_BOUNCER_API_KEY}
      CROWDSEC_AGENT_HOST: crowdsec:8080
    networks:
      - crowdsec-net
      - proxy-network
-   secrets:
-     - crowdsec_bouncer_api_key
    deploy:
      mode: replicated
      replicas: 1
@@ -38,7 +36,7 @@ services:
          - node.role == manager
      labels:
        - "traefik.enable=true"
-       - "traefik.http.routers.crowdsec-bouncer.rule=Host(`bouncer.abrahamgreenberg.co.uk`)" # Dummy rule
+       - "traefik.http.routers.crowdsec-bouncer.rule=Host(`bouncer.abrahamgreenberg.co.uk`)"
        - "traefik.http.routers.crowdsec-bouncer.entrypoints=websecure"
        - "traefik.http.routers.crowdsec-bouncer.tls=true"
        - "traefik.http.routers.crowdsec-bouncer.tls.certresolver=letsencrypt"
