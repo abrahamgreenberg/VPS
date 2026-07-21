@@ -74,7 +74,7 @@ services:
         - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
 
         
-        - "traefik.http.routers.dashboard.middlewares=crowdsec-bouncer@docker"
+        - "traefik.http.routers.dashboard.middlewares=crowdsec-bouncer@swarm"
 
         # Service hint (dashboard has no compose "service", so Traefik needs the port explicitly)
         - "traefik.http.services.traefik.loadbalancer.server.port=8080"
@@ -93,7 +93,7 @@ services:
         - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
         - "traefik.http.services.whoami.loadbalancer.server.port=80"
 
-        - "traefik.http.routers.whoami.middlewares=crowdsec-bouncer@docker,authentik@docker"
+        - "traefik.http.routers.whoami.middlewares=crowdsec-bouncer@swarm,authentik@swarm"
 
 
 volumes:

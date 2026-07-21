@@ -35,7 +35,7 @@ services:
         - "traefik.http.routers.portainer.entrypoints=websecure"
         - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
         - "traefik.http.routers.poratiner.tls=true"
-        - "traefik.http.routers.portainer.middlewares=crowdsec-bouncer@docker"
+        - "traefik.http.routers.portainer.middlewares=crowdsec-bouncer@swarm"
 
 networks:
   agent_network:
