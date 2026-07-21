@@ -12,7 +12,7 @@ services:
       - authentik-internal
 
   server:
-    image: ghcr.io/goauthentik/server:latest
+    image: ghcr.io/goauthentik/server:2026.5.5
     restart: unless-stopped
     command: server
     environment:
@@ -28,6 +28,7 @@ services:
     networks:
       - authentik-internal
       - proxy-network
+      - database-network
     deploy:
       labels:
         - "traefik.enable=true"
@@ -43,7 +44,7 @@ services:
 
 
   worker:
-    image: ghcr.io/goauthentik/server:latest
+    image: ghcr.io/goauthentik/server:2026.5.5
     restart: unless-stopped
     command: worker
     environment:
@@ -59,6 +60,7 @@ services:
       - authentik_templates:/templates
     networks:
       - authentik-internal
+      - database-network
 
 volumes:
   authentik_db:
@@ -79,3 +81,4 @@ networks:
 #     external: true
 #   postgres_password:
 #     external: true
+
