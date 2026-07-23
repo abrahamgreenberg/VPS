@@ -1,60 +1,72 @@
-version: '3.8'
-
 services:
   crowdsec:
     image: crowdsecurity/crowdsec:latest
+
     environment:
       GID: "${GID:-1000}"
       COLLECTIONS: "crowdsecurity/traefik"
+
     volumes:
       - crowdsec_db:/var/lib/crowdsec/data/
       - crowdsec_config:/etc/crowdsec/
+
     networks:
       - crowdsec-net
+
     deploy:
       mode: replicated
       replicas: 1
+
       placement:
         constraints:
           - node.role == manager
+
       labels:
         - "traefik.enable=false"
 
+
   bouncer:
-   image: fbonalair/traefik-crowdsec-bouncer:latest
-   environment:
-     CROWDSEC_BOUNCER_API_KEY: ${CROWDSEC_BOUNCER_API_KEY}
-     CROWDSEC_AGENT_HOST: crowdsec:8080
-   networks:
-     - crowdsec-net
-     - proxy-network
-   deploy:
-     mode: replicated
-     replicas: 1
-     placement:
-       constraints:
-         - node.role == manager
-     labels:
-       - "traefik.enable=true"
-       - "traefik.http.routers.crowdsec-bouncer.rule=Host(`bouncer.abrahamgreenberg.co.uk`)"
-       - "traefik.http.routers.crowdsec-bouncer.entrypoints=websecure"
-       - "traefik.http.routers.crowdsec-bouncer.tls=true"
-       - "traefik.http.routers.crowdsec-bouncer.tls.certresolver=letsencrypt"
-       - "traefik.http.services.crowdsec-bouncer.loadbalancer.server.port=8080"
-       - "traefik.http.middlewares.crowdsec-bouncer.forwardauth.address=http://bouncer:8080/api/v1/forwardAuth"
-       - "traefik.http.middlewares.crowdsec-bouncer.forwardauth.trustForwardHeader=true"
+    image: fbonalair/traefik-crowdsec-bouncer:latest
+
+    environment:
+      CROWDSEC_BOUNCER_API_KEY: "${CROWDSEC_BOUNCER_API_KEY}"
+      CROWDSEC_AGENT_HOST: crowdsec:8080
+
+    networks:
+      - crowdsec-net
+      - proxy-network
+
+    deploy:
+      mode: replicated
+      replicas: 1
+
+      placement:
+        constraints:
+          - node.role == manager
+
+      labels:
+        - "traefik.enable=true"
+
+        - "traefik.http.routers.crowdsec-bouncer.rule=Host(`bouncer.abrahamgreenberg.co.uk`)"
+        - "traefik.http.routers.crowdsec-bouncer.entrypoints=websecure"
+        - "traefik.http.routers.crowdsec-bouncer.tls=true"
+        - "traefik.http.routers.crowdsec-bouncer.tls.certresolver=letsencrypt"
+
+        - "traefik.http.services.crowdsec-bouncer.loadbalancer.server.port=8080"
+
+        - "traefik.http.middlewares.crowdsec-bouncer.forwardauth.address=http://bouncer:8080/api/v1/forwardAuth"
+        - "traefik.http.middlewares.crowdsec-bouncer.forwardauth.trustForwardHeader=true"
+
 
 volumes:
   crowdsec_db:
   crowdsec_config:
 
+
 networks:
   crowdsec-net:
     driver: overlay
     attachable: true
-  proxy-network:
-    external: true
 
-secrets:
-  crowdsec_bouncer_api_key:
+  proxy-network:
     external: true

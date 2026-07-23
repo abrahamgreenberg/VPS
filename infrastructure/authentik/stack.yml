@@ -2,43 +2,62 @@ services:
   redis:
     image: redis:alpine
     restart: unless-stopped
+
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       start_period: 20s
       interval: 30s
       retries: 5
       timeout: 3s
+
     networks:
       - authentik-internal
+
 
   server:
     image: ghcr.io/goauthentik/server:2026.5.5
     restart: unless-stopped
-    command: server
+
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        export AUTHENTIK_SECRET_KEY="$$(cat /run/secrets/authentik_secret_key)"
+        export AUTHENTIK_POSTGRESQL__USER="$$(cat /run/secrets/authentik_postgres_user)"
+        export AUTHENTIK_POSTGRESQL__PASSWORD="$$(cat /run/secrets/authentik_postgres_password)"
+        exec /lifecycle/ak server
+
     environment:
-      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
       AUTHENTIK_POSTGRESQL__HOST: postgres_postgres
       AUTHENTIK_POSTGRESQL__NAME: authentik
-      AUTHENTIK_POSTGRESQL__USER: ${POSTGRES_USER}
-      AUTHENTIK_POSTGRESQL__PASSWORD: ${POSTGRES_PASSWORD}
       AUTHENTIK_REDIS__HOST: redis
+
+    secrets:
+      - authentik_secret_key
+      - authentik_postgres_user
+      - authentik_postgres_password
+
     volumes:
       - authentik_media:/media
       - authentik_templates:/templates
+
     networks:
       - authentik-internal
       - proxy-network
       - database-network
+
     deploy:
       labels:
         - "traefik.enable=true"
+
+        # Authentik web interface
         - "traefik.http.routers.authentik.rule=Host(`auth.abrahamgreenberg.co.uk`)"
         - "traefik.http.routers.authentik.entrypoints=websecure"
         - "traefik.http.routers.authentik.tls=true"
         - "traefik.http.routers.authentik.tls.certresolver=letsencrypt"
         - "traefik.http.services.authentik.loadbalancer.server.port=9000"
-        # Forward Auth
-        - "traefik.http.middlewares.authentik.forwardauth.address=http://tasks.server:9000/outpost.goauthentik.io/auth/traefik"
+
+        # Authentik Forward Auth
+        - "traefik.http.middlewares.authentik.forwardauth.address=http://server:9000/outpost.goauthentik.io/auth/traefik"
         - "traefik.http.middlewares.authentik.forwardauth.trustForwardHeader=true"
         - "traefik.http.middlewares.authentik.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid"
 
@@ -46,39 +65,58 @@ services:
   worker:
     image: ghcr.io/goauthentik/server:2026.5.5
     restart: unless-stopped
-    command: worker
+
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        export AUTHENTIK_SECRET_KEY="$$(cat /run/secrets/authentik_secret_key)"
+        export AUTHENTIK_POSTGRESQL__USER="$$(cat /run/secrets/authentik_postgres_user)"
+        export AUTHENTIK_POSTGRESQL__PASSWORD="$$(cat /run/secrets/authentik_postgres_password)"
+        exec /lifecycle/ak worker
+
     environment:
-      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
       AUTHENTIK_POSTGRESQL__HOST: postgres_postgres
       AUTHENTIK_POSTGRESQL__NAME: authentik
-      AUTHENTIK_POSTGRESQL__USER: ${POSTGRES_USER}
-      AUTHENTIK_POSTGRESQL__PASSWORD: ${POSTGRES_PASSWORD}
       AUTHENTIK_REDIS__HOST: redis
+
+    secrets:
+      - authentik_secret_key
+      - authentik_postgres_user
+      - authentik_postgres_password
+
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - authentik_media:/media
       - authentik_templates:/templates
+
     networks:
       - authentik-internal
       - database-network
 
+
 volumes:
-  authentik_db:
   authentik_media:
   authentik_templates:
+
 
 networks:
   authentik-internal:
     driver: overlay
     attachable: true
+
   proxy-network:
     external: true
+
   database-network:
     external: true
 
-# secrets:
-#   postgres_user:
-#     external: true
-#   postgres_password:
-#     external: true
 
+secrets:
+  authentik_secret_key:
+    external: true
+
+  authentik_postgres_user:
+    external: true
+
+  authentik_postgres_password:
+    external: true
