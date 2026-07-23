@@ -74,7 +74,7 @@ services:
         - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
 
         
-        - "traefik.http.routers.dashboard.middlewares=crowdsec-bouncer@swarm"
+        - "traefik.http.routers.dashboard.middlewares=crowdsec-bouncer@swarm,authentik@swarm"
 
         # Service hint (dashboard has no compose "service", so Traefik needs the port explicitly)
         - "traefik.http.services.traefik.loadbalancer.server.port=8080"
