@@ -4,6 +4,7 @@ services:
 
     networks:
       - proxy-network
+      - monitoring-network
 
     ports:
         # Long syntax required for Swarm
@@ -15,6 +16,11 @@ services:
         published: 443
         protocol: tcp
         mode: host
+      # Dedicated entrypoint for OTLP gRPC (e.g. alloy.abrahamgreenberg.co.uk)
+      - target: 4317
+        published: 4317
+        protocol: tcp
+        mode: host
 
 
     volumes:
@@ -22,6 +28,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # Persistent storage for the Let's Encrypt certificate (acme.json)
       - traefik-certs:/certs
+
+    secrets:
+      # htpasswd-format credentials for the public alloy.<domain> OTLP gateway
+      # (monitoring stack). basicauth.usersFile is read by traefik itself,
+      # so this secret is mounted here rather than on the alloy service.
+      - alloy_basic_auth_users
 
 
     command:
@@ -35,6 +47,9 @@ services:
 
       # HTTPS EntryPoint
       - "--entrypoints.websecure.address=:443"
+
+      # Dedicated entrypoint for OTLP gRPC (h2c backends, e.g. alloy)
+      - "--entrypoints.grpc.address=:4317"
 
       # Let's Encrypt (ACME) via HTTP-01 challenge on the web entrypoint
       - "--certificatesresolvers.letsencrypt.acme.email=abrahamgreenberg123@gmail.com"
@@ -75,6 +90,10 @@ services:
         - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
         - "traefik.http.routers.dashboard.middlewares=crowdsec-bouncer@swarm,authentik@swarm"
         - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+
+        # Basic auth for the monitoring stack's public alloy.<domain> OTLP
+        # gateway (referenced as alloy-auth@swarm from monitoring/stack.yml).
+        - "traefik.http.middlewares.alloy-auth.basicauth.usersFile=/run/secrets/alloy_basic_auth_users"
   # Optional: test service to confirm routing works. Remove once you've verified the dashboard.
   whoami:
     image: traefik/whoami
@@ -97,4 +116,10 @@ volumes:
 
 networks:
   proxy-network:
+    external: true
+  monitoring-network:
+    external: true
+
+secrets:
+  alloy_basic_auth_users:
     external: true

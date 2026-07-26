@@ -1,0 +1,238 @@
+services:
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.enable-remote-write-receiver"
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    volumes:
+      - prometheus_data:/prometheus
+    networks:
+      - monitoring-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      update_config:
+        order: stop-first
+
+  loki:
+    image: grafana/loki:3.5.8
+    command: ["-config.file=/etc/loki/local-config.yaml"]
+    configs:
+      - source: loki_config
+        target: /etc/loki/local-config.yaml
+    volumes:
+      - loki_data:/loki
+    networks:
+      - monitoring-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      update_config:
+        order: stop-first
+
+  tempo:
+    image: grafana/tempo:2.6.1
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
+    configs:
+      - source: tempo_config
+        target: /etc/tempo/tempo.yaml
+    volumes:
+      - tempo_data:/var/tempo
+    networks:
+      - monitoring-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      update_config:
+        order: stop-first
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    environment:
+      GF_SECURITY_ADMIN_USER__FILE: /run/secrets/grafana_admin_user
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
+      GF_SERVER_ROOT_URL: "https://grafana.abrahamgreenberg.co.uk"
+    configs:
+      - source: grafana_datasources
+        target: /etc/grafana/provisioning/datasources/datasources.yaml
+    secrets:
+      - grafana_admin_user
+      - grafana_admin_password
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - proxy-network
+      - monitoring-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      update_config:
+        order: stop-first
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.grafana.rule=Host(`grafana.abrahamgreenberg.co.uk`)"
+        - "traefik.http.routers.grafana.entrypoints=websecure"
+        - "traefik.http.routers.grafana.tls=true"
+        - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
+        - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+        - "traefik.http.routers.grafana.middlewares=crowdsec-bouncer@swarm"
+
+  # Public OTLP ingestion gateway (gRPC :4317 + HTTP :4318). Reachable from the
+  # internet via alloy.abrahamgreenberg.co.uk, protected by basic auth defined
+  # below since it is internet-facing and authentik is currently disabled.
+  alloy:
+    image: grafana/alloy:v1.5.1
+    command:
+      - "run"
+      - "--server.http.listen-addr=0.0.0.0:12345"
+      - "--storage.path=/var/lib/alloy/data"
+      - "/etc/alloy/config.alloy"
+    configs:
+      - source: alloy_config
+        target: /etc/alloy/config.alloy
+    networks:
+      - proxy-network
+      - monitoring-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+
+        # OTLP/HTTP (logs, metrics, traces) on the standard websecure entrypoint.
+        - "traefik.http.routers.alloy-http.rule=Host(`alloy.abrahamgreenberg.co.uk`)"
+        - "traefik.http.routers.alloy-http.entrypoints=websecure"
+        - "traefik.http.routers.alloy-http.tls=true"
+        - "traefik.http.routers.alloy-http.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.alloy-http.service=alloy-http"
+        - "traefik.http.routers.alloy-http.middlewares=alloy-auth@swarm"
+        - "traefik.http.services.alloy-http.loadbalancer.server.port=4318"
+
+        # OTLP/gRPC on the dedicated grpc entrypoint (see traefik/stack.yml).
+        # h2c because alloy's own receiver is plaintext; traefik terminates TLS.
+        - "traefik.http.routers.alloy-grpc.rule=Host(`alloy.abrahamgreenberg.co.uk`)"
+        - "traefik.http.routers.alloy-grpc.entrypoints=grpc"
+        - "traefik.http.routers.alloy-grpc.tls=true"
+        - "traefik.http.routers.alloy-grpc.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.alloy-grpc.service=alloy-grpc"
+        - "traefik.http.routers.alloy-grpc.middlewares=alloy-auth@swarm"
+        - "traefik.http.services.alloy-grpc.loadbalancer.server.port=4317"
+        - "traefik.http.services.alloy-grpc.loadbalancer.server.scheme=h2c"
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    command:
+      - "--docker_only=true"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    networks:
+      - monitoring-network
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    command:
+      - "--path.rootfs=/host"
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    volumes:
+      - /:/host:ro,rslave
+    networks:
+      - monitoring-network
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+
+  # Monitors the shared postgres instance deployed by the postgres stack.
+  # Reuses that stack's postgres_user / postgres_password secrets.
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.15.0
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        export DATA_SOURCE_NAME="postgresql://$$(cat /run/secrets/postgres_user):$$(cat /run/secrets/postgres_password)@postgres_postgres:5432/postgres?sslmode=disable"
+        exec /bin/postgres_exporter
+    secrets:
+      - postgres_user
+      - postgres_password
+    networks:
+      - monitoring-network
+      - database-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+configs:
+  prometheus_config:
+    file: ./prometheus.yml
+  loki_config:
+    file: ./loki-config.yaml
+  tempo_config:
+    file: ./tempo-config.yaml
+  alloy_config:
+    file: ./alloy-config.alloy
+  grafana_datasources:
+    file: ./grafana-datasources.yaml
+
+volumes:
+  prometheus_data:
+  loki_data:
+  tempo_data:
+  grafana_data:
+
+networks:
+  proxy-network:
+    external: true
+  database-network:
+    external: true
+  monitoring-network:
+    external: true
+
+secrets:
+  postgres_user:
+    external: true
+  postgres_password:
+    external: true
+  grafana_admin_user:
+    external: true
+  grafana_admin_password:
+    external: true
