@@ -1,19 +1,15 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
+
+function readStoredHalachot() {
+    const stored = localStorage.getItem("halachot");
+    return stored ? JSON.parse(stored) : [];
+}
 
 export function useLocalStorage() {
-    const [clientHalachot, setClientHalachot] = useState([]);
-
-    useEffect(() => {
-        const stored = localStorage.getItem("halachot");
-        if (stored) {
-            setClientHalachot(JSON.parse(stored));
-        }
-    }, []);
+    const [clientHalachot, setClientHalachot] = useState(readStoredHalachot);
 
     const updateClientHalachot = useCallback((diff) => {
         // Remove halachot that are to be deleted or updated, then add new and updated halachot
-        console.log("uppdating client halachot=---asdf-asdf");
-        console.log(diff);
         setClientHalachot((prev) => {
             const newClientHalachot = [
                 ...prev.filter(

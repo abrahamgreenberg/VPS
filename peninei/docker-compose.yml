@@ -22,10 +22,13 @@ services:
       BACKEND_DEBUG_RESULTS: false,
       BACKEND_RATE_LIMIT_MAX_REQUESTS: ${BACKEND_RATE_LIMIT_MAX_REQUESTS},
       BACKEND_RATE_LIMIT_WINDOW_MS: ${BACKEND_RATE_LIMIT_WINDOW_MS}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://alloy:4318}
+      DEPLOYMENT_ENV: ${DEPLOYMENT_ENV:-production}
     volumes:
       - logs:/app/logs
     networks :
       - proxy-network
+      - monitoring-network
 
   frontend:
     build:
@@ -49,5 +52,7 @@ volumes:
 
 networks:
   proxy-network:
+    external: true
+  monitoring-network:
     external: true
 

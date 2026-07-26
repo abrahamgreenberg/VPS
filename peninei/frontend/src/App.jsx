@@ -1,20 +1,21 @@
 import { useEffect, useState, useRef } from "react";
-import { getTodayISODate, api } from "./utils";
+import { toBackendDateString, api } from "./utils";
 import HalachaCard from "./components/HalachaCard";
 import DisclaimerPopup from "./components/DisclaimerPopup";
 import CalendarSelector from "./components/CalendarSelector";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 
-// TODO: FIX CLIENT HALACHOT/SYNCING
+function todayAtLocalMidnight() {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
 export default function App() {
     const [apiHalachot, setApiHalachot] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showWarning, setShowWarning] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(() => {
-        const today = getTodayISODate();
-        return new Date(today);
-    });
+    const [selectedDate, setSelectedDate] = useState(todayAtLocalMidnight);
     const [displayMode, setDisplayMode] = useState("both");
     const { clientHalachot, updateClientHalachot } = useLocalStorage();
     const hasSynced = useRef(false);
@@ -23,19 +24,15 @@ export default function App() {
         const fetchHalacha = async () => {
             setLoading(true);
             setError(null);
-            selectedDate.setHours(6, 0, 0, 0);
-            const isoDate = selectedDate.toISOString().split("T")[0];
+            const isoDate = toBackendDateString(selectedDate);
 
             try {
                 const res = await api.get(`/halachas/${isoDate}`);
-                console.log(res.data);
                 setApiHalachot(res.data);
             } catch (err) {
-                console.log(isoDate);
+                setError("Failed to load halacha.");
                 console.error(err);
             } finally {
-                console.log("-----iso date----");
-                console.log(isoDate);
                 setLoading(false);
             }
         };
@@ -49,11 +46,9 @@ export default function App() {
                 return;
             }
             hasSynced.current = true;
-            console.log("Starting syncHalachot...");
 
             const lastSync = localStorage.getItem("halachaLastSync");
-            const today = new Date();
-            today.setHours(6, 0, 0, 0);
+            const today = todayAtLocalMidnight();
             if (lastSync && new Date(lastSync).getTime() === today.getTime()) {
                 // Already synced today
                 return;
@@ -69,9 +64,6 @@ export default function App() {
                 const res = await api.post("/halachot/sync", {
                     clientHalachot: clientHalachotReq,
                 });
-                console.log("Syncing halachot with backend...");
-                console.log(res.data);
-                console.log(currentHalachot);
 
                 updateClientHalachot(res.data);
                 localStorage.setItem("halachaLastSync", today.toISOString());
@@ -82,13 +74,11 @@ export default function App() {
         syncHalachot();
     }, [updateClientHalachot]);
 
-    console.log("LOADINGGGGGG");
-    console.log(clientHalachot);
     // Use API halachot if available, otherwise fall back to client halachot
     const halachot =
         apiHalachot ||
         clientHalachot.filter((h) => {
-            const isoDate = selectedDate.toISOString().split("T")[0];
+            const isoDate = toBackendDateString(selectedDate);
             return h.dateString === isoDate;
         });
 
@@ -103,7 +93,14 @@ export default function App() {
                     selectedDate={selectedDate}
                     onDateChange={(date) => setSelectedDate(date)}
                 />
-                <div className="flex mt-4 sm:mt-0">
+                <div className="flex items-center gap-3 mt-4 sm:mt-0">
+                    {loading && (
+                        <div
+                            className="w-4 h-4 rounded-full border-2 border-purple-300 border-t-purple-600 animate-spin"
+                            role="status"
+                            aria-label="Loading"
+                        />
+                    )}
                     <button
                         className={`px-4 py-2 rounded-l border border-purple-600 transition-colors duration-100 text-purple-600
                                     ${
@@ -149,9 +146,8 @@ export default function App() {
                 </div>
             </div>
 
-            {loading && <div>Loading...</div>}
             {error && <div className="text-red-600 font-bold">{error}</div>}
-            {halachot && halachot.length === 0 && (
+            {!loading && halachot && halachot.length === 0 && (
                 <div>No halacha found for this date.</div>
             )}
             {halachot &&

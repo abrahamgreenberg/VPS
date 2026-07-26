@@ -1,0 +1,102 @@
+services:
+  backend:
+    image: peninei-backend:latest
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        export BACKEND_DATABASE_URL="$$(cat /run/secrets/peninei_database_url)"
+        export BACKEND_OPEN_API_KEY="$$(cat /run/secrets/peninei_openai_api_key)"
+        exec sh -c "pnpm prisma migrate deploy && pnpm start"
+    environment:
+      BACKEND_LOG_LEVEL: info
+      BACKEND_API_PORT: "5002"
+      BACKEND_WRITE_TO_DB: "true"
+      BACKEND_CLEAR_LOGS_ON_START: "false"
+      BACKEND_PROCESS_WITH_AI: "true"
+      BACKEND_AI_MAX_ATTEMPTS: "3"
+      BACKEND_POPULATE_INITIAL_DATABASE: "true"
+      BACKEND_DEBUG_REQUESTS: "false"
+      BACKEND_DEBUG_RESULTS: "false"
+      BACKEND_RATE_LIMIT_MAX_REQUESTS: "50"
+      BACKEND_RATE_LIMIT_WINDOW_MS: "60000"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
+      DEPLOYMENT_ENV: "production"
+    secrets:
+      - peninei_database_url
+      - peninei_openai_api_key
+    volumes:
+      - peninei_logs:/app/logs
+    networks:
+      - proxy-network
+      - database-network
+      - monitoring-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        order: stop-first
+      labels:
+        - "traefik.enable=true"
+
+        # /api/* -> backend. Higher priority than the frontend's bare Host()
+        # rule so it wins on overlap (Traefik also auto-ranks by rule
+        # specificity, this just makes it explicit).
+        - "traefik.http.routers.peninei-backend.rule=Host(`peninei.abrahamgreenberg.co.uk`) && PathPrefix(`/api`)"
+        - "traefik.http.routers.peninei-backend.entrypoints=websecure"
+        - "traefik.http.routers.peninei-backend.tls=true"
+        - "traefik.http.routers.peninei-backend.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.peninei-backend.priority=10"
+        - "traefik.http.routers.peninei-backend.middlewares=crowdsec-bouncer@swarm"
+        - "traefik.http.services.peninei-backend.loadbalancer.server.port=5002"
+
+  frontend:
+    image: peninei-frontend:latest
+    networks:
+      - proxy-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        order: stop-first
+      labels:
+        - "traefik.enable=true"
+
+        # Everything else -> frontend (SPA)
+        - "traefik.http.routers.peninei-frontend.rule=Host(`peninei.abrahamgreenberg.co.uk`)"
+        - "traefik.http.routers.peninei-frontend.entrypoints=websecure"
+        - "traefik.http.routers.peninei-frontend.tls=true"
+        - "traefik.http.routers.peninei-frontend.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.peninei-frontend.priority=1"
+        - "traefik.http.routers.peninei-frontend.middlewares=crowdsec-bouncer@swarm"
+        - "traefik.http.services.peninei-frontend.loadbalancer.server.port=80"
+
+volumes:
+  peninei_logs:
+
+networks:
+  proxy-network:
+    external: true
+  database-network:
+    external: true
+  monitoring-network:
+    external: true
+
+secrets:
+  peninei_database_url:
+    external: true
+  peninei_openai_api_key:
+    external: true

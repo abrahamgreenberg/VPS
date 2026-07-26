@@ -1,6 +1,7 @@
 import { ai } from "../lib/index.js";
 import { PrismaClient } from "@prisma/client";
 import { createLogger } from "../logger.js";
+import { halachasAiParsedTotal } from "../telemetry";
 
 const logger = createLogger("parser");
 const prisma = new PrismaClient();
@@ -58,6 +59,7 @@ export const parse_halachot_with_ai = async () => {
                     logger.warn(
                         `AI translation failed for halacha: "${halacha.heTitle}"`
                     );
+                    halachasAiParsedTotal.add(1, { result: "failure" });
                     continue;
                 }
 
@@ -84,11 +86,13 @@ export const parse_halachot_with_ai = async () => {
                         `Saved ${aiResult.lines.length} translation lines for: "${halacha.heTitle}"`
                     );
                 }
+                halachasAiParsedTotal.add(1, { result: "success" });
             } catch (err) {
                 logger.error(
                     `Failed AI processing for halacha "${halacha.heTitle}": ${err.message}`
                 );
                 logger.error(err);
+                halachasAiParsedTotal.add(1, { result: "failure" });
             }
         }
 

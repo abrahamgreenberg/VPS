@@ -1,6 +1,7 @@
 import { scraper } from "../lib/index.js";
 import { PrismaClient } from "@prisma/client";
 import { createLogger } from "../logger.js";
+import { halachasScrapedTotal, scrapeDuration } from "../telemetry";
 
 const logger = createLogger("scraper");
 const prisma = new PrismaClient();
@@ -64,6 +65,7 @@ function numberToGematria(num) {
 
 const scrape_halachot_for_date = async (date) => {
     logger.info(`Starting scrape for ${date.toDateString()}`);
+    const scrapeStart = Date.now();
 
     try {
         const { bookTitle, halachot } = await scraper(date);
@@ -138,6 +140,7 @@ const scrape_halachot_for_date = async (date) => {
                 logger.info(`Saved new halacha: "${halachaRecord.heTitle}"`);
                 logger.debug("---- TEXT ---- ");
                 logger.debug(halachaRecord);
+                halachasScrapedTotal.add(1, { book: bookTitle });
             } catch (err) {
                 logger.error(
                     `Failed processing halacha "${scrapedHalacha.subtitle}": ${err.message}`
@@ -147,9 +150,11 @@ const scrape_halachot_for_date = async (date) => {
         }
 
         logger.info(`Completed scrape for ${date.toDateString()}`);
+        scrapeDuration.record(Date.now() - scrapeStart);
     } catch (err) {
         logger.error(`Scrape failed for ${date.toDateString()}`);
         logger.error(err);
+        scrapeDuration.record(Date.now() - scrapeStart, { result: "error" });
     }
 };
 

@@ -1,4 +1,5 @@
 // server.ts
+import "./telemetry"; // must load first so instrumentations patch http/express before use
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import scheduler from "./scheduled/index";
@@ -9,6 +10,7 @@ import { corsMiddleware, initializeCors } from "./middleware/cors";
 import { requestLogger } from "./middleware/requestLogger";
 import { rateLimiter, initializeRateLimiter } from "./middleware/rateLimiter";
 import { DateSchema, MonthYearSchema, SyncRequestSchema } from "./schema";
+import { syncRequestsTotal, syncDuration } from "./telemetry";
 
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
@@ -327,6 +329,7 @@ app.get(
 app.post(
     "/api/halachot/sync",
     asyncHandler(async (req, res) => {
+        const start = Date.now();
         logger.info("Received sync request");
         const {
             data: clientHalachotObj,
@@ -338,6 +341,7 @@ app.post(
             logger.warn(
                 `Invalid sync request received: "${JSON.stringify(req.body)}"`
             );
+            syncRequestsTotal.add(1, { result: "invalid" });
             return res.status(400).json({ error });
         }
         const { clientHalachot } = clientHalachotObj;
@@ -365,6 +369,9 @@ app.post(
             return !clientVersion;
         });
 
+        syncRequestsTotal.add(1, { result: "ok" });
+        syncDuration.record(Date.now() - start);
+
         res.json({
             toDelete,
             toCreate,
@@ -382,6 +389,6 @@ app.use(errorHandler);
 // Start server
 // ---------------------------
 const PORT = process.env.BACKEND_API_PORT || "5002";
-app.listen(5002, "0.0.0.0", () => {
+app.listen(Number(PORT), "0.0.0.0", () => {
     logger.info(`Server running on http://localhost:${PORT}`);
 });

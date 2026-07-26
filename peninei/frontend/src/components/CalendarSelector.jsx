@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import { api } from "../utils";
+import { api, toBackendDateString, parseBackendDateString } from "../utils";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 
 export default function CalendarSelector({ selectedDate, onDateChange }) {
@@ -32,16 +32,7 @@ export default function CalendarSelector({ selectedDate, onDateChange }) {
     const availableDates =
         apiAvailableDates || clientHalachot?.map((h) => h.dateString);
 
-    const availableDateObjs = availableDates.map((d) => new Date(d));
-    function toBackendDateString(date) {
-        return (
-            date.getFullYear() +
-            "-" +
-            String(date.getMonth() + 1).padStart(2, "0") +
-            "-" +
-            String(date.getDate()).padStart(2, "0")
-        );
-    }
+    const availableDateObjs = availableDates.map(parseBackendDateString);
 
     if (loading) return <div>Loading...</div>;
 
