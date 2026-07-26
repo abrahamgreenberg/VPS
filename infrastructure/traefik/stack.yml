@@ -15,6 +15,11 @@ services:
         published: 443
         protocol: tcp
         mode: host
+      # TEMP: insecure dashboard/API port for baseline diagnosis - remove once dashboard is confirmed working
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
 
     volumes:
       # Docker socket for the Swarm provider - must run on a manager node
@@ -48,8 +53,8 @@ services:
       - "--providers.swarm.network=proxy-network"
 
       # API & Dashboard
-      - "--api.dashboard=true"
-      - "--api.insecure=false"
+      # TEMP: insecure mode for baseline diagnosis (exposes dashboard unauthenticated on :8080) - revert to false once confirmed working
+      - "--api.insecure=true"
 
       # Observability
       - "--log.level=INFO"
@@ -72,12 +77,6 @@ services:
         - "traefik.http.routers.dashboard.service=api@internal"
         - "traefik.http.routers.dashboard.tls=true"
         - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
-
-        
-        - "traefik.http.routers.dashboard.middlewares=crowdsec-bouncer@swarm,authentik@swarm"
-
-        # Service hint (dashboard has no compose "service", so Traefik needs the port explicitly)
-        - "traefik.http.services.traefik.loadbalancer.server.port=8080"
 
   # Optional: test service to confirm routing works. Remove once you've verified the dashboard.
   whoami:
