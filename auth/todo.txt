@@ -1,7 +1,0 @@
-get deploying as dev env on docker working
-
-get typescript on docker working 
-
-cry...
-
-then be happy when it works!
