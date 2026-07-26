@@ -1,0 +1,55 @@
+services:
+  gateway:
+    build: .
+    command: ["python", "gateway/app.py"]
+    environment: &otel-env
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://alloy:4318}
+      OTEL_EXPORTER_OTLP_HEADERS: ${OTEL_EXPORTER_OTLP_HEADERS:-}
+      DEPLOYMENT_ENV: ${DEPLOYMENT_ENV:-demo}
+      ORDERS_URL: http://orders:5001
+    depends_on:
+      - orders
+    networks:
+      - shop-demo
+
+  orders:
+    build: .
+    command: ["python", "orders/app.py"]
+    environment:
+      <<: *otel-env
+      INVENTORY_URL: http://inventory:5002
+      PAYMENTS_URL: http://payments:5003
+    depends_on:
+      - inventory
+      - payments
+    networks:
+      - shop-demo
+
+  inventory:
+    build: .
+    command: ["python", "inventory/app.py"]
+    environment: *otel-env
+    networks:
+      - shop-demo
+
+  payments:
+    build: .
+    command: ["python", "payments/app.py"]
+    environment:
+      <<: *otel-env
+      PAYMENTS_DECLINE_RATE: "0.08"
+    networks:
+      - shop-demo
+
+  load-generator:
+    build: .
+    command: ["python", "load_generator/generate.py"]
+    environment:
+      GATEWAY_URL: http://gateway:5000
+    depends_on:
+      - gateway
+    networks:
+      - shop-demo
+
+networks:
+  shop-demo:
