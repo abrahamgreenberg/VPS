@@ -1,0 +1,84 @@
+# Forward-auth for admin surfaces: oauth2-proxy + GitHub, single allowed email.
+# Stack MUST be deployed as "auth" (traefik reaches it as auth_oauth2-proxy).
+#
+#   export GITHUB_CLIENT_ID=<prod oauth app client id>
+#   docker stack deploy -c infrastructure/auth/stack.yml auth
+#
+# Attach to any service with ONE label (crowdsec is already inside the chain):
+#   traefik.http.routers.<name>.middlewares=sso@swarm
+services:
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.12.0
+    environment:
+      OAUTH2_PROXY_PROVIDER: github
+      OAUTH2_PROXY_CLIENT_ID: ${GITHUB_CLIENT_ID:?export GITHUB_CLIENT_ID before deploying}
+      OAUTH2_PROXY_CLIENT_SECRET_FILE: /run/secrets/oauth_client_secret
+      OAUTH2_PROXY_COOKIE_SECRET_FILE: /run/secrets/oauth_cookie_secret
+      # Single-user gate. Deliberately NO EMAIL_DOMAINS="*" (would admit any GitHub account)
+      OAUTH2_PROXY_AUTHENTICATED_EMAILS_FILE: /etc/oauth2-proxy/emails.txt
+      OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
+      OAUTH2_PROXY_UPSTREAMS: static://202
+      OAUTH2_PROXY_REVERSE_PROXY: "true"
+      OAUTH2_PROXY_SET_XAUTHREQUEST: "true"
+      OAUTH2_PROXY_REDIRECT_URL: https://auth.abrahamgreenberg.co.uk/oauth2/callback
+      OAUTH2_PROXY_COOKIE_DOMAINS: .abrahamgreenberg.co.uk
+      OAUTH2_PROXY_WHITELIST_DOMAINS: .abrahamgreenberg.co.uk
+      OAUTH2_PROXY_COOKIE_SECURE: "true"
+    secrets:
+      - oauth_client_secret
+      - oauth_cookie_secret
+    configs:
+      - source: allowed_emails
+        target: /etc/oauth2-proxy/emails.txt
+    networks:
+      - proxy-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+
+        # Sign-in / callback host
+        - "traefik.http.routers.auth.rule=Host(`auth.abrahamgreenberg.co.uk`)"
+        - "traefik.http.routers.auth.entrypoints=websecure"
+        - "traefik.http.routers.auth.tls=true"
+        - "traefik.http.routers.auth.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.auth.middlewares=crowdsec-bouncer@swarm"
+        - "traefik.http.services.auth.loadbalancer.server.port=4180"
+
+        # /oauth2/* on EVERY subdomain -> oauth2-proxy (the sign-in button posts to
+        # /oauth2/start on the host being visited). Certs come from each app's own router.
+        - "traefik.http.routers.oauth2-all.rule=HostRegexp(`^.+\\.abrahamgreenberg\\.co\\.uk$$`) && PathPrefix(`/oauth2/`)"
+        - "traefik.http.routers.oauth2-all.entrypoints=websecure"
+        - "traefik.http.routers.oauth2-all.tls=true"
+        - "traefik.http.routers.oauth2-all.priority=1000"
+        - "traefik.http.routers.oauth2-all.middlewares=crowdsec-bouncer@swarm"
+        - "traefik.http.routers.oauth2-all.service=auth"
+
+        # forwardAuth check (202 = allowed, 401 = not logged in)
+        - "traefik.http.middlewares.oauth-auth.forwardauth.address=http://auth_oauth2-proxy:4180/oauth2/auth"
+        - "traefik.http.middlewares.oauth-auth.forwardauth.trustForwardHeader=true"
+        - "traefik.http.middlewares.oauth-auth.forwardauth.authResponseHeaders=X-Auth-Request-User,X-Auth-Request-Email"
+        # 401 -> serve the sign-in page
+        - "traefik.http.middlewares.oauth-errors.errors.status=401"
+        - "traefik.http.middlewares.oauth-errors.errors.service=auth"
+        - "traefik.http.middlewares.oauth-errors.errors.query=/oauth2/sign_in?rd={url}"
+
+        # The one label other services attach: CrowdSec first, then auth
+        - "traefik.http.middlewares.sso.chain.middlewares=crowdsec-bouncer@swarm,oauth-errors,oauth-auth"
+
+configs:
+  allowed_emails:
+    external: true
+
+secrets:
+  oauth_client_secret:
+    external: true
+  oauth_cookie_secret:
+    external: true
+
+networks:
+  proxy-network:
+    external: true

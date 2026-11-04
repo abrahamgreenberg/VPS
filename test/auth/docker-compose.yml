@@ -1,0 +1,108 @@
+# Local test rig for the forward-auth layer (oauth2-proxy + GitHub).
+# Mirrors prod (Traefik -> forwardAuth middleware chain) but on plain HTTP.
+# *.localtest.me resolves to 127.0.0.1, so no /etc/hosts edits are needed.
+#
+#   docker compose up -d                       # Traefik + open whoami only
+#   docker compose --profile auth up -d        # + oauth2-proxy + protected whoami
+services:
+  traefik:
+    image: traefik:v3.7
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=auth-test
+      # Same entrypoint name as prod (websecure), but plain HTTP locally
+      - --entrypoints.websecure.address=:80
+      - --accesslog=true
+      - --log.level=INFO
+    ports:
+      - "127.0.0.1:80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks: [auth-test]
+
+  # Unprotected: proves routing works before auth is involved
+  whoami-open:
+    image: traefik/whoami:v1.10
+    networks: [auth-test]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.whoami-open.rule=Host(`open.localtest.me`)
+      - traefik.http.routers.whoami-open.entrypoints=websecure
+      - traefik.http.services.whoami-open.loadbalancer.server.port=80
+
+  oauth2-proxy:
+    profiles: [auth]
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.12.0
+    environment:
+      OAUTH2_PROXY_PROVIDER: github
+      OAUTH2_PROXY_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      OAUTH2_PROXY_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      OAUTH2_PROXY_COOKIE_SECRET: ${COOKIE_SECRET:-}
+      # Single-user gate: only the email(s) in the allowlist file may log in.
+      # Deliberately NO EMAIL_DOMAINS="*" - that would let any GitHub account in.
+      OAUTH2_PROXY_AUTHENTICATED_EMAILS_FILE: /etc/oauth2-proxy/emails.txt
+      OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
+      OAUTH2_PROXY_UPSTREAMS: static://202
+      OAUTH2_PROXY_REVERSE_PROXY: "true"
+      OAUTH2_PROXY_SET_XAUTHREQUEST: "true"
+      OAUTH2_PROXY_REDIRECT_URL: http://auth.localtest.me/oauth2/callback
+      OAUTH2_PROXY_COOKIE_DOMAINS: .localtest.me
+      OAUTH2_PROXY_WHITELIST_DOMAINS: .localtest.me
+      OAUTH2_PROXY_COOKIE_SECURE: "false" # local HTTP only - must be true in prod
+    configs:
+      - source: allowed_emails
+        target: /etc/oauth2-proxy/emails.txt
+    networks: [auth-test]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.auth.rule=Host(`auth.localtest.me`)
+      - traefik.http.routers.auth.entrypoints=websecure
+      - traefik.http.services.auth.loadbalancer.server.port=4180
+      # /oauth2/* on EVERY subdomain goes to oauth2-proxy (the sign-in button posts to
+      # /oauth2/start on the host being visited). Without this the button loops through sso.
+      - traefik.http.routers.oauth2-all.rule=HostRegexp(`^.+\.localtest\.me$$`) && PathPrefix(`/oauth2/`)
+      - traefik.http.routers.oauth2-all.entrypoints=websecure
+      - traefik.http.routers.oauth2-all.priority=1000
+      - traefik.http.routers.oauth2-all.service=auth
+      # 202 = allowed, 401 = not logged in
+      - traefik.http.middlewares.oauth-auth.forwardauth.address=http://oauth2-proxy:4180/oauth2/auth
+      - traefik.http.middlewares.oauth-auth.forwardauth.trustForwardHeader=true
+      - traefik.http.middlewares.oauth-auth.forwardauth.authResponseHeaders=X-Auth-Request-User,X-Auth-Request-Email
+      # Turn a 401 into a redirect to the sign-in page
+      - traefik.http.middlewares.oauth-errors.errors.status=401
+      - traefik.http.middlewares.oauth-errors.errors.service=auth
+      - traefik.http.middlewares.oauth-errors.errors.query=/oauth2/sign_in?rd={url}
+      # The one label other services attach (prod prepends crowdsec-bouncer@swarm)
+      - traefik.http.middlewares.sso.chain.middlewares=oauth-errors,oauth-auth
+
+  whoami-protected:
+    profiles: [auth]
+    image: traefik/whoami:v1.10
+    networks: [auth-test]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.whoami-protected.rule=Host(`protected.localtest.me`)
+      - traefik.http.routers.whoami-protected.entrypoints=websecure
+      - traefik.http.routers.whoami-protected.middlewares=sso@docker
+      - traefik.http.services.whoami-protected.loadbalancer.server.port=80
+
+  # Second protected host: proves the cookie is shared across subdomains (SSO)
+  whoami-protected-2:
+    profiles: [auth]
+    image: traefik/whoami:v1.10
+    networks: [auth-test]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.whoami-protected-2.rule=Host(`protected2.localtest.me`)
+      - traefik.http.routers.whoami-protected-2.entrypoints=websecure
+      - traefik.http.routers.whoami-protected-2.middlewares=sso@docker
+      - traefik.http.services.whoami-protected-2.loadbalancer.server.port=80
+
+configs:
+  allowed_emails:
+    environment: ALLOWED_EMAIL
+
+networks:
+  auth-test:
+    name: auth-test

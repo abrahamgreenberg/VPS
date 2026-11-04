@@ -105,7 +105,7 @@ services:
 
   # Public OTLP ingestion gateway (gRPC :4317 + HTTP :4318). Reachable from the
   # internet via alloy.abrahamgreenberg.co.uk, protected by basic auth defined
-  # below since it is internet-facing and authentik is currently disabled.
+  # below since it is internet-facing (the sso forward-auth is not used for OTLP clients).
   alloy:
     image: grafana/alloy:v1.5.1
     command:

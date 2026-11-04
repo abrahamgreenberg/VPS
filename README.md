@@ -19,7 +19,7 @@ Running several unrelated apps (a scraper/API/PWA, a portfolio site, more to com
 | `traefik`    | Edge reverse proxy / automatic TLS (Let's Encrypt) — replacing Nginx Proxy Manager                   |
 | `monitoring` | Grafana, Prometheus, Loki, Tempo, Alloy (OTLP collector), cAdvisor, node-exporter, postgres-exporter |
 | `crowdsec`   | Intrusion detection + a Traefik bouncer middleware that auto-blocks abusive IPs                      |
-| `authentik`  | SSO / forward-auth for admin panels (mid-rollout)                                                    |
+| `auth`       | oauth2-proxy + GitHub forward-auth (`sso@swarm` middleware) for admin panels, single allowed email   |
 | `postgres`   | Shared PostgreSQL instance + pgAdmin                                                                 |
 | `portainer`  | Swarm ops UI                                                                                         |
 
@@ -83,7 +83,7 @@ I have been exploring the use of Coolify to deploy apps on my VPS. This will pro
 - [ ] Fix peninei telemetry: add traces, fix logs actually landing in Loki (metrics work; log pipeline needs debugging)
 - [ ] Self-hosted image registry, so images are built locally and pushed rather than built directly on the VPS
 - [ ] CI/CD with GitHub Actions (build, push, deploy)
-- [ ] Protect more admin surfaces (pgAdmin, Portainer, Traefik dashboard, Grafana) with Authentik forward-auth
+- [ ] Protect more admin surfaces (pgAdmin, Portainer, Traefik dashboard, Grafana) with the `sso@swarm` forward-auth middleware
 - [ ] Switch peninei's AI step (translation/parsing) from OpenAI to Claude
 - [ ] Better deployment environments (proper staging vs. production, not just SSH + `docker stack deploy`)
 - [ ] VPS backups at the volume/DB level (nightly, encrypted — see runbook §7.4 for the Restic sketch)
@@ -92,7 +92,7 @@ I have been exploring the use of Coolify to deploy apps on my VPS. This will pro
 ### Later
 
 - [ ] Wire up the alerts listed above
-- [ ] Finish the Authentik + CrowdSec rollout across all admin routes
+- [ ] Finish the oauth2-proxy + CrowdSec rollout across all admin routes
 - [ ] Disaster-recovery drills (restore DB + volumes from backup, redeploy from Git only)
 - [ ] Home page listing all services
 
