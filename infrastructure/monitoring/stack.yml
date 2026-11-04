@@ -101,7 +101,7 @@ services:
         - "traefik.http.routers.grafana.tls=true"
         - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
         - "traefik.http.services.grafana.loadbalancer.server.port=3000"
-        - "traefik.http.routers.grafana.middlewares=crowdsec-bouncer@swarm"
+        - "traefik.http.routers.grafana.middlewares=sso@swarm"
 
   # Public OTLP ingestion gateway (gRPC :4317 + HTTP :4318). Reachable from the
   # internet via alloy.abrahamgreenberg.co.uk, protected by basic auth defined

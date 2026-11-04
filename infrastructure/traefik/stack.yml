@@ -64,7 +64,7 @@ services:
       - "--providers.swarm.network=proxy-network"
 
       # API & Dashboard
-      # TEMP: insecure mode for baseline diagnosis (exposes dashboard unauthenticated on :8080) - revert to false once confirmed working
+      # Dashboard is served only via the `dashboard` router below (crowdsec + sso); api.insecure is off
       - "--api.dashboard=true"
 
       # Observability
@@ -90,6 +90,12 @@ services:
         - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
         - "traefik.http.routers.dashboard.middlewares=crowdsec-bouncer@swarm,sso@swarm"
         - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+
+        # CrowdSec forward-auth middleware (referenced everywhere as crowdsec-bouncer@swarm).
+        # The bouncer service (crowdsec/stack.yml) is deliberately not routed publicly;
+        # traefik reaches it over proxy-network.
+        - "traefik.http.middlewares.crowdsec-bouncer.forwardauth.address=http://bouncer:8080/api/v1/forwardAuth"
+        - "traefik.http.middlewares.crowdsec-bouncer.forwardauth.trustForwardHeader=true"
 
         # Basic auth for the monitoring stack's public alloy.<domain> OTLP
         # gateway (referenced as alloy-auth@swarm from monitoring/stack.yml).
