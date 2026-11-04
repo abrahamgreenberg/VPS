@@ -65,7 +65,7 @@ services:
 
       # API & Dashboard
       # TEMP: insecure mode for baseline diagnosis (exposes dashboard unauthenticated on :8080) - revert to false once confirmed working
-      - "--api.insecure=true"
+      - "--api.dashboard=true"
 
       # Observability
       - "--log.level=INFO"
