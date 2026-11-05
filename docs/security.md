@@ -16,7 +16,7 @@ Here's a prioritized rundown, with the Docker/Swarm-specific gotchas that catch 
 ssh-copy-id user@your-server       # from your own machine
 ```
 
-Then create `/etc/ssh/sshd_config.d/99-hardening.conf`:
+Then create `/etc/ssh/sshd_config.d/00-hardening.conf`. The `00-` prefix matters: sshd uses the **first** value it reads and files load alphabetically, so a `99-` file loses to cloud-init's `50-cloud-init.conf` (`PasswordAuthentication yes`):
 
 ```
 PasswordAuthentication no
@@ -107,3 +107,16 @@ Anything listening on `0.0.0.0` that isn't SSH/80/443 deserves a second look.
 7. No backups, so any incident becomes a disaster
 
 If you tell me your OS and what services you run (and whether you use Traefik), I can give you a more specific checklist. If you paste the output of `sudo ss -tulpn`, I can point out anything that looks exposed.
+
+---
+
+## Later: Docker hardening (TODO)
+
+- [ ] Pin remaining `:latest` images (`crowdsec`, `fbonalair/traefik-crowdsec-bouncer`, `pgadmin4`, `traefik/whoami`, portainer `lts`); check the bouncer image is still maintained
+- [ ] Docker socket proxy (`tecnativa/docker-socket-proxy`, read-only) in front of Traefik; review the Portainer agent socket + volumes mount
+- [ ] `cap_drop: [ALL]`, `read_only: true`, non-root `user:` per service, only where compatible (test each on redeploy)
+- [ ] Encrypted overlay networks (`--opt encrypted`) if a second node is ever added
+- [ ] Image scanning (`trivy image` / `docker scout`) for peninei and the pinned third-party images
+- [ ] Move `CROWDSEC_BOUNCER_API_KEY` env var to the existing `crowdsec_bouncer_api_key` Swarm secret (if the bouncer supports `_FILE`)
+- [ ] Remove unused secret `traefik_dashboard_auth`; review the dangling anonymous volumes (after backups)
+- [ ] `lynis audit system` and act on the findings
