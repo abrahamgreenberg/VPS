@@ -4,25 +4,28 @@ The overview is in the [README](../README.md#roadmap). This is the detailed list
 
 ## Order of work
 
-| Focus | Why this slot | Status |
-| ----- | ------------- | ------ |
-| Auth / bouncer rollout | Finish before starting anything new | Done |
-| Host security + local backups + housekeeping | Biggest risks first | Done (see [operations](operations.md)) |
-| Docker hardening | Finish the security pass | Next |
-| Private registry | Unlocks building off the VPS; small, self-contained | Not started |
-| CI/CD (GitHub Actions -> registry -> deploy) | Needs the registry; moves peninei off VPS-side builds | Not started |
-| Off-box backups | Local dumps don't survive losing the disk | Later |
-| Portfolio and other websites | Easy once registry + CI/CD template exists | Later |
-| Ongoing | Telemetry fixes, alerts, repo tidying | Interleave |
+| Focus                                        | Why this slot                                         | Status                                 |
+| -------------------------------------------- | ----------------------------------------------------- | -------------------------------------- |
+| Auth / bouncer rollout                       | Finish before starting anything new                   | Done                                   |
+| Host security + local backups + housekeeping | Biggest risks first                                   | Done (see [operations](operations.md)) |
+| Docker hardening                             | Finish the security pass                              | Next                                   |
+| Private registry                             | Unlocks building off the VPS; small, self-contained   | Not started                            |
+| CI/CD (GitHub Actions -> registry -> deploy) | Needs the registry; moves peninei off VPS-side builds | Not started                            |
+| Off-box backups                              | Local dumps don't survive losing the disk             | Later                                  |
+| Portfolio and other websites                 | Easy once registry + CI/CD template exists            | Later                                  |
+| Ongoing                                      | Telemetry fixes, alerts, repo tidying                 | Interleave                             |
 
 ## Next
 
-- [ ] **Private image registry** at `registry.<domain>`. Use its own htpasswd auth (not `sso`: the docker CLI can't do
-      browser logins) behind CrowdSec. Zot is preferred over `registry:2` (per-user permissions so there can be a
-      genuinely pull-only `deployer` credential, plus built-in garbage collection). Needs persistent storage + backup.
+- [ ] **Private image registry** at `registry.<domain>` ([infrastructure/registry](../infrastructure/registry/README.md)): Zot, htpasswd auth
+      (not `sso`), CrowdSec, retention of `latest` + the 5 newest `YYYY.MM.DD.REV` tags. Written and tested locally; deploy it, then
+      prove the flow with a simple app (push from PC -> `docker stack deploy --with-registry-auth` on the VPS).
 - [ ] Move peninei (then the others) to `registry.<domain>/...` images: build + push from PC,
       `docker stack deploy --with-registry-auth` on the VPS, so nothing is built on the VPS
-- [ ] CI/CD with GitHub Actions (build, push to the registry, deploy)
+- [ ] CI/CD with GitHub Actions: push to `main` builds and pushes `latest`; a manual `workflow_dispatch` builds and pushes the
+      next `YYYY.MM.DD.REV`. Needs thought on a public repo: only collaborators can dispatch, forks never get secrets, restrict
+      the dispatch job to an environment with required reviewers, push with the `ci` user only, never use `pull_request_target`
+      with secrets; then deploy (manual `docker stack deploy` first)
 - [ ] Fix peninei telemetry: add traces, fix logs actually landing in Loki (metrics work; the log pipeline needs debugging)
 - [ ] Proper staging vs production environments (not just SSH + `docker stack deploy`)
 - [ ] Switch peninei's AI step (translation/parsing) from OpenAI to Claude
@@ -34,7 +37,6 @@ auto-reboot), Portainer no longer publishes ports, dashboards behind SSO, Traefi
 
 - [ ] Reboot plan for kernel updates (single-node Swarm = brief downtime)
 - [ ] Verify CrowdSec is actually ingesting Traefik's access log (`cscli metrics`); the stack has no log source mounted, so it may only enforce the community blocklist
-- [ ] Restrict SSH in the Vultr firewall to my IP(s) if not already
 - [ ] Pin remaining `:latest` images (`crowdsec`, `fbonalair/traefik-crowdsec-bouncer`, `pgadmin4`, `traefik/whoami`,
       portainer `lts`); check the bouncer image is still maintained
 - [ ] Docker socket proxy (`tecnativa/docker-socket-proxy`, read-only) in front of Traefik; review the Portainer
@@ -58,7 +60,8 @@ Done: nightly local `pg_dumpall` (newest 2 kept), weekly Docker/log prune, Loki/
 - [ ] Backup of telemetry data / whole-system snapshots (Vultr snapshots are the cheap option)
 - [ ] Alert if the newest dump is older than ~26h or a timer job fails
 - [ ] Restore drill on a scratch host, documented
-- [ ] Prune old image tags from the registry once it exists (GC frees the disk once tags are deleted)
+- [x] Registry tag pruning: Zot retention keeps `latest` + 5 newest dated tags (set up with the registry)
+- [ ] Back up the registry volume (low priority: images can be rebuilt by CI) and add `registry_data` to the off-box list
 - [ ] Review the dangling anonymous volumes the prune job will clean up
 - [ ] Monthly check: image updates, cert expiry, CrowdSec decisions, backup restore test
 
@@ -88,25 +91,30 @@ The metrics pipeline exists (Prometheus + Loki + cAdvisor + node-exporter + post
 metrics); alerting on top of it doesn't yet.
 
 **Infra health**
+
 - Disk usage > 80% on the host (`node_filesystem_avail_bytes`)
 - Container restart loop - N restarts in 5 minutes (cAdvisor)
 - A Swarm service's running replica count < desired for > 2 minutes
 - Container OOM-killed
 
 **App health (peninei, and future apps via the same OTEL pattern)**
+
 - HTTP 5xx rate over a rolling window (`http_requests_total{status_code=~"5.."}`)
 - p95 request latency above threshold (`http_request_duration_ms`)
 - `sync_duration_ms` p99 spike
 
 **Data freshness (business logic, not just infra)**
+
 - `halachas_scraped_total` flat for > 24h -> the daily scrape job silently failed
 - `halachas_ai_parsed_total{result="failure"}` rate spike -> AI translation step degrading
 
 **Security**
+
 - Spike in CrowdSec bans/decisions over baseline -> possible attack in progress
 - TLS certificate expiring within 14 days (Traefik/ACME)
 
 **Meta**
+
 - No logs received from a known service in Loki for > N minutes
 - Optional: Grafana auth-proxy SSO (needs Grafana on a Traefik-only network first)
 

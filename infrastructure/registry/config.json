@@ -1,0 +1,49 @@
+{
+  "distSpecVersion": "1.1.0",
+  "storage": {
+    "rootDirectory": "/var/lib/registry",
+    "gc": true,
+    "gcDelay": "1h",
+    "gcInterval": "6h",
+    "retention": {
+      "dryRun": false,
+      "policies": [
+        {
+          "repositories": ["**"],
+          "deleteReferrers": true,
+          "deleteUntagged": true,
+          "keepTags": [
+            { "patterns": ["^latest$"] },
+            { "patterns": ["^\\d{4}\\.\\d{2}\\.\\d{2}\\.\\d+$"], "mostRecentlyPushedCount": 5 }
+          ]
+        }
+      ]
+    }
+  },
+  "http": {
+    "address": "0.0.0.0",
+    "port": "5000",
+    "realm": "zot",
+    "auth": {
+      "htpasswd": { "path": "/run/secrets/registry_htpasswd" },
+      "failDelay": 3
+    },
+    "accessControl": {
+      "repositories": {
+        "**": {
+          "policies": [
+            { "users": ["deployer"], "actions": ["read"] },
+            { "users": ["ci"], "actions": ["read", "create", "update"] }
+          ],
+          "defaultPolicy": [],
+          "anonymousPolicy": []
+        }
+      },
+      "adminPolicy": {
+        "users": ["admin"],
+        "actions": ["read", "create", "update", "delete"]
+      }
+    }
+  },
+  "log": { "level": "info" }
+}

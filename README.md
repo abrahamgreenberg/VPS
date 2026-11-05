@@ -56,6 +56,7 @@ Each folder has its own README: what it is, how to deploy it, how to operate it.
 | [`monitoring`](infrastructure/monitoring/README.md) | Grafana, Prometheus, Loki, Tempo, Alloy (OTLP gateway), cAdvisor, node-exporter, postgres-exporter |
 | [`postgres`](infrastructure/postgres/README.md) | Shared PostgreSQL instance + pgAdmin |
 | [`portainer`](infrastructure/portainer/README.md) | Swarm ops UI |
+| [`registry`](infrastructure/registry/README.md) | Private Docker image registry (Zot) with htpasswd auth and tag retention, so images are built off the VPS |
 | [`backup`](infrastructure/backup/README.md) | Nightly Postgres dump to local disk (newest 2 kept) |
 | [`maintenance`](infrastructure/maintenance/README.md) | Weekly prune of images, containers, stale volumes and logs |
 
@@ -82,7 +83,7 @@ Each folder has its own README: what it is, how to deploy it, how to operate it.
 │   ├── operations.md            host security, backups, housekeeping, recovery notes
 │   └── roadmap.md               detailed roadmap and alert ideas
 ├── infrastructure/              the platform: one folder per stack, each with stack.yml + README
-│   ├── traefik/  auth/  crowdsec/  monitoring/  postgres/  portainer/
+│   ├── traefik/  auth/  crowdsec/  monitoring/  postgres/  portainer/  registry/
 │   ├── backup/  maintenance/    systemd-timer jobs
 │   └── install-host-jobs.sh     installs the two timers on the VPS
 ├── peninei/                     app: scraper + API + PWA (stack.yml, Dockerfiles)

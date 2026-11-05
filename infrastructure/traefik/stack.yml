@@ -51,6 +51,10 @@ services:
       # Dedicated entrypoint for OTLP gRPC (h2c backends, e.g. alloy)
       - "--entrypoints.grpc.address=:4317"
 
+      # Traefik v3 aborts any request whose body takes >60s to arrive (default readTimeout=60s). A single
+      # image layer upload to registry.<domain> can exceed that on a home connection, so allow 30 minutes.
+      - "--entrypoints.websecure.transport.respondingTimeouts.readTimeout=30m"
+
       # Let's Encrypt (ACME) via HTTP-01 challenge on the web entrypoint
       - "--certificatesresolvers.letsencrypt.acme.email=abrahamgreenberg123@gmail.com"
       - "--certificatesresolvers.letsencrypt.acme.storage=/certs/acme.json"

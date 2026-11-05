@@ -1,0 +1,56 @@
+# Private image registry (Zot) at registry.<domain>, htpasswd auth, public via Traefik + CrowdSec.
+# Deliberately NOT behind sso@swarm: the docker CLI / CI can't do browser logins.
+#
+#   ./infrastructure/registry/create-secrets.sh                      # first time only
+#   docker stack deploy -c infrastructure/registry/stack.yml registry
+#
+# Prerequisite: traefik's websecure readTimeout is raised (traefik/stack.yml) or big layer pushes fail at 60s.
+services:
+  zot:
+    image: ghcr.io/project-zot/zot-linux-amd64:v2.1.22   # x86_64 VPS; use zot-linux-arm64 on ARM
+    configs:
+      - source: registry_config
+        target: /etc/zot/config.json
+    secrets:
+      - registry_htpasswd
+    volumes:
+      - registry_data:/var/lib/registry
+    networks:
+      - proxy-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      update_config:
+        order: stop-first   # one writer on the storage volume at a time
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.registry.rule=Host(`registry.abrahamgreenberg.co.uk`)"
+        - "traefik.http.routers.registry.entrypoints=websecure"
+        - "traefik.http.routers.registry.tls=true"
+        - "traefik.http.routers.registry.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.registry.middlewares=crowdsec-bouncer@swarm"
+        - "traefik.http.services.registry.loadbalancer.server.port=5000"
+
+configs:
+  registry_config:
+    # Swarm configs are immutable: after editing config.json bump the version (v2, v3, ...) and redeploy.
+    name: registry_config_v1
+    file: ./config.json
+
+secrets:
+  registry_htpasswd:
+    # Immutable too: to add/rotate a user create registry_htpasswd_v2, bump the name here, redeploy.
+    external: true
+    name: registry_htpasswd_v1
+
+volumes:
+  registry_data:
+
+networks:
+  proxy-network:
+    external: true
