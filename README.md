@@ -101,25 +101,22 @@ I have been exploring the use of Coolify to deploy apps on my VPS. This will pro
 
 ### Server maintenance (todo)
 
-Backups
-- [ ] Nightly encrypted backups (Restic) of: Postgres (`pg_dump` all DBs, not just the volume), Docker volumes (`grafana_data`, `portainer_data`, `zot_data`, `traefik-certs`/`acme.json`, `crowdsec_*`), and the Swarm Docker secrets/configs source of truth (password manager, since secrets can't be read back out)
-- [ ] Off-box destination (object storage / second provider) + retention policy (e.g. 7 daily / 4 weekly / 6 monthly)
-- [ ] Backup script lives in the repo (`infrastructure/backup/`), runs from cron/systemd timer, alerts on failure
-- [ ] Restore drill: bring up Postgres + a volume from backup on a scratch host and document the steps
+Backups (local only for now; details in `docs/backups-and-maintenance.md`)
+- [x] Nightly `pg_dumpall` of all databases to `/var/backups/postgres`, newest 2 kept (`infrastructure/backup/`, systemd timer)
+- [ ] Deploy it on the VPS and do one real restore check
+- [ ] Later: off-box encrypted backups (Restic) of dumps + Docker volumes (`grafana_data`, `portainer_data`, `traefik-certs`/`acme.json`, `crowdsec_*`), telemetry/system snapshots, retention policy, alert on failure/stale dump, scratch-host restore drill
 
 Housekeeping / cleanup scripts
-- [ ] Scheduled `docker system prune` (dangling images, stopped containers, build cache) - not `--volumes`
+- [x] Weekly prune of stopped containers, dangling/old images, build cache, stale anonymous volumes, journal (`infrastructure/maintenance/`); named volumes never touched
 - [ ] Prune old image tags from the registry (GC frees the disk once tags are deleted)
-- [ ] Docker log rotation (`json-file` `max-size`/`max-file` in `daemon.json`) and journald size limit
+- [ ] Docker log rotation (`json-file` `max-size`/`max-file` in `daemon.json`; needs a Docker restart, see the doc) (journald limit is handled by the prune job)
 - [ ] Loki / Prometheus / Tempo retention limits so the disk doesn't fill
 - [ ] Disk usage alert (>80%) wired to the monitoring stack
 
 Host hardening and patching
-- [ ] `unattended-upgrades` for security patches; reboot plan for Swarm (single node = brief downtime)
-- [ ] SSH: key-only, no root login, non-default fail2ban/CrowdSec SSH collection
-- [ ] Firewall (ufw/Vultr firewall): only 22, 80, 443 (+4317 OTLP); confirm nothing else is published
-- [ ] Pin remaining `:latest` images (`crowdsec`, `fbonalair/traefik-crowdsec-bouncer`, `pgadmin4`, portainer `lts`) and review whether the bouncer image is still maintained
-- [ ] Remove the `whoami` test service once it's no longer needed
+- [x] `unattended-upgrades` (security only, no auto-reboot), SSH key-only/no root, fail2ban, Vultr firewall; Portainer no longer publishes ports
+- [ ] Reboot plan for kernel updates (single-node Swarm = brief downtime)
+- [ ] Docker hardening: pin `:latest` images, socket proxy, `cap_drop`/`read_only`/non-root, image scanning (checklist in `docs/security.md`)
 - [ ] Monthly check: image updates, cert expiry, CrowdSec decisions, backup restore test
 
 ### Repo cleanup (todo)

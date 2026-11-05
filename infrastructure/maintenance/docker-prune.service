@@ -1,0 +1,8 @@
+[Unit]
+Description=Weekly Docker + log housekeeping
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/docker-prune.sh --all-images --volumes

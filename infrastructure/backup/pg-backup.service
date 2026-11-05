@@ -1,0 +1,8 @@
+[Unit]
+Description=Nightly Postgres dump (all databases) to /var/backups/postgres
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/pg-backup.sh
