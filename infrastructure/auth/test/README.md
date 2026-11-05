@@ -1,12 +1,5 @@
 # Local forward-auth test rig
 
-TODO:
-GET BETTER AUTH
-GET BETTER DEPLOYMENT STACK
-FIX PENINEI
-GET OTHER APPS DEPLOYED
-:)
-
 Traefik + oauth2-proxy (GitHub) + whoami, on `*.localtest.me` (resolves to 127.0.0.1).
 
 ## 1. Routing only (no secrets needed)

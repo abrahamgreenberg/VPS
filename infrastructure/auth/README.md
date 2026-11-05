@@ -55,7 +55,7 @@ callback: `https://auth.abrahamgreenberg.co.uk/oauth2/callback`.
 - **Log out:** `https://auth.abrahamgreenberg.co.uk/oauth2/sign_out`
 - **Locked out of a dashboard:** SSH in; set that router's label to `crowdsec-bouncer@swarm` and
   redeploy its stack. Peninei and the other public apps never depend on sso.
-- **Test locally first:** `test/auth/` (Compose + `*.localtest.me`).
+- **Test locally first:** `infrastructure/auth/test/` (Compose + `*.localtest.me`).
 
 ## Troubleshooting
 | Symptom                                   | Likely cause                                              |

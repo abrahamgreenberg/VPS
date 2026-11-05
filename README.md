@@ -124,10 +124,7 @@ Host hardening and patching
 
 ### Repo cleanup (todo)
 
-- [ ] Delete the superseded Compose-era `infra/` directory (`infra/docker/*`, `infra/python`, `infra/scripts`) and `infra/docker/ngninx-proxy-manager` (typo + replaced by Traefik)
-- [ ] Remove `test/` (stale Node test app + `TODO.txt`) now that `test/auth/` is the real test rig - move that to `infrastructure/auth/test/` or keep `test/auth/` only
-- [ ] Remove `infra/docker/observability/todo` and fold the real items into this roadmap
-- [ ] One layout: `infrastructure/<stack>/stack.yml` for platform, `<app>/stack.yml` for apps; consistent `.env.example` per stack
+- [ ] Consistent `.env.example` per stack (layout is now `infrastructure/<stack>/stack.yml` for platform, `<app>/stack.yml` for apps)
 - [ ] Fix naming typos (`peninei` vs `penieni`, `READEME` in history is fine to leave) and make `.gitignore` cover every `.env` / local secret file
 - [ ] Add a short `docs/runbook.md` (deploy order, secrets list, rollback, DNS records) so nothing lives only in my head
 - [ ] Pre-commit check: `docker compose config`/`yamllint` on every stack file
@@ -149,6 +146,7 @@ Host hardening and patching
 ### Done
 
 - [x] Merged all projects into one monorepo
+- [x] Repo cleanup: removed the Compose-era `infra/` and stale `test/` dirs; auth test rig now at `infrastructure/auth/test/`; notes in `docs/`
 - [x] Rate limiting + caching on the peninei API
 - [x] Alpine base images + shared pnpm store across Node containers
 - [x] Offline-capable PWA download for peninei halachot

@@ -221,3 +221,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Secrets / TLS material (belt and braces; real secrets live in Swarm secrets)
+*.pem
+*.key
+*.crt
+acme.json
+secrets/
+.htpasswd
+*.htpasswd
