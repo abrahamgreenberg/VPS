@@ -9,6 +9,7 @@ genuinely pull-only credential) and built-in garbage collection + tag retention.
 | Image | `ghcr.io/project-zot/zot-linux-amd64:v2.1.22` (x86_64; swap for `-arm64` on ARM) |
 | Routing | `registry.<domain>` via Traefik with `crowdsec-bouncer@swarm`. **Not** behind `sso`: docker/CI can't do browser logins |
 | Auth | htpasswd (bcrypt) in the Swarm secret `registry_htpasswd_v1`; anonymous access is denied |
+| Dashboard | Zot's web UI at `https://registry.<domain>/` (see below) |
 | Storage | `registry_data` volume at `/var/lib/registry` |
 | Network | `proxy-network` only, no published ports |
 
@@ -21,6 +22,13 @@ genuinely pull-only credential) and built-in garbage collection + tag retention.
 
 Access rules live in `config.json` (`http.accessControl`). Verified locally against the real image: wrong password and
 anonymous are rejected, `deployer` can pull but a push returns "access denied".
+
+## Dashboard (web UI)
+Open `https://registry.abrahamgreenberg.co.uk/` and sign in with `admin`, `ci` or `deployer`. You can browse
+repositories and tags, see each image's layers, size, platforms and last-pushed time, search by name, and copy the
+`docker pull` command. It is read-only: pushing and deleting still happen with the CLI. The page shell is public but all
+data (repos, tags, search) requires a login - checked at the API level: anonymous gets 401, `deployer` sees repos.
+It is enabled by the `search` + `ui` extensions in `config.json`; no CVE scanning.
 
 ## Tag plan and retention
 | Tag | Meaning |
@@ -67,6 +75,16 @@ Inspect (as `ci` or `admin`):
     curl -su ci:<password> https://registry.abrahamgreenberg.co.uk/v2/_catalog
     curl -su ci:<password> https://registry.abrahamgreenberg.co.uk/v2/apps/hello/tags/list
 
+## Troubleshooting
+- **"Not all multiplatform-content is present and only the available single-platform image was pushed"** when pushing:
+  an informational note from Docker's containerd image store, not an error. The local tag points at a multi-platform
+  index (e.g. `hello-world`) but only your platform's content is on disk, so only that platform was pushed (the two
+  digests are the index and the manifest actually pushed). For your own builds it means "pushed for the platform you built
+  for", so build for the VPS with `--platform linux/amd64`.
+- **Push fails after about a minute with a closed connection / EOF:** a timeout in Traefik (`readTimeout`) or Zot
+  (`http.readTimeout`/`writeTimeout`); both are raised to 30m in this repo. Check both were redeployed.
+- **`denied: requested access to the resource is denied`:** wrong user (`deployer` is pull-only) or not logged in.
+
 ## Operate
 - **Change the config:** edit `config.json`, bump `registry_config_v1` -> `_v2` in `stack.yml`, redeploy the stack.
 - **Add/rotate a user:** `REGISTRY_HTPASSWD_SECRET=registry_htpasswd_v2 ./create-secrets.sh` (regenerates all three
@@ -84,5 +102,6 @@ release tags you might want to roll back to. When off-box backups happen, add th
 
 ## Known limits
 - One replica on one volume; `update_config: stop-first` means a brief outage on redeploy.
-- No web UI or metrics extensions enabled (smaller attack surface). Adding Zot's Prometheus metrics is a later option.
+- Only the `search` and `ui` extensions are enabled (no CVE scanner, no metrics). Zot's Prometheus metrics are a later option.
+- Zot and Traefik both allow a request up to 30 minutes (`readTimeout`); that is generous on purpose for big layers.
 - Passwords in `docker login` land in a plain credentials file unless a credential helper is configured.

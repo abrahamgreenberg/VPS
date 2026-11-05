@@ -71,6 +71,7 @@ Each folder has its own README: what it is, how to deploy it, how to operate it.
 - **[Observability test app](infrastructure/monitoring/test-app/README.md)** - a disposable multi-service Flask demo
   built to validate the OTLP -> Alloy -> Prometheus/Loki/Tempo -> Grafana pipeline *before* trusting it with a real app.
   Its telemetry code became the reference the peninei backend was ported from.
+- **[Hello](hello/README.md)** - a one-page site used to prove the build-on-PC -> private registry -> Portainer deploy loop.
 - **[Portfolio](portfolio/README.md)** - personal site (Eleventy + nginx), a writing class portfolio. Offline for now.
 
 ## Repository layout
@@ -86,6 +87,7 @@ Each folder has its own README: what it is, how to deploy it, how to operate it.
 │   ├── traefik/  auth/  crowdsec/  monitoring/  postgres/  portainer/  registry/
 │   ├── backup/  maintenance/    systemd-timer jobs
 │   └── install-host-jobs.sh     installs the two timers on the VPS
+├── hello/                       app: tiny static page (Dockerfile + stack.yml for Portainer)
 ├── peninei/                     app: scraper + API + PWA (stack.yml, Dockerfiles)
 └── portfolio/                   app: static site
 ```

@@ -1,0 +1,36 @@
+# Hello page - the first app deployed from the private registry. Meant to be pasted into / pulled by Portainer.
+#
+# Portainer: Stacks -> Add stack -> (Web editor | Repository: hello/stack.yml). Optional env var HELLO_TAG
+# (defaults to latest). The registry must be added under Portainer -> Registries (user: deployer).
+# CLI alternative: docker stack deploy --with-registry-auth -c hello/stack.yml hello
+services:
+  web:
+    image: registry.abrahamgreenberg.co.uk/apps/hello:${HELLO_TAG:-latest}
+    networks:
+      - proxy-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+      rollback_config:
+        order: stop-first
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.hello.rule=Host(`hello.abrahamgreenberg.co.uk`)"
+        - "traefik.http.routers.hello.entrypoints=websecure"
+        - "traefik.http.routers.hello.tls=true"
+        - "traefik.http.routers.hello.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.hello.middlewares=crowdsec-bouncer@swarm"
+        - "traefik.http.services.hello.loadbalancer.server.port=8080"
+
+networks:
+  proxy-network:
+    external: true

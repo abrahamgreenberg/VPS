@@ -39,7 +39,7 @@ services:
 configs:
   registry_config:
     # Swarm configs are immutable: after editing config.json bump the version (v2, v3, ...) and redeploy.
-    name: registry_config_v1
+    name: registry_config_v2
     file: ./config.json
 
 secrets:

@@ -9,12 +9,23 @@
       "dryRun": false,
       "policies": [
         {
-          "repositories": ["**"],
+          "repositories": [
+            "**"
+          ],
           "deleteReferrers": true,
           "deleteUntagged": true,
           "keepTags": [
-            { "patterns": ["^latest$"] },
-            { "patterns": ["^\\d{4}\\.\\d{2}\\.\\d{2}\\.\\d+$"], "mostRecentlyPushedCount": 5 }
+            {
+              "patterns": [
+                "^latest$"
+              ]
+            },
+            {
+              "patterns": [
+                "^\\d{4}\\.\\d{2}\\.\\d{2}\\.\\d+$"
+              ],
+              "mostRecentlyPushedCount": 5
+            }
           ]
         }
       ]
@@ -25,25 +36,62 @@
     "port": "5000",
     "realm": "zot",
     "auth": {
-      "htpasswd": { "path": "/run/secrets/registry_htpasswd" },
+      "htpasswd": {
+        "path": "/run/secrets/registry_htpasswd"
+      },
       "failDelay": 3
     },
     "accessControl": {
       "repositories": {
         "**": {
           "policies": [
-            { "users": ["deployer"], "actions": ["read"] },
-            { "users": ["ci"], "actions": ["read", "create", "update"] }
+            {
+              "users": [
+                "deployer"
+              ],
+              "actions": [
+                "read"
+              ]
+            },
+            {
+              "users": [
+                "ci"
+              ],
+              "actions": [
+                "read",
+                "create",
+                "update"
+              ]
+            }
           ],
           "defaultPolicy": [],
           "anonymousPolicy": []
         }
       },
       "adminPolicy": {
-        "users": ["admin"],
-        "actions": ["read", "create", "update", "delete"]
+        "users": [
+          "admin"
+        ],
+        "actions": [
+          "read",
+          "create",
+          "update",
+          "delete"
+        ]
       }
-    }
+    },
+    "readTimeout": "30m",
+    "writeTimeout": "30m"
   },
-  "log": { "level": "info" }
+  "log": {
+    "level": "info"
+  },
+  "extensions": {
+    "search": {
+      "enable": true
+    },
+    "ui": {
+      "enable": true
+    }
+  }
 }

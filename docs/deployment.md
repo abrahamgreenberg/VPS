@@ -32,6 +32,7 @@ A records pointing at the VPS IP (or one wildcard `*.abrahamgreenberg.co.uk`):
 | `alloy.` | monitoring (OTLP gateway) | basic auth (no CrowdSec) |
 | `registry.` | [registry](../infrastructure/registry/README.md) | CrowdSec + htpasswd (not SSO) |
 | `peninei.` | [peninei](../peninei/README.md) | CrowdSec (public) |
+| `hello.` | [hello](../hello/README.md) | CrowdSec (public) |
 
 Firewall (Vultr): inbound **22, 80, 443, 4317** only. Docker's published ports bypass `ufw`, so the Vultr firewall
 is the real perimeter.
