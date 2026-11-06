@@ -16,7 +16,7 @@ Repo: `abrahamgreenberg/VPS` (public). GitHub Actions is free and unmetered for 
 Production stacks should **pin a dated tag**, not `latest`, so a push to `main` can never change what's running. The registry keeps `latest` +
 the 5 newest dated tags per image, which is also the rollback window.
 
-Images (repository path in the registry): `apps/hello`, `apps/peninei-backend`, `apps/peninei-migrate` (same Dockerfile, `--target migrate`; built alongside the backend), `apps/peninei-frontend`, later `apps/portfolio`.
+Images (repository path in the registry): `apps/hello`, `apps/peninei-backend`, `apps/peninei-migrate` (same Dockerfile, `--target migrate`; built alongside the backend), `apps/peninei-frontend`, `apps/portfolio`.
 
 ## Design
 
@@ -26,8 +26,9 @@ Images (repository path in the registry): `apps/hello`, `apps/peninei-backend`, 
   Inputs: registry, username, password, image name, build context, tag, optional build args. It is a composite action rather than a
   reusable workflow because a reusable workflow does not receive the `registry` environment's secrets (the login step got empty
   credentials); the caller job declares `environment: registry`, reads the secrets and passes them in.
-- `latest-<image>.yml` - one small caller per image (checkout + the action) with its own `on.push.paths` filter, so only changed images rebuild. Plain
-  `paths:` filters avoid a third-party paths-filter action.
+- `latest-<image>.yml` - one small caller per image (checkout + the action) with its own `on.push.paths` filter, so only changed images rebuild. Each filter lists only that image's folder and its own workflow file
+  (not the shared action), so a push to `peninei/` never starts the hello or portfolio runs. Plain `paths:` filters avoid a third-party
+  paths-filter action. Trade-off: editing the shared action rebuilds nothing; test such a change by running a workflow by hand.
 - `release.yml` - `workflow_dispatch` with a **choice** input listing the images; one job per image gated by `inputs.image`. It computes the tag:
   `date -u +%Y.%m.%d` + (highest REV for today in the registry's `/v2/<repo>/tags/list`, +1). A `concurrency` group per image stops two runs
   racing for the same REV.
@@ -102,7 +103,8 @@ Do this **before** pushing the workflows: a workflow that references an environm
 2. **Release workflow** (built: `release.yml`, `.github/scripts/next-release-tag.sh`, which has no test suite but was checked against edge cases by hand): run it twice on `hello` (expect `.1` then `.2`), confirm retention, deploy a pinned tag via `HELLO_TAG`.
 3. **Peninei:** backend + migrate + frontend callers, stack switched to registry images with tag variables, migrated into Portainer, VPS-side build files removed.
 4. **Hardening:** PR build, actionlint, Dependabot, Trivy scan of built images (report first, fail on critical later).
-5. **Optional:** webhook deploys; portfolio pipeline once it has a stack.
+5. **Portfolio** (built: `portfolio/Dockerfile`, `stack.yml`, `latest-portfolio.yml`, a `release.yml` option): same pattern as `hello`, simpler than peninei. Peninei (phase 3 above) is still to do.
+6. **Optional:** webhook deploys.
 
 ## Decisions to confirm before building
 

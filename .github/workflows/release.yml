@@ -15,6 +15,7 @@ on:
         required: true
         options:
           - hello
+          - portfolio
 
 permissions:
   contents: read
@@ -46,6 +47,7 @@ jobs:
         run: |
           case "$CHOICE" in
             hello) name=apps/hello; context=hello ;;
+            portfolio) name=apps/portfolio; context=portfolio ;;
             *) echo "::error::unknown image '$CHOICE'"; exit 1 ;;
           esac
           echo "name=$name" >> "$GITHUB_OUTPUT"

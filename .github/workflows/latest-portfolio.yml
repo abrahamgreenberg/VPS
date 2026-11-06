@@ -1,0 +1,37 @@
+# Push to main touching portfolio/ -> build and push apps/portfolio:latest (development tag).
+# Only portfolio/ (and this file) trigger it; pushes elsewhere in the repo do not.
+name: latest / portfolio
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "portfolio/**"
+      - ".github/workflows/latest-portfolio.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: latest-portfolio
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: registry
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/build-image
+        with:
+          registry: ${{ vars.REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+          image: apps/portfolio
+          context: portfolio
+          tag: latest

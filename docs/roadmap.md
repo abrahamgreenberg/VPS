@@ -75,8 +75,8 @@ Done: nightly local `pg_dumpall` (newest 2 kept), weekly Docker/log prune, Loki/
 
 ## Websites to host
 
-- [ ] Put the **portfolio** back online (`portfolio/` has a Dockerfile; needs a Swarm `stack.yml`, `portfolio.` / apex
-      route, CrowdSec only, image from the registry)
+- [ ] Put the **portfolio** back online: image + `stack.yml` + CI are built (host `portfolio.abrahamgreenberg.co.uk`, CrowdSec
+      only); remaining: push, deploy it in Portainer, then decide the apex
 - [ ] Decide the apex domain: `abrahamgreenberg.co.uk` -> portfolio, other sites on subdomains
 - [ ] Add other personal projects as they're built, each with its own stack file; template: image from registry,
       `proxy-network`, router with `crowdsec-bouncer@swarm` (public) or `sso@swarm` (private)

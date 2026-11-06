@@ -1,18 +1,23 @@
 # Portfolio
 
 First-year writing portfolio: a static site built with [Eleventy](https://www.11ty.dev/) (Nunjucks layouts, Markdown
-articles in `src/`) and served by nginx. **Not currently deployed** - bringing it back online is on the
-[roadmap](../docs/roadmap.md#websites-to-host).
+articles in `src/`) and served by non-root nginx. Host: `portfolio.abrahamgreenberg.co.uk` (public, CrowdSec only - no SSO).
+Moving it to the apex domain is on the [roadmap](../docs/roadmap.md#websites-to-host).
 
 ## Develop
     npm install
     npm start          # eleventy --serve
     npm run build      # output in _site/
 
-## Container
-`Dockerfile`: Node 20 builds `_site/`, then nginx serves it on port 80. `docker-compose.yml` is the older Compose-era
-runner (publishes `127.0.0.1:${PORTFOLIO_PORT}`).
+## Image and deploy
+`Dockerfile`: Node 20 builds `_site/`, then `nginxinc/nginx-unprivileged` serves it on port 8080 (113 MB on disk).
+CI builds it (nothing is built on the VPS):
 
-## To deploy on the platform
-Needs a `stack.yml` like peninei's: `proxy-network` only, a router for the portfolio host with
-`crowdsec-bouncer@swarm`, port 80, and ideally an image from the future private registry.
+- a push to `main` that touches `portfolio/` builds and pushes `registry.abrahamgreenberg.co.uk/apps/portfolio:latest`
+  ([`latest-portfolio.yml`](../.github/workflows/latest-portfolio.yml));
+- Actions -> **release** -> image `portfolio` pushes a dated tag `YYYY.MM.DD.REV`.
+
+Deploy with [`stack.yml`](stack.yml) in Portainer (Stacks -> Add stack, name `portfolio`; optional env var `PORTFOLIO_TAG`,
+default `latest`; the registry must be added in Portainer with the `deployer` user). Updates are start-first with automatic
+rollback. To update: "Re-pull image and redeploy" for `latest`, or set `PORTFOLIO_TAG` to a dated tag.
+Details: [docs/ci-cd.md](../docs/ci-cd.md).

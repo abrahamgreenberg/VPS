@@ -1,6 +1,7 @@
 # Push to main touching hello/ -> build and push apps/hello:latest (development tag).
-# Credentials come from the "registry" environment (restricted to main); the build steps live in
-# .github/actions/build-image.
+# Only hello/ (and this file) trigger it; pushes elsewhere in the repo do not. Credentials come from the
+# "registry" environment (restricted to main); the build steps live in .github/actions/build-image
+# (changing that shared action does not rebuild anything: run a workflow by hand to test it).
 name: latest / hello
 
 on:
@@ -8,7 +9,6 @@ on:
     branches: [main]
     paths:
       - "hello/**"
-      - ".github/actions/build-image/**"
       - ".github/workflows/latest-hello.yml"
   workflow_dispatch: {}
 

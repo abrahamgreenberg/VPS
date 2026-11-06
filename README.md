@@ -72,7 +72,7 @@ Each folder has its own README: what it is, how to deploy it, how to operate it.
   built to validate the OTLP -> Alloy -> Prometheus/Loki/Tempo -> Grafana pipeline _before_ trusting it with a real app.
   Its telemetry code became the reference the peninei backend was ported from.
 - **[Hello](hello/README.md)** - a one-page site used to prove the build-on-PC -> private registry -> Portainer deploy loop.
-- **[Portfolio](portfolio/README.md)** - personal site (Eleventy + nginx), a writing class portfolio. Offline for now.
+- **[Portfolio](portfolio/README.md)** - personal site (Eleventy + nginx), a writing class portfolio. Image, stack and CI are ready; deploy via Portainer.
 
 ## Repository layout
 
