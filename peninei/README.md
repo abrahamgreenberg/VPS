@@ -37,7 +37,9 @@ Images are built on the VPS (private registry + CI/CD are on the [roadmap](../do
 
 Updates are `start-first` with automatic rollback on failure; manual: `docker service rollback peninei_backend`.
 
-If Prisma complains about a failed migration in production, see the comment at the bottom of `backend/Dockerfile`.
+The backend image is multi-stage (build -> production-only `node_modules` + compiled `dist/`), runs on Node 20, and has **no pnpm**:
+the stack starts it with `node_modules/.bin/prisma migrate deploy && node dist/server.js`. `prisma` is a production dependency for
+that reason. If Prisma complains about a failed migration in production, see the comment above `CMD` in `backend/Dockerfile`.
 
 ## Develop
     cd backend && pnpm install && pnpm dev      # needs a Postgres + backend env vars (see .env.example)

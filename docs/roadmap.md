@@ -26,6 +26,10 @@ The overview is in the [README](../README.md#roadmap). This is the detailed list
       next `YYYY.MM.DD.REV`. Needs thought on a public repo: only collaborators can dispatch, forks never get secrets, restrict
       the dispatch job to an environment with required reviewers, push with the `ci` user only, never use `pull_request_target`
       with secrets; then deploy (manual `docker stack deploy` first)
+- [ ] **Upgrade Node 20 -> 24 (LTS)** for peninei backend/frontend and `hello`: Node 20 reached end of life on 2026-04-30. The
+      base image is one `ARG NODE_IMAGE` in `peninei/backend/Dockerfile`; re-run the backend e2e check (migrate + a Prisma query) after
+- [ ] Shrink the backend image further (optional): run `prisma migrate deploy` as a one-off step instead of at container start so the
+      Prisma CLI and its deps (~150 MB) can leave the runtime image; or trim unused Prisma runtime files
 - [ ] Fix peninei telemetry: add traces, fix logs actually landing in Loki (metrics work; the log pipeline needs debugging)
 - [ ] Proper staging vs production environments (not just SSH + `docker stack deploy`)
 - [ ] Switch peninei's AI step (translation/parsing) from OpenAI to Claude
@@ -64,6 +68,7 @@ Done: nightly local `pg_dumpall` (newest 2 kept), weekly Docker/log prune, Loki/
 - [ ] Back up the registry volume (low priority: images can be rebuilt by CI) and add `registry_data` to the off-box list
 - [ ] Review the dangling anonymous volumes the prune job will clean up
 - [ ] Monthly check: image updates, cert expiry, CrowdSec decisions, backup restore test
+- [ ] Add more password generating scripts
 
 ## Repo
 
@@ -120,6 +125,7 @@ metrics); alerting on top of it doesn't yet.
 
 ## Done
 
+- [x] Peninei backend image slimmed: multi-stage, production deps only, `.dockerignore` (compressed 187 MB -> 155 MB); no pnpm at runtime
 - [x] Merged all projects into one monorepo
 - [x] Rate limiting + caching on the peninei API
 - [x] Alpine base images + shared pnpm store across Node containers

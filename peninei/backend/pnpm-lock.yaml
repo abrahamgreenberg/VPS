@@ -22,16 +22,16 @@ importers:
         version: 0.221.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/instrumentation':
         specifier: ^0.221.0
-        version: 0.221.0(@opentelemetry/api@1.9.1)(supports-color@5.5.0)
+        version: 0.221.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/instrumentation-express':
         specifier: ^0.69.0
-        version: 0.69.0(@opentelemetry/api@1.9.1)(supports-color@5.5.0)
+        version: 0.69.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/instrumentation-http':
         specifier: ^0.221.0
-        version: 0.221.0(@opentelemetry/api@1.9.1)(supports-color@5.5.0)
+        version: 0.221.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/instrumentation-winston':
         specifier: ^0.65.0
-        version: 0.65.0(@opentelemetry/api@1.9.1)(supports-color@5.5.0)
+        version: 0.65.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/resources':
         specifier: ^2.10.0
         version: 2.10.0(@opentelemetry/api@1.9.1)
@@ -44,12 +44,9 @@ importers:
       '@prisma/client':
         specifier: ^6.18.0
         version: 6.18.0(prisma@6.18.0(typescript@5.9.3))(typescript@5.9.3)
-      '@types/express':
-        specifier: ^5.0.5
-        version: 5.0.5
       axios:
         specifier: ^1.13.1
-        version: 1.13.1(debug@4.4.3(supports-color@5.5.0))
+        version: 1.13.1
       cheerio:
         specifier: ^1.1.2
         version: 1.1.2
@@ -58,28 +55,28 @@ importers:
         version: 17.2.3
       express:
         specifier: ^5.1.0
-        version: 5.1.0(supports-color@5.5.0)
+        version: 5.1.0
       express-rate-limiter:
         specifier: ^1.3.1
         version: 1.3.1
       jsdom:
         specifier: ^27.1.0
-        version: 27.1.0(supports-color@5.5.0)
+        version: 27.1.0
       node-schedule:
         specifier: ^2.1.1
         version: 2.1.1
-      nodemon:
-        specifier: ^3.1.10
-        version: 3.1.10
       openai:
         specifier: ^6.7.0
         version: 6.7.0(ws@8.18.3)(zod@4.1.12)
+      prisma:
+        specifier: ^6.18.0
+        version: 6.18.0(typescript@5.9.3)
       swagger-jsdoc:
         specifier: ^6.2.8
         version: 6.2.8(openapi-types@12.1.3)
       swagger-ui-express:
         specifier: ^5.0.1
-        version: 5.0.1(express@5.1.0(supports-color@5.5.0))
+        version: 5.0.1(express@5.1.0)
       winston:
         specifier: ^3.18.3
         version: 3.18.3
@@ -87,15 +84,18 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12
     devDependencies:
+      '@types/express':
+        specifier: ^5.0.5
+        version: 5.0.5
       '@types/node':
         specifier: ^24.9.2
         version: 24.9.2
       '@types/swagger-ui-express':
         specifier: ^4.1.8
         version: 4.1.8
-      prisma:
-        specifier: ^6.18.0
-        version: 6.18.0(typescript@5.9.3)
+      nodemon:
+        specifier: ^3.1.10
+        version: 3.1.10
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.9.2)(typescript@5.9.3)
@@ -550,6 +550,7 @@ packages:
   cron-parser@4.9.0:
     resolution: {integrity: sha512-p0SaNjrHOnQeR8/VnfGbmg9te2kfyYSQ7Sc/j/6DtPL3JQvKxmjO9TSjNFpujqV3vEYYBvNNvXSxzyksBWAx1Q==}
     engines: {node: '>=12.0.0'}
+    deprecated: v4 is no longer maintained, upgrade to v5
 
   css-select@5.2.2:
     resolution: {integrity: sha512-TizTzUddG/xYLA3NXodFM0fSbNizXjOKhqiQQwvhlspadZokn1KDy0NZFS0wuEubIYAV5/c1/lAr0TaaFXEXzw==}
@@ -1555,39 +1556,39 @@ snapshots:
       '@opentelemetry/resources': 2.10.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/sdk-metrics': 2.10.0(@opentelemetry/api@1.9.1)
 
-  '@opentelemetry/instrumentation-express@0.69.0(@opentelemetry/api@1.9.1)(supports-color@5.5.0)':
+  '@opentelemetry/instrumentation-express@0.69.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.10.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/instrumentation': 0.221.0(@opentelemetry/api@1.9.1)(supports-color@5.5.0)
+      '@opentelemetry/instrumentation': 0.221.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.43.0
     transitivePeerDependencies:
       - supports-color
 
-  '@opentelemetry/instrumentation-http@0.221.0(@opentelemetry/api@1.9.1)(supports-color@5.5.0)':
+  '@opentelemetry/instrumentation-http@0.221.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.10.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/instrumentation': 0.221.0(@opentelemetry/api@1.9.1)(supports-color@5.5.0)
+      '@opentelemetry/instrumentation': 0.221.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.43.0
       forwarded-parse: 2.1.2
     transitivePeerDependencies:
       - supports-color
 
-  '@opentelemetry/instrumentation-winston@0.65.0(@opentelemetry/api@1.9.1)(supports-color@5.5.0)':
+  '@opentelemetry/instrumentation-winston@0.65.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/api-logs': 0.221.0
-      '@opentelemetry/instrumentation': 0.221.0(@opentelemetry/api@1.9.1)(supports-color@5.5.0)
+      '@opentelemetry/instrumentation': 0.221.0(@opentelemetry/api@1.9.1)
     transitivePeerDependencies:
       - supports-color
 
-  '@opentelemetry/instrumentation@0.221.0(@opentelemetry/api@1.9.1)(supports-color@5.5.0)':
+  '@opentelemetry/instrumentation@0.221.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/api-logs': 0.221.0
       import-in-the-middle: 3.3.2
-      require-in-the-middle: 8.0.1(supports-color@5.5.0)
+      require-in-the-middle: 8.0.1
     transitivePeerDependencies:
       - supports-color
 
@@ -1776,9 +1777,9 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.13.1(debug@4.4.3(supports-color@5.5.0)):
+  axios@1.13.1:
     dependencies:
-      follow-redirects: 1.15.11(debug@4.4.3(supports-color@5.5.0))
+      follow-redirects: 1.15.11
       form-data: 4.0.4
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -1792,7 +1793,7 @@ snapshots:
 
   binary-extensions@2.3.0: {}
 
-  body-parser@2.2.0(supports-color@5.5.0):
+  body-parser@2.2.0:
     dependencies:
       bytes: 3.1.2
       content-type: 1.0.5
@@ -2068,10 +2069,10 @@ snapshots:
 
   express-rate-limiter@1.3.1: {}
 
-  express@5.1.0(supports-color@5.5.0):
+  express@5.1.0:
     dependencies:
       accepts: 2.0.0
-      body-parser: 2.2.0(supports-color@5.5.0)
+      body-parser: 2.2.0
       content-disposition: 1.0.0
       content-type: 1.0.5
       cookie: 0.7.2
@@ -2080,7 +2081,7 @@ snapshots:
       encodeurl: 2.0.0
       escape-html: 1.0.3
       etag: 1.8.1
-      finalhandler: 2.1.0(supports-color@5.5.0)
+      finalhandler: 2.1.0
       fresh: 2.0.0
       http-errors: 2.0.0
       merge-descriptors: 2.0.0
@@ -2091,9 +2092,9 @@ snapshots:
       proxy-addr: 2.0.7
       qs: 6.14.0
       range-parser: 1.2.1
-      router: 2.2.0(supports-color@5.5.0)
-      send: 1.2.0(supports-color@5.5.0)
-      serve-static: 2.2.0(supports-color@5.5.0)
+      router: 2.2.0
+      send: 1.2.0
+      serve-static: 2.2.0
       statuses: 2.0.2
       type-is: 2.0.1
       vary: 1.1.2
@@ -2112,7 +2113,7 @@ snapshots:
     dependencies:
       to-regex-range: 5.0.1
 
-  finalhandler@2.1.0(supports-color@5.5.0):
+  finalhandler@2.1.0:
     dependencies:
       debug: 4.4.3(supports-color@5.5.0)
       encodeurl: 2.0.0
@@ -2125,9 +2126,7 @@ snapshots:
 
   fn.name@1.1.0: {}
 
-  follow-redirects@1.15.11(debug@4.4.3(supports-color@5.5.0)):
-    optionalDependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+  follow-redirects@1.15.11: {}
 
   form-data@4.0.4:
     dependencies:
@@ -2232,14 +2231,14 @@ snapshots:
       statuses: 2.0.1
       toidentifier: 1.0.1
 
-  http-proxy-agent@7.0.2(supports-color@5.5.0):
+  http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.4
       debug: 4.4.3(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
-  https-proxy-agent@7.0.6(supports-color@5.5.0):
+  https-proxy-agent@7.0.6:
     dependencies:
       agent-base: 7.1.4
       debug: 4.4.3(supports-color@5.5.0)
@@ -2299,7 +2298,7 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
-  jsdom@27.1.0(supports-color@5.5.0):
+  jsdom@27.1.0:
     dependencies:
       '@acemir/cssom': 0.9.19
       '@asamuzakjp/dom-selector': 6.7.4
@@ -2307,8 +2306,8 @@ snapshots:
       data-urls: 6.0.0
       decimal.js: 10.6.0
       html-encoding-sniffer: 4.0.0
-      http-proxy-agent: 7.0.2(supports-color@5.5.0)
-      https-proxy-agent: 7.0.6(supports-color@5.5.0)
+      http-proxy-agent: 7.0.2
+      https-proxy-agent: 7.0.6
       is-potential-custom-element-name: 1.0.1
       parse5: 8.0.0
       saxes: 6.0.0
@@ -2534,7 +2533,7 @@ snapshots:
 
   require-from-string@2.0.2: {}
 
-  require-in-the-middle@8.0.1(supports-color@5.5.0):
+  require-in-the-middle@8.0.1:
     dependencies:
       debug: 4.4.3(supports-color@5.5.0)
       module-details-from-path: 1.0.4
@@ -2551,7 +2550,7 @@ snapshots:
     dependencies:
       glob: 7.2.3
 
-  router@2.2.0(supports-color@5.5.0):
+  router@2.2.0:
     dependencies:
       debug: 4.4.3(supports-color@5.5.0)
       depd: 2.0.0
@@ -2573,7 +2572,7 @@ snapshots:
 
   semver@7.7.3: {}
 
-  send@1.2.0(supports-color@5.5.0):
+  send@1.2.0:
     dependencies:
       debug: 4.4.3(supports-color@5.5.0)
       encodeurl: 2.0.0
@@ -2589,12 +2588,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  serve-static@2.2.0(supports-color@5.5.0):
+  serve-static@2.2.0:
     dependencies:
       encodeurl: 2.0.0
       escape-html: 1.0.3
       parseurl: 1.3.3
-      send: 1.2.0(supports-color@5.5.0)
+      send: 1.2.0
     transitivePeerDependencies:
       - supports-color
 
@@ -2684,9 +2683,9 @@ snapshots:
     dependencies:
       '@scarf/scarf': 1.4.0
 
-  swagger-ui-express@5.0.1(express@5.1.0(supports-color@5.5.0)):
+  swagger-ui-express@5.0.1(express@5.1.0):
     dependencies:
-      express: 5.1.0(supports-color@5.5.0)
+      express: 5.1.0
       swagger-ui-dist: 5.30.2
 
   symbol-tree@3.2.4: {}
