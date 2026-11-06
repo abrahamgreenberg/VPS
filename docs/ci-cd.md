@@ -21,10 +21,12 @@ Images (repository path in the registry): `apps/hello`, `apps/peninei-backend`, 
 ## Design
 
 **Workflows** (`.github/workflows/`):
-- `build-image.yml` - a *reusable* workflow (`workflow_call`) that does the work: checkout, buildx, login, `docker/build-push-action`
+- `.github/actions/build-image/action.yml` - a local *composite action* that does the work: buildx, login, `docker/build-push-action`
   with `platforms: linux/amd64`, OCI labels (source, revision), GHA layer cache, provenance on (tested compatible with Zot's retention).
-  Inputs: image name, build context, tag mode (`latest` | `release`), optional build args.
-- `latest-<image>.yml` - one tiny caller per image (~10 lines) with its own `on.push.paths` filter, so only changed images rebuild. Plain
+  Inputs: registry, username, password, image name, build context, tag, optional build args. It is a composite action rather than a
+  reusable workflow because a reusable workflow does not receive the `registry` environment's secrets (the login step got empty
+  credentials); the caller job declares `environment: registry`, reads the secrets and passes them in.
+- `latest-<image>.yml` - one small caller per image (checkout + the action) with its own `on.push.paths` filter, so only changed images rebuild. Plain
   `paths:` filters avoid a third-party paths-filter action.
 - `release.yml` - `workflow_dispatch` with a **choice** input listing the images; one job per image gated by `inputs.image`. It computes the tag:
   `date -u +%Y.%m.%d` + (highest REV for today in the registry's `/v2/<repo>/tags/list`, +1). A `concurrency` group per image stops two runs
@@ -96,7 +98,7 @@ Do this **before** pushing the workflows: a workflow that references an environm
 
 0. **Settings + secrets** (you, in the GitHub UI): the table above; create the `registry` environment with `ci` credentials. Update the local remote:
    `git remote set-url origin https://github.com/abrahamgreenberg/VPS.git`.
-1. **`hello` end to end** (built: `.github/workflows/build-image.yml`, `latest-hello.yml`, `dependabot.yml`): push a change under `hello/`, watch the run, see `apps/hello:latest` update in the registry dashboard, redeploy in Portainer.
+1. **`hello` end to end** (built: `.github/actions/build-image`, `latest-hello.yml`, `dependabot.yml`): push a change under `hello/`, watch the run, see `apps/hello:latest` update in the registry dashboard, redeploy in Portainer.
 2. **Release workflow** with the REV calculation; run it twice on `hello` (expect `.1` then `.2`), confirm retention, deploy a pinned tag via `HELLO_TAG`.
 3. **Peninei:** backend + migrate + frontend callers, stack switched to registry images with tag variables, migrated into Portainer, VPS-side build files removed.
 4. **Hardening:** PR build, actionlint, Dependabot, Trivy scan of built images (report first, fail on critical later).

@@ -1,4 +1,6 @@
 # Push to main touching hello/ -> build and push apps/hello:latest (development tag).
+# Credentials come from the "registry" environment (restricted to main); the build steps live in
+# .github/actions/build-image.
 name: latest / hello
 
 on:
@@ -6,7 +8,7 @@ on:
     branches: [main]
     paths:
       - "hello/**"
-      - ".github/workflows/build-image.yml"
+      - ".github/actions/build-image/**"
       - ".github/workflows/latest-hello.yml"
   workflow_dispatch: {}
 
@@ -19,10 +21,21 @@ concurrency:
 
 jobs:
   build:
-    uses: ./.github/workflows/build-image.yml
-    with:
-      image: apps/hello
-      context: hello
-      tag: latest
-      build_args: |
-        VERSION=latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: registry
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/build-image
+        with:
+          registry: ${{ vars.REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+          image: apps/hello
+          context: hello
+          tag: latest
+          build-args: |
+            VERSION=latest
