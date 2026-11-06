@@ -1,0 +1,28 @@
+# Push to main touching hello/ -> build and push apps/hello:latest (development tag).
+name: latest / hello
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "hello/**"
+      - ".github/workflows/build-image.yml"
+      - ".github/workflows/latest-hello.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: latest-hello
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-image.yml
+    with:
+      image: apps/hello
+      context: hello
+      tag: latest
+      build_args: |
+        VERSION=latest

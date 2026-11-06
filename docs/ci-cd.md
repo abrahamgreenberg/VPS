@@ -1,6 +1,6 @@
 # CI/CD plan (GitHub Actions -> private registry -> Portainer)
 
-**Status: planned, nothing built yet.** Registry: [infrastructure/registry](../infrastructure/registry/README.md). Goal: nothing is built on
+**Status: phase 1 built (`hello` -> `:latest`); the rest is planned.** Registry: [infrastructure/registry](../infrastructure/registry/README.md). Goal: nothing is built on
 the VPS; images are built by GitHub, stored in `registry.abrahamgreenberg.co.uk`, and deployed (manually at first) from Portainer.
 Repo: `abrahamgreenberg/VPS` (public). GitHub Actions is free and unmetered for public repos.
 
@@ -75,11 +75,28 @@ Portainer migration note: stacks created with `docker stack deploy` show in Port
 and recreate it in Portainer (secrets and volumes are external/named so they survive; expect a minute of downtime). Monitoring uses config files from the repo and isn't
 portable to Portainer's editor, so it stays CLI-deployed.
 
+## One-time GitHub setup (phase 0)
+
+Do this **before** pushing the workflows: a workflow that references an environment that doesn't exist creates it with no protection.
+
+1. **Settings -> Actions -> General**
+   - *Actions permissions*: "Allow abrahamgreenberg, and select non-abrahamgreenberg, actions and reusable workflows". Tick
+     "Allow actions created by GitHub", add `docker/*` to the allow list, and tick **Require actions to be pinned to a full-length commit SHA**. Save.
+   - *Fork pull request workflows from outside collaborators*: **Require approval for all outside collaborators**. Save.
+   - *Workflow permissions*: leave "Read repository contents and packages"; leave "Allow GitHub Actions to create and approve pull requests" off.
+2. **Settings -> Environments -> New environment**: name `registry`. Under *Deployment branches and tags* choose **Selected branches and tags** and add `main`.
+   Add environment secrets (the `ci` registry user, not `admin`):
+   `gh secret set REGISTRY_USERNAME --env registry --body ci` and `gh secret set REGISTRY_PASSWORD --env registry` (prompts, so the password stays out of shell history).
+3. **Settings -> Secrets and variables -> Actions -> Variables**: new *repository variable* `REGISTRY` = `registry.abrahamgreenberg.co.uk`
+   (`gh variable set REGISTRY --body registry.abrahamgreenberg.co.uk`).
+4. **Settings -> Rules -> Rulesets -> New branch ruleset**: name `protect main`, enforcement *Active*, target the default branch, tick
+   **Restrict deletions** and **Block force pushes**, no bypass. (Do not require pull requests yet; you push straight to `main`.)
+
 ## Rollout phases
 
 0. **Settings + secrets** (you, in the GitHub UI): the table above; create the `registry` environment with `ci` credentials. Update the local remote:
    `git remote set-url origin https://github.com/abrahamgreenberg/VPS.git`.
-1. **`hello` end to end:** reusable build workflow + `latest-hello`; push, see `apps/hello:latest` update in the registry dashboard; redeploy in Portainer.
+1. **`hello` end to end** (built: `.github/workflows/build-image.yml`, `latest-hello.yml`, `dependabot.yml`): push a change under `hello/`, watch the run, see `apps/hello:latest` update in the registry dashboard, redeploy in Portainer.
 2. **Release workflow** with the REV calculation; run it twice on `hello` (expect `.1` then `.2`), confirm retention, deploy a pinned tag via `HELLO_TAG`.
 3. **Peninei:** backend + frontend callers, stack switched to registry images with tag variables, migrated into Portainer, VPS-side build files removed.
 4. **Hardening:** PR build, actionlint, Dependabot, Trivy scan of built images (report first, fail on critical later).
