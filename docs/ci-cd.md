@@ -16,7 +16,7 @@ Repo: `abrahamgreenberg/VPS` (public). GitHub Actions is free and unmetered for 
 Production stacks should **pin a dated tag**, not `latest`, so a push to `main` can never change what's running. The registry keeps `latest` +
 the 5 newest dated tags per image, which is also the rollback window.
 
-Images (repository path in the registry): `apps/hello`, `apps/peninei-backend`, `apps/peninei-frontend`, later `apps/portfolio`.
+Images (repository path in the registry): `apps/hello`, `apps/peninei-backend`, `apps/peninei-migrate` (same Dockerfile, `--target migrate`; built alongside the backend), `apps/peninei-frontend`, later `apps/portfolio`.
 
 ## Design
 
@@ -59,7 +59,7 @@ stack's secrets, and rotating it is one script + two secrets (see the registry R
 
 - `.github/workflows/*` as above, `.github/dependabot.yml` (actions, and Dockerfile base images / npm for the apps).
 - `peninei/stack.yml`: `image: peninei-backend:latest` -> `registry.abrahamgreenberg.co.uk/apps/peninei-backend:${PENINEI_BACKEND_TAG:-latest}` (same for the frontend). Backend and frontend
-  release independently, so two tag variables.
+  release independently, so two tag variables. `peninei/migrate/stack.yml` takes `PENINEI_MIGRATE_IMAGE` (run manually before a backend deploy that includes a migration).
 - The frontend image bakes its API URL at build time, so CI passes `VITE_FRONTEND_API_URL` as a build arg (value to confirm; with path-based routing it's the
   same origin).
 - `peninei/docker-compose.yml`, `peninei/scripts/` (the VPS-side build + deploy path) become unused and can go once peninei deploys from the registry.
@@ -98,7 +98,7 @@ Do this **before** pushing the workflows: a workflow that references an environm
    `git remote set-url origin https://github.com/abrahamgreenberg/VPS.git`.
 1. **`hello` end to end** (built: `.github/workflows/build-image.yml`, `latest-hello.yml`, `dependabot.yml`): push a change under `hello/`, watch the run, see `apps/hello:latest` update in the registry dashboard, redeploy in Portainer.
 2. **Release workflow** with the REV calculation; run it twice on `hello` (expect `.1` then `.2`), confirm retention, deploy a pinned tag via `HELLO_TAG`.
-3. **Peninei:** backend + frontend callers, stack switched to registry images with tag variables, migrated into Portainer, VPS-side build files removed.
+3. **Peninei:** backend + migrate + frontend callers, stack switched to registry images with tag variables, migrated into Portainer, VPS-side build files removed.
 4. **Hardening:** PR build, actionlint, Dependabot, Trivy scan of built images (report first, fail on critical later).
 5. **Optional:** webhook deploys; portfolio pipeline once it has a stack.
 

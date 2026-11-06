@@ -1,0 +1,41 @@
+# One-off database migration for peninei. Deploy this BEFORE (re)deploying the peninei stack
+# whenever the Prisma schema changed (new folder under backend/prisma/migrations), then delete it.
+#
+#   Portainer: Stacks -> Add stack -> name "peninei-migrate" -> paste this -> Deploy.
+#              Watch the service logs ("All migrations have been successfully applied."), then delete the stack.
+#   CLI:       docker stack deploy -c peninei/migrate/stack.yml peninei-migrate
+#              docker service logs peninei-migrate_migrate
+#              (when done) remove the stack with: docker stack rm peninei-migrate
+#
+# It is a Swarm job: runs once to completion and never restarts. Re-applying already-applied migrations
+# is a no-op, so running it when nothing changed is harmless. Deleting and re-deploying the stack is
+# what runs it again; "updating" an unchanged stack does not.
+#
+# Image: built from backend/Dockerfile --target migrate (Prisma CLI + migrations only, no app code).
+#   Today (built on the VPS):  docker compose -f peninei/docker-compose.yml build migrate  -> peninei-migrate:latest
+#   After CI phase 3: set PENINEI_MIGRATE_IMAGE=registry.abrahamgreenberg.co.uk/apps/peninei-migrate:<tag>
+#   (the same tag as the backend you are about to deploy).
+services:
+  migrate:
+    image: ${PENINEI_MIGRATE_IMAGE:-peninei-migrate:latest}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        export BACKEND_DATABASE_URL="$$(cat /run/secrets/peninei_database_url)"
+        exec prisma migrate deploy
+    secrets:
+      - peninei_database_url
+    networks:
+      - database-network
+    deploy:
+      mode: replicated-job
+      restart_policy:
+        condition: none
+
+networks:
+  database-network:
+    external: true
+
+secrets:
+  peninei_database_url:
+    external: true

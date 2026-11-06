@@ -6,7 +6,7 @@ services:
       - |
         export BACKEND_DATABASE_URL="$$(cat /run/secrets/peninei_database_url)"
         export BACKEND_OPEN_API_KEY="$$(cat /run/secrets/peninei_openai_api_key)"
-        exec sh -c "node_modules/.bin/prisma migrate deploy && node dist/server.js"
+        exec node dist/server.js
     environment:
       BACKEND_LOG_LEVEL: info
       BACKEND_API_PORT: "5002"

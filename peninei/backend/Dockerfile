@@ -1,36 +1,41 @@
 # syntax=docker/dockerfile:1
 ARG NODE_IMAGE=node:20-alpine
 
-# ---- shared: pnpm + manifests -------------------------------------------------
-FROM ${NODE_IMAGE} AS base
+# Two images come out of this file:
+#   --target runtime   the API (default, last stage). No Prisma CLI, no pnpm, no sources.
+#   --target migrate   one-shot `prisma migrate deploy`. Only the Prisma CLI + prisma/ folder.
+
+# ---- build: full deps -> generated Prisma client + dist/ -> prune dev deps ------
+FROM ${NODE_IMAGE} AS build
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@9 --activate
 COPY package.json pnpm-lock.yaml ./
-
-# ---- production dependencies only, plus the generated Prisma client ------------
-FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile --prod
-COPY prisma ./prisma
-RUN pnpm prisma generate
-
-# ---- build: full deps (typescript) -> dist/ ------------------------------------
-FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm prisma generate && pnpm build
+# Remember the exact CLI version from the lockfile for the migrate image, then drop
+# every devDependency and the optional peers (typescript, prisma CLI, ...). The client stays.
+RUN node -p "require('prisma/package.json').version" > /prisma-version \
+ && pnpm prune --prod --no-optional
 
-# ---- runtime: node + prod node_modules + compiled code. No pnpm, no sources ----
+# ---- migrate: just the Prisma CLI (same version as @prisma/client) + migrations --
+FROM ${NODE_IMAGE} AS migrate
+WORKDIR /app
+COPY --from=build /prisma-version /tmp/prisma-version
+RUN npm install --prefix /opt/prisma --cache /tmp/npm-cache --no-audit --no-fund "prisma@$(cat /tmp/prisma-version)" \
+ && rm -rf /tmp/npm-cache /tmp/prisma-version /root/.cache
+ENV PATH=/opt/prisma/node_modules/.bin:$PATH
+COPY prisma ./prisma
+# Needs BACKEND_DATABASE_URL (see peninei/migrate-stack.yml). If Prisma reports a failed
+# migration: run this image with `prisma migrate resolve --rolled-back "<migration name>"`.
+CMD ["prisma", "migrate", "deploy"]
+
+# ---- runtime (default): node + prod node_modules + compiled code ----------------
 FROM ${NODE_IMAGE} AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
-COPY --from=prod-deps /app/node_modules ./node_modules
+COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY package.json ./
-COPY prisma ./prisma
-
-# Migrations run on start (prisma is a production dependency for this reason).
-# If Prisma complains about a failed migration in production:
-#   docker exec -it <backend container> sh   then   node_modules/.bin/prisma migrate resolve --rolled-back "<migration name>"
-CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node dist/server.js"]
+CMD ["node", "dist/server.js"]

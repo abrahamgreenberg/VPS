@@ -30,6 +30,14 @@ services:
       - proxy-network
       - monitoring-network
 
+  # One-off migration image (Prisma CLI + migrations only); run via migrate/stack.yml, not `up`.
+  migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: migrate
+    image: peninei-migrate:latest
+
   frontend:
     build:
       context: ./frontend

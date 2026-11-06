@@ -24,7 +24,7 @@ everything else -> frontend (nginx :80). Both routers carry `crowdsec-bouncer@sw
 
 ## Secrets
 Swarm secrets (read into env at container start): `peninei_database_url`, `peninei_openai_api_key`
-([how to create](../docs/deployment.md#3-secrets)). The backend runs `prisma migrate deploy` on start.
+([how to create](../docs/deployment.md#3-secrets)). The backend does **not** run migrations; see [Database migrations](#database-migrations).
 Networks: `proxy-network`, `database-network`, `monitoring-network`.
 
 ## Deploy
@@ -32,14 +32,30 @@ Images are built on the VPS (private registry + CI/CD are on the [roadmap](../do
 
     cd ~/repos/vps && git pull
     cd peninei && cp -n .env.example .env        # set VITE_FRONTEND_API_URL etc. (build arg for the frontend)
-    docker compose build                          # produces peninei-backend:latest and peninei-frontend:latest
+    docker compose build                          # produces peninei-backend, peninei-frontend and peninei-migrate (:latest)
+    # if the schema changed: run the migration first (see below)
     cd .. && docker stack deploy -c peninei/stack.yml peninei
 
 Updates are `start-first` with automatic rollback on failure; manual: `docker service rollback peninei_backend`.
 
-The backend image is multi-stage (build -> production-only `node_modules` + compiled `dist/`), runs on Node 20, and has **no pnpm**:
-the stack starts it with `node_modules/.bin/prisma migrate deploy && node dist/server.js`. `prisma` is a production dependency for
-that reason. If Prisma complains about a failed migration in production, see the comment above `CMD` in `backend/Dockerfile`.
+The backend image is multi-stage and runs on Node 20 with **no pnpm and no Prisma CLI**: it just starts `node dist/server.js`
+(465 MB on disk, down from 698 MB when it also carried the Prisma CLI and TypeScript).
+
+## Database migrations
+Migrations are a separate, manual step, because the schema rarely changes. The same `backend/Dockerfile` has a second target,
+`migrate` (Prisma CLI + the `prisma/` folder only), run through [`migrate/stack.yml`](migrate/stack.yml), a one-off Swarm job.
+
+When a new folder appears under `backend/prisma/migrations/`:
+
+1. Build the images (`docker compose build`) so `peninei-migrate` has the new migrations.
+2. Deploy `migrate/stack.yml` as its own stack, `peninei-migrate` (Portainer: Add stack, paste it; or
+   `docker stack deploy -c peninei/migrate/stack.yml peninei-migrate`).
+3. Read its logs (`docker service logs peninei-migrate_migrate`): it should end with "All migrations have been successfully applied."
+4. Delete the `peninei-migrate` stack, then deploy/update the `peninei` stack as usual.
+
+Deploy the migration _before_ the new backend. Keep migrations backward compatible (add columns/tables first; remove old ones in a
+later release) so the old backend keeps working while you do this. If Prisma reports a failed migration, run the migrate image with
+`prisma migrate resolve --rolled-back "<migration name>"` as the command (see the comment above `CMD` in `backend/Dockerfile`).
 
 ## Develop
     cd backend && pnpm install && pnpm dev      # needs a Postgres + backend env vars (see .env.example)

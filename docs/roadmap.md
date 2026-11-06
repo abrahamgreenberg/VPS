@@ -28,8 +28,6 @@ The overview is in the [README](../README.md#roadmap). This is the detailed list
       with secrets; then deploy (manual `docker stack deploy` first)
 - [ ] **Upgrade Node 20 -> 24 (LTS)** for peninei backend/frontend and `hello`: Node 20 reached end of life on 2026-04-30. The
       base image is one `ARG NODE_IMAGE` in `peninei/backend/Dockerfile`; re-run the backend e2e check (migrate + a Prisma query) after
-- [ ] Shrink the backend image further (optional): run `prisma migrate deploy` as a one-off step instead of at container start so the
-      Prisma CLI and its deps (~150 MB) can leave the runtime image; or trim unused Prisma runtime files
 - [ ] Fix peninei telemetry: add traces, fix logs actually landing in Loki (metrics work; the log pipeline needs debugging)
 - [ ] Proper staging vs production environments (not just SSH + `docker stack deploy`)
 - [ ] Switch peninei's AI step (translation/parsing) from OpenAI to Claude
@@ -126,6 +124,7 @@ metrics); alerting on top of it doesn't yet.
 ## Done
 
 - [x] Peninei backend image slimmed: multi-stage, production deps only, `.dockerignore` (compressed 187 MB -> 155 MB); no pnpm at runtime
+- [x] Peninei migrations split from the runtime: `migrate` Dockerfile target + manual `peninei/migrate/stack.yml` job; runtime has no Prisma CLI (698 MB -> 465 MB on disk)
 - [x] Merged all projects into one monorepo
 - [x] Rate limiting + caching on the peninei API
 - [x] Alpine base images + shared pnpm store across Node containers
