@@ -113,14 +113,16 @@ Layout rule: `infrastructure/<stack>/stack.yml` for platform pieces, `<app>/stac
 Detailed list: [docs/roadmap.md](docs/roadmap.md).
 
 **Done so far:** Swarm + Traefik platform; observability pipeline; CrowdSec; SSO for dashboards; host hardening (cloud
-firewall, key-only SSH, fail2ban, automatic security patches); nightly local Postgres backup; weekly cleanup job.
+firewall, key-only SSH, fail2ban, automatic security patches); nightly local Postgres backup; weekly cleanup job; private
+registry (Zot); GitHub Actions builds (per-folder `latest` + manual dated releases); Grafana email alerts as code; the
+observability stack and portfolio shipped as CI-built images.
 
 **Next**
 
 - Docker hardening: pin image versions, a socket proxy for Traefik, drop container capabilities, scan images
-- A private image registry, then CI/CD with GitHub Actions so nothing is built on the VPS
+- Move peninei onto registry images (CI phase 3) so nothing is built on the VPS, and deploy the portfolio
 - Fix the remaining peninei telemetry gaps (traces, logs landing in Loki)
-- Wire up alerts on top of the metrics (disk, restart loops, 5xx rate, stale scrapes, expiring certificates)
+- Alerts for what is still unmonitored: stale backups, peninei app/data freshness, CrowdSec spikes
 - Proper staging vs production environments
 
 **Later**
