@@ -96,5 +96,5 @@ it, so don't rename them.
   `docker service update --publish-rm <port> <service>`.
 - **Gotcha:** in Swarm, a published port bound to `127.0.0.1` is *not* honoured - it still listens on `0.0.0.0`.
   Don't publish ports at all for anything that goes through Traefik.
-- Swarm configs are immutable too: to change one, create a new name and update the stack file (see
-  [monitoring](../infrastructure/monitoring/README.md)).
+- Swarm configs are immutable: to change one, create a new name and update the stack file. (The monitoring stack avoids this by
+  baking its configs into CI-built images, see [monitoring](../infrastructure/monitoring/README.md).)

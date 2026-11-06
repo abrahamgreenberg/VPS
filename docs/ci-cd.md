@@ -75,8 +75,8 @@ stack's secrets, and rotating it is one script + two secrets (see the registry R
 3. Not recommended: giving GitHub an SSH key to the VPS (a leaked key = root on the box).
 
 Portainer migration note: stacks created with `docker stack deploy` show in Portainer with limited control. To manage peninei fully from Portainer, remove the CLI stack
-and recreate it in Portainer (secrets and volumes are external/named so they survive; expect a minute of downtime). Monitoring uses config files from the repo and isn't
-portable to Portainer's editor, so it stays CLI-deployed.
+and recreate it in Portainer (secrets and volumes are external/named so they survive; expect a minute of downtime). Monitoring no longer needs repo files at deploy time (its configs are baked into CI-built images), so it can be
+pasted into Portainer like the other stacks.
 
 ## One-time GitHub setup (phase 0)
 
