@@ -44,9 +44,9 @@ configs:
 
 secrets:
   registry_htpasswd:
-    # Immutable too: to add/rotate a user create registry_htpasswd_v2, bump the name here, redeploy.
+    # Immutable too: to rotate passwords bump the version here (v3, ...), run create-secrets.sh (it reads this name), redeploy.
     external: true
-    name: registry_htpasswd_v1
+    name: registry_htpasswd_v2
 
 volumes:
   registry_data:

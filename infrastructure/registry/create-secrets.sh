@@ -4,10 +4,13 @@
 # Swarm secrets can't be read back. Skips if the secret already exists.
 set -euo pipefail
 
-SECRET="${REGISTRY_HTPASSWD_SECRET:-registry_htpasswd_v1}"
+# The secret name comes from stack.yml so the script always creates exactly what the stack expects.
+here="$(cd "$(dirname "$0")" && pwd)"
+SECRET="${REGISTRY_HTPASSWD_SECRET:-$(sed -n '/^secrets:/,$p' "$here/stack.yml" | awk '/^ +name:/ {print $2; exit}')}"
+[ -n "$SECRET" ] || { echo "could not read the secret name from stack.yml" >&2; exit 1; }
 
 if docker secret inspect "$SECRET" >/dev/null 2>&1; then
-  echo "secret $SECRET exists - skipping (to rotate: create registry_htpasswd_v2, bump the name in stack.yml)"
+  echo "secret $SECRET exists - skipping (to rotate passwords: bump the version in stack.yml, then re-run)"
   exit 0
 fi
 

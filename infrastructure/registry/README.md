@@ -8,7 +8,7 @@ genuinely pull-only credential) and built-in garbage collection + tag retention.
 | ---- | ------ |
 | Image | `ghcr.io/project-zot/zot-linux-amd64:v2.1.22` (x86_64; swap for `-arm64` on ARM) |
 | Routing | `registry.<domain>` via Traefik with `crowdsec-bouncer@swarm`. **Not** behind `sso`: docker/CI can't do browser logins |
-| Auth | htpasswd (bcrypt) in the Swarm secret `registry_htpasswd_v1`; anonymous access is denied |
+| Auth | htpasswd (bcrypt) in the Swarm secret `registry_htpasswd_v2` (name set in `stack.yml`); anonymous access is denied |
 | Dashboard | Zot's web UI at `https://registry.<domain>/` (see below) |
 | Storage | `registry_data` volume at `/var/lib/registry` |
 | Network | `proxy-network` only, no published ports |
@@ -87,8 +87,12 @@ Inspect (as `ci` or `admin`):
 
 ## Operate
 - **Change the config:** edit `config.json`, bump `registry_config_v1` -> `_v2` in `stack.yml`, redeploy the stack.
-- **Add/rotate a user:** `REGISTRY_HTPASSWD_SECRET=registry_htpasswd_v2 ./create-secrets.sh` (regenerates all three
-  passwords), bump the secret name in `stack.yml`, redeploy, update GitHub secrets and the VPS `docker login`.
+- **Reset / rotate passwords** (e.g. a password was copied wrong): Swarm secrets can't be read back, so rotation
+  replaces all three. Bump the secret name in `stack.yml` (`registry_htpasswd_v2` -> `_v3`), commit and pull on the VPS,
+  then `./infrastructure/registry/create-secrets.sh` (reads the name from `stack.yml`, prints three new passwords once),
+  `docker stack deploy -c infrastructure/registry/stack.yml registry` (Zot restarts for a few seconds), and finally
+  `docker secret rm <old name>`. Then update everything that holds a password: `docker login` on the PC (`ci`),
+  GitHub secrets (`ci`), Portainer -> Registries (`deployer`), and your password manager.
 - **Delete a tag by hand** (admin): `skopeo delete` / `regctl tag rm`, or let retention do it.
 - **Disk:** `docker exec $(docker ps -qf name=registry_zot) du -sh /var/lib/registry`. The weekly prune job does not
   touch this named volume.

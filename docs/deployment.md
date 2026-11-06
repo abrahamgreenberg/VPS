@@ -50,7 +50,7 @@ Create with `printf '%s' "<value>" | docker secret create <name> -`.
 | `alloy_basic_auth_users` | traefik | htpasswd line: `htpasswd -nbB <user> '<password>'` |
 | `oauth_client_secret`, `oauth_cookie_secret`, config `allowed_emails` | auth | made by `infrastructure/auth/create-secrets.sh` |
 | `peninei_database_url`, `peninei_openai_api_key` | peninei | |
-| `registry_htpasswd_v1` | registry | users `admin`, `ci`, `deployer`; made by `infrastructure/registry/create-secrets.sh` |
+| `registry_htpasswd_v2` (versioned, see its README) | registry | users `admin`, `ci`, `deployer`; made by `infrastructure/registry/create-secrets.sh` |
 | `crowdsec_bouncer_api_key` | *(not wired up yet)* | the crowdsec stack still reads the env var below |
 | `traefik_dashboard_auth` | *(unused leftover)* | safe to `docker secret rm` |
 
@@ -73,7 +73,7 @@ Order matters because later stacks reference earlier ones (networks, secrets, Tr
     docker stack deploy -c infrastructure/auth/stack.yml        auth         # name MUST be "auth"; needs GITHUB_CLIENT_ID
     docker stack deploy -c infrastructure/monitoring/stack.yml  monitoring
     docker stack deploy -c infrastructure/portainer/stack.yml   portainer
-    docker stack deploy -c infrastructure/registry/stack.yml    registry     # needs the registry_htpasswd_v1 secret; see its README
+    docker stack deploy -c infrastructure/registry/stack.yml    registry     # needs the registry_htpasswd_v* secret named in its stack.yml; see its README
     # apps: see peninei/README.md
 
 The stack name is the prefix in service names (`auth_oauth2-proxy`, `postgres_postgres`) and some configs rely on

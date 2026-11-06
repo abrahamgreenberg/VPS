@@ -1,3 +1,11 @@
+TODO:
+FINSH GETTING STACK SETUP
+DEPLOY TEST SITE
+FIX THE URL
+FIX DNS ENTRIES
+GET GITHUB ACTIONS
+DONE :)
+
 # Private VPS - Personal Infrastructure & App Platform
 
 A single Vultr VPS (DNS on Namecheap) that hosts my side projects, run like a small production platform: Docker Swarm,
@@ -48,17 +56,17 @@ GitHub login restricted to one email. Secrets are Docker Swarm secrets, never fi
 
 Each folder has its own README: what it is, how to deploy it, how to operate it.
 
-| Stack | Purpose |
-| ----- | ------- |
-| [`traefik`](infrastructure/traefik/README.md) | Edge reverse proxy and automatic TLS (Let's Encrypt); replaced Nginx Proxy Manager |
-| [`auth`](infrastructure/auth/README.md) | oauth2-proxy + GitHub forward-auth (`sso@swarm`) in front of every dashboard; one allowed email, no database |
-| [`crowdsec`](infrastructure/crowdsec/README.md) | Intrusion detection + a Traefik bouncer that blocks abusive IPs |
-| [`monitoring`](infrastructure/monitoring/README.md) | Grafana, Prometheus, Loki, Tempo, Alloy (OTLP gateway), cAdvisor, node-exporter, postgres-exporter |
-| [`postgres`](infrastructure/postgres/README.md) | Shared PostgreSQL instance + pgAdmin |
-| [`portainer`](infrastructure/portainer/README.md) | Swarm ops UI |
-| [`registry`](infrastructure/registry/README.md) | Private Docker image registry (Zot) with htpasswd auth and tag retention, so images are built off the VPS |
-| [`backup`](infrastructure/backup/README.md) | Nightly Postgres dump to local disk (newest 2 kept) |
-| [`maintenance`](infrastructure/maintenance/README.md) | Weekly prune of images, containers, stale volumes and logs |
+| Stack                                                 | Purpose                                                                                                      |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| [`traefik`](infrastructure/traefik/README.md)         | Edge reverse proxy and automatic TLS (Let's Encrypt); replaced Nginx Proxy Manager                           |
+| [`auth`](infrastructure/auth/README.md)               | oauth2-proxy + GitHub forward-auth (`sso@swarm`) in front of every dashboard; one allowed email, no database |
+| [`crowdsec`](infrastructure/crowdsec/README.md)       | Intrusion detection + a Traefik bouncer that blocks abusive IPs                                              |
+| [`monitoring`](infrastructure/monitoring/README.md)   | Grafana, Prometheus, Loki, Tempo, Alloy (OTLP gateway), cAdvisor, node-exporter, postgres-exporter           |
+| [`postgres`](infrastructure/postgres/README.md)       | Shared PostgreSQL instance + pgAdmin                                                                         |
+| [`portainer`](infrastructure/portainer/README.md)     | Swarm ops UI                                                                                                 |
+| [`registry`](infrastructure/registry/README.md)       | Private Docker image registry (Zot) with htpasswd auth and tag retention, so images are built off the VPS    |
+| [`backup`](infrastructure/backup/README.md)           | Nightly Postgres dump to local disk (newest 2 kept)                                                          |
+| [`maintenance`](infrastructure/maintenance/README.md) | Weekly prune of images, containers, stale volumes and logs                                                   |
 
 ### Projects running on it
 
@@ -69,7 +77,7 @@ Each folder has its own README: what it is, how to deploy it, how to operate it.
   fixed along the way. Its simplicity let me test the infrastructure and validate the observability pipeline before
   trusting it with something more complex.
 - **[Observability test app](infrastructure/monitoring/test-app/README.md)** - a disposable multi-service Flask demo
-  built to validate the OTLP -> Alloy -> Prometheus/Loki/Tempo -> Grafana pipeline *before* trusting it with a real app.
+  built to validate the OTLP -> Alloy -> Prometheus/Loki/Tempo -> Grafana pipeline _before_ trusting it with a real app.
   Its telemetry code became the reference the peninei backend was ported from.
 - **[Hello](hello/README.md)** - a one-page site used to prove the build-on-PC -> private registry -> Portainer deploy loop.
 - **[Portfolio](portfolio/README.md)** - personal site (Eleventy + nginx), a writing class portfolio. Offline for now.
@@ -96,12 +104,12 @@ Layout rule: `infrastructure/<stack>/stack.yml` for platform pieces, `<app>/stac
 
 ## Documentation
 
-| I want to... | Read |
-| ------------ | ---- |
-| stand the whole thing up, or redeploy one stack | [docs/deployment.md](docs/deployment.md) |
+| I want to...                                          | Read                                     |
+| ----------------------------------------------------- | ---------------------------------------- |
+| stand the whole thing up, or redeploy one stack       | [docs/deployment.md](docs/deployment.md) |
 | know how the server is secured, backed up and cleaned | [docs/operations.md](docs/operations.md) |
-| see what's planned | [docs/roadmap.md](docs/roadmap.md) |
-| work on one stack | the README in its folder (table above) |
+| see what's planned                                    | [docs/roadmap.md](docs/roadmap.md)       |
+| work on one stack                                     | the README in its folder (table above)   |
 
 ## What I learned
 
@@ -115,6 +123,7 @@ Detailed list: [docs/roadmap.md](docs/roadmap.md).
 firewall, key-only SSH, fail2ban, automatic security patches); nightly local Postgres backup; weekly cleanup job.
 
 **Next**
+
 - Docker hardening: pin image versions, a socket proxy for Traefik, drop container capabilities, scan images
 - A private image registry, then CI/CD with GitHub Actions so nothing is built on the VPS
 - Fix the remaining peninei telemetry gaps (traces, logs landing in Loki)
@@ -122,6 +131,7 @@ firewall, key-only SSH, fail2ban, automatic security patches); nightly local Pos
 - Proper staging vs production environments
 
 **Later**
+
 - Off-box encrypted backups, telemetry/system snapshots, and a restore drill
 - Put the portfolio back online and host more personal projects on the platform, with a landing page
 - Switch peninei's AI step from OpenAI to Claude
