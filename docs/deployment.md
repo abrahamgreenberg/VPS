@@ -47,6 +47,7 @@ Create with `printf '%s' "<value>" | docker secret create <name> -`.
 | `postgres_user`, `postgres_password` | postgres, monitoring (postgres-exporter) | superuser for the shared DB |
 | `pgadmin_default_email`, `pgadmin_default_password` | postgres (pgAdmin) | |
 | `grafana_admin_user`, `grafana_admin_password` | monitoring | |
+| `grafana_smtp_password` | monitoring | email relay API key (Resend); also needs env var `ALERT_EMAIL_TO` at deploy, see the monitoring README |
 | `alloy_basic_auth_users` | traefik | htpasswd line: `htpasswd -nbB <user> '<password>'` |
 | `oauth_client_secret`, `oauth_cookie_secret`, config `allowed_emails` | auth | made by `infrastructure/auth/create-secrets.sh` |
 | `peninei_database_url`, `peninei_openai_api_key` | peninei | |
@@ -71,7 +72,7 @@ Order matters because later stacks reference earlier ones (networks, secrets, Tr
     docker stack deploy -c infrastructure/traefik/stack.yml     traefik
     docker stack deploy -c infrastructure/crowdsec/stack.yml    crowdsec     # needs CROWDSEC_BOUNCER_API_KEY
     docker stack deploy -c infrastructure/auth/stack.yml        auth         # name MUST be "auth"; needs GITHUB_CLIENT_ID
-    docker stack deploy -c infrastructure/monitoring/stack.yml  monitoring
+    docker stack deploy -c infrastructure/monitoring/stack.yml  monitoring   # export ALERT_EMAIL_TO=... first
     docker stack deploy -c infrastructure/portainer/stack.yml   portainer
     docker stack deploy -c infrastructure/registry/stack.yml    registry     # needs the registry_htpasswd_v* secret named in its stack.yml; see its README
     # apps: see peninei/README.md

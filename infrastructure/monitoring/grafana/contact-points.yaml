@@ -1,0 +1,12 @@
+# Where alerts go. ${ALERT_EMAIL_TO} comes from the grafana service's environment (stack.yml).
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: email
+    receivers:
+      - uid: email-main
+        type: email
+        settings:
+          addresses: ${ALERT_EMAIL_TO}
+          singleEmail: true

@@ -1,0 +1,281 @@
+# Alert rules (Grafana-managed, evaluated against Prometheus). Provisioned read-only: edit here, not in the UI.
+# Each rule: A = the query, B = last value, C = the threshold. noData is treated as OK (a missing metric is not an outage).
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: infrastructure
+    folder: Alerts
+    interval: 1m
+    rules:
+      - uid: disk-usage-high
+        title: Disk usage high
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              expr: '100 * (1 - node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay|squashfs"})'
+              instant: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              refId: C
+              conditions:
+                - evaluator: {type: gt, params: [85]}
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        annotations:
+          summary: 'Root disk is {{ $$values.B.Value | printf "%.0f" }}% full on {{ $$labels.instance }}'
+        labels:
+          severity: warning
+
+      - uid: memory-usage-high
+        title: Memory usage high
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              expr: '100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)'
+              instant: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              refId: C
+              conditions:
+                - evaluator: {type: gt, params: [90]}
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        annotations:
+          summary: 'Memory is {{ $$values.B.Value | printf "%.0f" }}% used on {{ $$labels.instance }}'
+        labels:
+          severity: warning
+
+      - uid: scrape-target-down
+        title: Metrics target down
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              expr: 'up'
+              instant: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              refId: C
+              conditions:
+                - evaluator: {type: lt, params: [1]}
+        noDataState: OK
+        execErrState: Error
+        for: 3m
+        annotations:
+          summary: 'Prometheus cannot scrape {{ $$labels.job }} ({{ $$labels.instance }})'
+        labels:
+          severity: critical
+
+      - uid: postgres-down
+        title: Postgres down
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              expr: 'pg_up'
+              instant: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              refId: C
+              conditions:
+                - evaluator: {type: lt, params: [1]}
+        noDataState: OK
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: 'postgres-exporter cannot reach the database'
+        labels:
+          severity: critical
+
+      - uid: container-restart-loop
+        title: Container restart loop
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              expr: 'count by (container_label_com_docker_swarm_service_name) (container_start_time_seconds{container_label_com_docker_swarm_service_name!=""} > time() - 600)'
+              instant: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              refId: C
+              conditions:
+                - evaluator: {type: gt, params: [3]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: '{{ $$labels.container_label_com_docker_swarm_service_name }} started more than 3 containers in 10 minutes'
+        labels:
+          severity: warning
+
+      - uid: container-oom-killed
+        title: Container OOM-killed
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              expr: 'sum by (container_label_com_docker_swarm_service_name) (increase(container_oom_events_total{container_label_com_docker_swarm_service_name!=""}[5m]))'
+              instant: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              refId: C
+              conditions:
+                - evaluator: {type: gt, params: [0]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: '{{ $$labels.container_label_com_docker_swarm_service_name }} was OOM-killed (raise its memory limit)'
+        labels:
+          severity: warning
+
+      - uid: traefik-5xx-rate
+        title: High 5xx error rate
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              expr: '100 * sum(rate(traefik_service_requests_total{code=~"5.."}[5m])) / sum(rate(traefik_service_requests_total[5m]))'
+              instant: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              refId: C
+              conditions:
+                - evaluator: {type: gt, params: [5]}
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: '{{ $$values.B.Value | printf "%.1f" }}% of requests through Traefik are 5xx'
+        labels:
+          severity: warning
+
+      - uid: tls-cert-expiring
+        title: TLS certificate expiring
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              expr: '(traefik_tls_certs_not_after - time()) / 86400'
+              instant: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              refId: C
+              conditions:
+                - evaluator: {type: lt, params: [14]}
+        noDataState: OK
+        execErrState: Error
+        for: 1h
+        annotations:
+          summary: 'A certificate expires in {{ $$values.B.Value | printf "%.0f" }} days (ACME renewal is failing)'
+        labels:
+          severity: warning

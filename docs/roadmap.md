@@ -91,7 +91,8 @@ hosting bill, so it may not be worth it for this project.
 ## Alerts worth adding
 
 The metrics pipeline exists (Prometheus + Loki + cAdvisor + node-exporter + postgres-exporter + peninei's own OTEL
-metrics); alerting on top of it doesn't yet.
+metrics). Infra alerts (disk, memory, targets, Postgres, restarts, OOM, 5xx, cert expiry) are provisioned with email delivery
+([monitoring README](../infrastructure/monitoring/README.md#alerting-config-as-code)); the rest below is still to do.
 
 **Infra health**
 
@@ -138,4 +139,5 @@ metrics); alerting on top of it doesn't yet.
 - [x] CrowdSec bouncer no longer exposed to the internet; Traefik insecure API turned off
 - [x] Repo cleanup: removed the Compose-era `infra/` and stale `test/` dirs, auth test rig moved into `infrastructure/auth/test/`
 - [x] Host hardening (firewall, SSH, fail2ban, unattended-upgrades) and Portainer port closed
+- [x] Grafana config as code (datasources, contact point, policy, 8 infra alert rules) + email via SMTP relay from alerts@<domain>
 - [x] Nightly local Postgres backup + weekly prune timers

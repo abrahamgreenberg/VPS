@@ -73,12 +73,29 @@ services:
       GF_SECURITY_ADMIN_USER__FILE: /run/secrets/grafana_admin_user
       GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
       GF_SERVER_ROOT_URL: "https://grafana.abrahamgreenberg.co.uk"
+      # Outbound alert email through an SMTP relay (see README). Grafana only sends; nothing here receives mail.
+      GF_SMTP_ENABLED: "true"
+      GF_SMTP_HOST: ${SMTP_HOST:-smtp.resend.com:587}
+      GF_SMTP_USER: ${SMTP_USER:-resend}
+      GF_SMTP_PASSWORD__FILE: /run/secrets/grafana_smtp_password
+      GF_SMTP_FROM_ADDRESS: ${ALERT_EMAIL_FROM:-alerts@abrahamgreenberg.co.uk}
+      GF_SMTP_FROM_NAME: "VPS alerts"
+      GF_SMTP_STARTTLS_POLICY: MandatoryStartTLS
+      # Recipient, substituted into provisioning/alerting/contact-points.yaml. Required at deploy time.
+      ALERT_EMAIL_TO: ${ALERT_EMAIL_TO:?set ALERT_EMAIL_TO to the address that receives alerts}
     configs:
-      - source: grafana_datasources
+      - source: grafana_datasources_v1
         target: /etc/grafana/provisioning/datasources/datasources.yaml
+      - source: grafana_contact_points_v1
+        target: /etc/grafana/provisioning/alerting/contact-points.yaml
+      - source: grafana_notification_policies_v1
+        target: /etc/grafana/provisioning/alerting/notification-policies.yaml
+      - source: grafana_alert_rules_v1
+        target: /etc/grafana/provisioning/alerting/alert-rules.yaml
     secrets:
       - grafana_admin_user
       - grafana_admin_password
+      - grafana_smtp_password
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
@@ -210,8 +227,15 @@ configs:
     file: ./tempo-config.yaml
   alloy_config:
     file: ./alloy-config.alloy
-  grafana_datasources:
-    file: ./grafana-datasources.yaml
+  # Grafana provisioning. Swarm configs are immutable: after editing a file, bump its _vN suffix here and in the service.
+  grafana_datasources_v1:
+    file: ./grafana/datasources.yaml
+  grafana_contact_points_v1:
+    file: ./grafana/contact-points.yaml
+  grafana_notification_policies_v1:
+    file: ./grafana/notification-policies.yaml
+  grafana_alert_rules_v1:
+    file: ./grafana/alert-rules.yaml
 
 volumes:
   prometheus_data:
@@ -235,4 +259,6 @@ secrets:
   grafana_admin_user:
     external: true
   grafana_admin_password:
+    external: true
+  grafana_smtp_password:
     external: true
