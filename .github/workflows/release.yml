@@ -1,0 +1,83 @@
+# Manual release: build an image from main and push the next dated tag (YYYY.MM.DD.REV) to the registry.
+# Run it from the Actions tab ("Run workflow") or: gh workflow run release.yml -f image=hello
+#
+# Who can run it: only people with write access to this repo (workflow_dispatch). It also needs the "registry"
+# environment, which is restricted to the main branch, and the job refuses any other ref. Forks never run it.
+# The `latest` tag is untouched (that is latest-<image>.yml); the registry keeps the 5 newest dated tags.
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Which image to release
+        type: choice
+        required: true
+        options:
+          - hello
+
+permissions:
+  contents: read
+
+# One release per image at a time, so two runs can't pick the same REV.
+concurrency:
+  group: release-${{ inputs.image }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: registry
+    env:
+      REGISTRY: ${{ vars.REGISTRY }}
+      REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+      REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Resolve image
+        id: img
+        env:
+          CHOICE: ${{ inputs.image }}
+        run: |
+          case "$CHOICE" in
+            hello) name=apps/hello; context=hello ;;
+            *) echo "::error::unknown image '$CHOICE'"; exit 1 ;;
+          esac
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "context=$context" >> "$GITHUB_OUTPUT"
+
+      - name: Work out the next tag
+        id: tag
+        env:
+          IMAGE: ${{ steps.img.outputs.name }}
+        run: |
+          [ -n "$REGISTRY" ] && [ -n "$REGISTRY_USERNAME" ] && [ -n "$REGISTRY_PASSWORD" ] \
+            || { echo "::error::REGISTRY variable or REGISTRY_USERNAME/REGISTRY_PASSWORD secrets are missing"; exit 1; }
+          day="$(date -u +%Y.%m.%d)"
+          code="$(curl -sS -u "$REGISTRY_USERNAME:$REGISTRY_PASSWORD" -o tags.json -w '%{http_code}' \
+                    "https://$REGISTRY/v2/$IMAGE/tags/list")"
+          case "$code" in
+            200) ;;
+            404) echo '{"tags": []}' > tags.json ;;   # repository doesn't exist yet: first push
+            *) echo "::error::registry answered HTTP $code for tags/list"; cat tags.json; exit 1 ;;
+          esac
+          tag="$(bash .github/scripts/next-release-tag.sh "$day" < tags.json)"
+          rm tags.json
+          echo "Next tag: $tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - uses: ./.github/actions/build-image
+        with:
+          registry: ${{ vars.REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+          image: ${{ steps.img.outputs.name }}
+          context: ${{ steps.img.outputs.context }}
+          tag: ${{ steps.tag.outputs.tag }}
+          build-args: |
+            VERSION=${{ steps.tag.outputs.tag }}

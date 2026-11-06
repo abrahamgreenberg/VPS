@@ -1,6 +1,6 @@
 # CI/CD plan (GitHub Actions -> private registry -> Portainer)
 
-**Status: phase 1 built (`hello` -> `:latest`); the rest is planned.** Registry: [infrastructure/registry](../infrastructure/registry/README.md). Goal: nothing is built on
+**Status: phases 1-2 built (`hello` -> `:latest`, manual `release` -> dated tag); the rest is planned.** Registry: [infrastructure/registry](../infrastructure/registry/README.md). Goal: nothing is built on
 the VPS; images are built by GitHub, stored in `registry.abrahamgreenberg.co.uk`, and deployed (manually at first) from Portainer.
 Repo: `abrahamgreenberg/VPS` (public). GitHub Actions is free and unmetered for public repos.
 
@@ -99,7 +99,7 @@ Do this **before** pushing the workflows: a workflow that references an environm
 0. **Settings + secrets** (you, in the GitHub UI): the table above; create the `registry` environment with `ci` credentials. Update the local remote:
    `git remote set-url origin https://github.com/abrahamgreenberg/VPS.git`.
 1. **`hello` end to end** (built: `.github/actions/build-image`, `latest-hello.yml`, `dependabot.yml`): push a change under `hello/`, watch the run, see `apps/hello:latest` update in the registry dashboard, redeploy in Portainer.
-2. **Release workflow** with the REV calculation; run it twice on `hello` (expect `.1` then `.2`), confirm retention, deploy a pinned tag via `HELLO_TAG`.
+2. **Release workflow** (built: `release.yml`, `.github/scripts/next-release-tag.sh`, which has no test suite but was checked against edge cases by hand): run it twice on `hello` (expect `.1` then `.2`), confirm retention, deploy a pinned tag via `HELLO_TAG`.
 3. **Peninei:** backend + migrate + frontend callers, stack switched to registry images with tag variables, migrated into Portainer, VPS-side build files removed.
 4. **Hardening:** PR build, actionlint, Dependabot, Trivy scan of built images (report first, fail on critical later).
 5. **Optional:** webhook deploys; portfolio pipeline once it has a stack.
