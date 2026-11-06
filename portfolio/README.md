@@ -1,7 +1,7 @@
 # Portfolio
 
 First-year writing portfolio: a static site built with [Eleventy](https://www.11ty.dev/) (Nunjucks layouts, Markdown
-articles in `src/`) and served by non-root nginx. Host: `portfolio.abrahamgreenberg.co.uk` (public, CrowdSec only - no SSO).
+articles in `src/`) and served by non-root nginx. Hosts: `portfolio.abrahamgreenberg.co.uk` and the alias `fywr.abrahamgreenberg.co.uk` (public, CrowdSec only - no SSO).
 Moving it to the apex domain is on the [roadmap](../docs/roadmap.md#websites-to-host).
 
 ## Develop

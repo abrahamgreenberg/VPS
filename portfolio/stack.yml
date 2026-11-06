@@ -1,7 +1,7 @@
 # Portfolio site, deployed from the private registry. Paste into Portainer (Stacks -> Add stack), optional
 # env var PORTFOLIO_TAG (defaults to latest). The registry must be added under Portainer -> Registries (user: deployer).
 # CLI alternative: docker stack deploy --with-registry-auth -c portfolio/stack.yml portfolio
-# DNS: covered by the *.abrahamgreenberg.co.uk wildcard. Moving it to the apex later = change the Host() rule.
+# DNS: covered by the *.abrahamgreenberg.co.uk wildcard. Both hosts serve the same site (one certificate with both names). Moving to the apex later = edit the Host() rule.
 services:
   web:
     image: registry.abrahamgreenberg.co.uk/apps/portfolio:${PORTFOLIO_TAG:-latest}
@@ -23,7 +23,7 @@ services:
         order: stop-first
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.portfolio.rule=Host(`portfolio.abrahamgreenberg.co.uk`)"
+        - "traefik.http.routers.portfolio.rule=Host(`portfolio.abrahamgreenberg.co.uk`) || Host(`fywr.abrahamgreenberg.co.uk`)"
         - "traefik.http.routers.portfolio.entrypoints=websecure"
         - "traefik.http.routers.portfolio.tls=true"
         - "traefik.http.routers.portfolio.tls.certresolver=letsencrypt"
