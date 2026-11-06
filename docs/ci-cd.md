@@ -16,7 +16,7 @@ Repo: `abrahamgreenberg/VPS` (public). GitHub Actions is free and unmetered for 
 Production stacks should **pin a dated tag**, not `latest`, so a push to `main` can never change what's running. The registry keeps `latest` +
 the 5 newest dated tags per image, which is also the rollback window.
 
-Images (repository path in the registry): `apps/hello`, `apps/peninei-backend`, `apps/peninei-migrate` (same Dockerfile, `--target migrate`; built alongside the backend), `apps/peninei-frontend`, `apps/portfolio`.
+Images (repository path in the registry; the observability stack adds `infra/prometheus|loki|tempo|alloy|grafana`, each the upstream image + its config from `infrastructure/monitoring/<service>/`): `apps/hello`, `apps/peninei-backend`, `apps/peninei-migrate` (same Dockerfile, `--target migrate`; built alongside the backend), `apps/peninei-frontend`, `apps/portfolio`.
 
 ## Design
 

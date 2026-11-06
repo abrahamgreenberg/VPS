@@ -1,0 +1,38 @@
+# Push to main touching infrastructure/monitoring/loki/ -> build and push infra/loki:latest (development tag).
+# Only changes under infrastructure/monitoring/loki/ trigger it. Editing this workflow does NOT: run it by hand to test.
+name: latest / loki
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "infrastructure/monitoring/loki/**"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: latest-loki
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: registry
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/build-image
+        with:
+          registry: ${{ vars.REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+          image: infra/loki
+          context: infrastructure/monitoring/loki
+          tag: latest
+          build-args: |
+            VERSION=latest

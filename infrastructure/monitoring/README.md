@@ -8,33 +8,36 @@ Grafana shows it all.
                         --traces---> tempo -------/
     cadvisor, node-exporter, postgres-exporter, traefik  <-- scraped by prometheus
 
-| Service | Image | Detail |
-| ------- | ----- | ------ |
-| `prometheus` | `prom/prometheus:v2.55.1` | 15d retention; accepts remote-write from Alloy; scrape config in `prometheus.yml` |
-| `loki` | `grafana/loki:3.5.8` | logs, 7d retention (`loki-config.yaml`) |
-| `tempo` | `grafana/tempo:2.6.1` | traces, 7d retention (`tempo-config.yaml`) |
-| `grafana` | `registry.<domain>/infra/grafana` (built from `grafana/Dockerfile` on `grafana/grafana:11.4.0`) | `grafana.<domain>` behind `sso@swarm` + its own login; datasources, alerting and SMTP all provisioned from `grafana/` (config as code) |
-| `alloy` | `grafana/alloy:v1.5.1` | **public** OTLP gateway at `alloy.<domain>` (HTTP via 443, gRPC via 4317) behind Traefik basic auth (`alloy-auth@swarm`); pipeline in `alloy-config.alloy` |
-| `cadvisor`, `node-exporter` | pinned | global; container and host metrics |
-| `postgres-exporter` | `v0.15.0` | reads the shared Postgres using the `postgres_*` secrets |
+Folders `prometheus/`, `loki/`, `tempo/`, `alloy/`, `grafana/` each hold a service's config plus a tiny Dockerfile that bakes it into
+the upstream image. CI builds them (path-filtered, `latest / <service>`) and pushes `registry.<domain>/infra/<service>`.
+
+| Service | Base image (pinned in its Dockerfile) | Detail |
+| ------- | ------------------------------------- | ------ |
+| `prometheus` | `prom/prometheus:v2.55.1` | 15d retention; accepts remote-write from Alloy; scrape config `prometheus/prometheus.yml` |
+| `loki` | `grafana/loki:3.5.8` | logs, 7d retention (`loki/loki-config.yaml`) |
+| `tempo` | `grafana/tempo:2.6.1` | traces, 7d retention (`tempo/tempo-config.yaml`) |
+| `grafana` | `grafana/grafana:11.4.0` | `grafana.<domain>` behind `sso@swarm` + its own login; datasources, alerting and SMTP provisioned from `grafana/` |
+| `alloy` | `grafana/alloy:v1.5.1` | **public** OTLP gateway at `alloy.<domain>` (HTTP via 443, gRPC via 4317) behind Traefik basic auth (`alloy-auth@swarm`); pipeline `alloy/config.alloy` |
+| `cadvisor`, `node-exporter` | stock, pinned in `stack.yml` | global; container and host metrics |
+| `postgres-exporter` | stock `v0.15.0` | reads the shared Postgres using the `postgres_*` secrets |
 
 Networks: `monitoring-network` (internal data path), `proxy-network` (Grafana, Alloy), `database-network` (exporter).
 Volumes: `prometheus_data`, `loki_data`, `tempo_data`, `grafana_data`.
 Secrets: `grafana_admin_user`, `grafana_admin_password`, `grafana_smtp_password`, `postgres_user`, `postgres_password`.
-Configs are created from the files in this folder.
+No Swarm configs: configuration travels inside the images, so there is nothing to version or bump.
 
-## Deploy
-    export ALERT_EMAIL_TO=you@example.com        # required: who receives alerts
-    docker stack deploy -c infrastructure/monitoring/stack.yml monitoring
+## Deploy and update
+First time:
+1. Push to main so CI builds the five `infra/*` images (check the Actions tab).
+2. Create the `grafana_smtp_password` secret (see [Alert email](#alert-email)). Prerequisites: postgres + traefik stacks.
+3. Portainer -> Stacks -> Add stack: paste `stack.yml`; env vars `ALERT_EMAIL_TO` (required) and optionally `PROMETHEUS_TAG`, `LOKI_TAG`,
+   `TEMPO_TAG`, `ALLOY_TAG`, `GRAFANA_TAG` (default `latest`); the registry (user `deployer`) must be added under Registries.
+   (If the stack currently runs from the CLI, `docker stack rm monitoring` first; the volumes survive.)
 
-Needs the `grafana_smtp_password` secret first (see [Alert email](#alert-email)) and the `infra/grafana` image in the registry (push to main
-first so CI builds it). In Portainer: paste `stack.yml`, set `ALERT_EMAIL_TO` (and optionally `GRAFANA_TAG`), and add the registry
-under Registries (user `deployer`). From the CLI add `--with-registry-auth`.
-
-Prerequisites: postgres stack + traefik stack (Traefik must be on `monitoring-network` to be scraped).
-
-**Changing a config file:** Swarm configs are immutable, so editing e.g. `prometheus.yml` and redeploying under the same
-name fails. Give the config a new name in `stack.yml` (e.g. `prometheus_config_v2`) or remove the stack and redeploy.
+Every later config change: edit the file on your machine -> push -> CI rebuilds only the changed service's image ->
+Portainer -> the stack -> **Update the stack** with "Re-pull image and redeploy". To pin or roll back, run the **release**
+workflow for that service and set its `*_TAG` variable. Changing `stack.yml` itself needs no CI: paste it into Portainer.
+CLI alternative: `ALERT_EMAIL_TO=... docker stack deploy --with-registry-auth -c infrastructure/monitoring/stack.yml monitoring`.
 
 ## Operate
 - Grafana: log in with GitHub (SSO), then the Grafana admin credentials.
@@ -43,9 +46,8 @@ name fails. Give the config a new name in `stack.yml` (e.g. `prometheus_config_v
 - `test-app/` is a disposable demo that generates traffic to validate the pipeline - see its README.
 
 ## Alerting (config as code)
-Everything lives in `grafana/` and is baked into the Grafana image by CI, so it is read-only in the Grafana UI. To change it: edit the file, push
-(`latest / grafana` builds `infra/grafana:latest`), then redeploy the stack with "Re-pull image" in Portainer. For a pinned version run
-**release** with `grafana` and set `GRAFANA_TAG` to the printed tag.
+Everything lives in `grafana/` and is baked into the image, so it is read-only in the Grafana UI. To change it: see
+[Deploy and update](#deploy-and-update).
 
 | File | What |
 | ---- | ---- |

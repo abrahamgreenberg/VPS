@@ -1,8 +1,38 @@
-# Keeps the SHA-pinned GitHub Actions current (weekly PRs). Dockerfile base images / npm can be added later.
+# Keeps the SHA-pinned GitHub Actions current (weekly PRs). Monitoring base images too (their versions live in the Dockerfiles). App Dockerfiles / npm can be added later.
 version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+  - package-ecosystem: docker
+    directory: /infrastructure/monitoring/grafana
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+  - package-ecosystem: docker
+    directory: /infrastructure/monitoring/prometheus
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+  - package-ecosystem: docker
+    directory: /infrastructure/monitoring/loki
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+  - package-ecosystem: docker
+    directory: /infrastructure/monitoring/tempo
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+  - package-ecosystem: docker
+    directory: /infrastructure/monitoring/alloy
     schedule:
       interval: weekly
     cooldown:

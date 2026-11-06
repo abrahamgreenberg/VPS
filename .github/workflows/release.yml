@@ -17,6 +17,10 @@ on:
           - hello
           - portfolio
           - grafana
+          - prometheus
+          - loki
+          - tempo
+          - alloy
 
 permissions:
   contents: read
@@ -50,6 +54,10 @@ jobs:
             hello) name=apps/hello; context=hello ;;
             portfolio) name=apps/portfolio; context=portfolio ;;
             grafana) name=infra/grafana; context=infrastructure/monitoring/grafana ;;
+            prometheus) name=infra/prometheus; context=infrastructure/monitoring/prometheus ;;
+            loki) name=infra/loki; context=infrastructure/monitoring/loki ;;
+            tempo) name=infra/tempo; context=infrastructure/monitoring/tempo ;;
+            alloy) name=infra/alloy; context=infrastructure/monitoring/alloy ;;
             *) echo "::error::unknown image '$CHOICE'"; exit 1 ;;
           esac
           echo "name=$name" >> "$GITHUB_OUTPUT"
@@ -68,6 +76,10 @@ jobs:
           case "$code" in
             200) ;;
             404) echo '{"tags": []}' > tags.json ;;   # repository doesn't exist yet: first push
+            prometheus) name=infra/prometheus; context=infrastructure/monitoring/prometheus ;;
+            loki) name=infra/loki; context=infrastructure/monitoring/loki ;;
+            tempo) name=infra/tempo; context=infrastructure/monitoring/tempo ;;
+            alloy) name=infra/alloy; context=infrastructure/monitoring/alloy ;;
             *) echo "::error::registry answered HTTP $code for tags/list"; cat tags.json; exit 1 ;;
           esac
           tag="$(bash .github/scripts/next-release-tag.sh "$day" < tags.json)"

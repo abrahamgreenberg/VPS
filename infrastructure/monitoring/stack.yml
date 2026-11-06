@@ -1,15 +1,17 @@
+# Observability stack. prometheus, loki, tempo, alloy and grafana are images built by CI with their config baked in
+# (infrastructure/monitoring/<service>/), tagged latest or a release tag via <SERVICE>_TAG. Stock images (cadvisor,
+# node-exporter, postgres-exporter) have no config. Deploy in Portainer: Stacks -> paste this file, env vars ALERT_EMAIL_TO
+# (required) and optional *_TAG; registry `deployer` must be added under Registries. Update = push, wait for CI, then
+# "Re-pull image and redeploy". CLI alternative: docker stack deploy --with-registry-auth -c stack.yml monitoring
 services:
 
   prometheus:
-    image: prom/prometheus:v2.55.1
+    image: registry.abrahamgreenberg.co.uk/infra/prometheus:${PROMETHEUS_TAG:-latest}
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=15d"
       - "--web.enable-remote-write-receiver"
-    configs:
-      - source: prometheus_config
-        target: /etc/prometheus/prometheus.yml
     volumes:
       - prometheus_data:/prometheus
     networks:
@@ -26,11 +28,8 @@ services:
         order: stop-first
 
   loki:
-    image: grafana/loki:3.5.8
+    image: registry.abrahamgreenberg.co.uk/infra/loki:${LOKI_TAG:-latest}
     command: ["-config.file=/etc/loki/local-config.yaml"]
-    configs:
-      - source: loki_config
-        target: /etc/loki/local-config.yaml
     volumes:
       - loki_data:/loki
     networks:
@@ -47,11 +46,8 @@ services:
         order: stop-first
 
   tempo:
-    image: grafana/tempo:2.6.1
+    image: registry.abrahamgreenberg.co.uk/infra/tempo:${TEMPO_TAG:-latest}
     command: ["-config.file=/etc/tempo/tempo.yaml"]
-    configs:
-      - source: tempo_config
-        target: /etc/tempo/tempo.yaml
     volumes:
       - tempo_data:/var/tempo
     networks:
@@ -117,15 +113,12 @@ services:
   # internet via alloy.abrahamgreenberg.co.uk, protected by basic auth defined
   # below since it is internet-facing (the sso forward-auth is not used for OTLP clients).
   alloy:
-    image: grafana/alloy:v1.5.1
+    image: registry.abrahamgreenberg.co.uk/infra/alloy:${ALLOY_TAG:-latest}
     command:
       - "run"
       - "--server.http.listen-addr=0.0.0.0:12345"
       - "--storage.path=/var/lib/alloy/data"
       - "/etc/alloy/config.alloy"
-    configs:
-      - source: alloy_config
-        target: /etc/alloy/config.alloy
     networks:
       - proxy-network
       - monitoring-network
@@ -210,16 +203,6 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
-
-configs:
-  prometheus_config:
-    file: ./prometheus.yml
-  loki_config:
-    file: ./loki-config.yaml
-  tempo_config:
-    file: ./tempo-config.yaml
-  alloy_config:
-    file: ./alloy-config.alloy
 
 volumes:
   prometheus_data:
