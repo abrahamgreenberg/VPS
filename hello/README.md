@@ -34,7 +34,7 @@ Check it landed: open the registry dashboard (`https://registry.abrahamgreenberg
 ## Deploy with Portainer
 Stacks -> **Add stack**:
 - Name: `hello`, type: Swarm (Portainer on a Swarm shows this automatically).
-- Build method **Web editor**: paste `stack.yml`. Or **Repository**: URL `https://github.com/abisammy/vps`, reference
+- Build method **Web editor**: paste `stack.yml`. Or **Repository**: URL `https://github.com/abrahamgreenberg/VPS`, reference
   `refs/heads/main`, compose path `hello/stack.yml` - this is the one to use long-term, because the stack then lives in git.
 - Environment variables (optional): `HELLO_TAG` = `latest` or a release like `2026.11.05.1`.
 - **Deploy the stack**, then open `https://hello.abrahamgreenberg.co.uk`. The first request can be slow while the

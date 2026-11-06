@@ -22,7 +22,7 @@ The overview is in the [README](../README.md#roadmap). This is the detailed list
       prove the flow with a simple app (push from PC -> `docker stack deploy --with-registry-auth` on the VPS).
 - [ ] Move peninei (then the others) to `registry.<domain>/...` images: build + push from PC,
       `docker stack deploy --with-registry-auth` on the VPS, so nothing is built on the VPS
-- [ ] CI/CD with GitHub Actions: push to `main` builds and pushes `latest`; a manual `workflow_dispatch` builds and pushes the
+- [ ] CI/CD with GitHub Actions (plan: [ci-cd.md](ci-cd.md)): push to `main` builds and pushes `latest`; a manual `workflow_dispatch` builds and pushes the
       next `YYYY.MM.DD.REV`. Needs thought on a public repo: only collaborators can dispatch, forks never get secrets, restrict
       the dispatch job to an environment with required reviewers, push with the `ci` user only, never use `pull_request_target`
       with secrets; then deploy (manual `docker stack deploy` first)

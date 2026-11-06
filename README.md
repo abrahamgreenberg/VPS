@@ -1,8 +1,3 @@
-TODO:
-
-GET GITHUB ACTIONS
-DONE :)
-
 # Private VPS - Personal Infrastructure & App Platform
 
 A single Vultr VPS (DNS on Namecheap) that hosts my side projects, run like a small production platform: Docker Swarm,
@@ -87,6 +82,7 @@ Each folder has its own README: what it is, how to deploy it, how to operate it.
 ├── docs/
 │   ├── deployment.md            bootstrap a VPS, DNS, secrets list, deploy order, rollback
 │   ├── operations.md            host security, backups, housekeeping, recovery notes
+│   ├── ci-cd.md                 plan: GitHub Actions -> registry -> Portainer
 │   └── roadmap.md               detailed roadmap and alert ideas
 ├── infrastructure/              the platform: one folder per stack, each with stack.yml + README
 │   ├── traefik/  auth/  crowdsec/  monitoring/  postgres/  portainer/  registry/

@@ -17,7 +17,7 @@ Everything runs on a **single-node Docker Swarm** on a Vultr VPS. DNS is at Name
        docker network create --driver overlay --attachable monitoring-network
 
    These three are **external** networks shared by every stack. A service only joins the ones it needs.
-4. Clone the repo: `git clone https://github.com/abisammy/vps ~/repos/vps`.
+4. Clone the repo: `git clone https://github.com/abrahamgreenberg/VPS ~/repos/vps`.
 5. Install the backup + housekeeping timers: [`infrastructure/backup`](../infrastructure/backup/README.md) and
    [`infrastructure/maintenance`](../infrastructure/maintenance/README.md) (`sudo ./infrastructure/install-host-jobs.sh`).
 
