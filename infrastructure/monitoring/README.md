@@ -13,7 +13,7 @@ Grafana shows it all.
 | `prometheus` | `prom/prometheus:v2.55.1` | 15d retention; accepts remote-write from Alloy; scrape config in `prometheus.yml` |
 | `loki` | `grafana/loki:3.5.8` | logs, 7d retention (`loki-config.yaml`) |
 | `tempo` | `grafana/tempo:2.6.1` | traces, 7d retention (`tempo-config.yaml`) |
-| `grafana` | `grafana/grafana:11.4.0` | `grafana.<domain>` behind `sso@swarm` + its own login; datasources, alerting and SMTP all provisioned from `grafana/` (config as code) |
+| `grafana` | `registry.<domain>/infra/grafana` (built from `grafana/Dockerfile` on `grafana/grafana:11.4.0`) | `grafana.<domain>` behind `sso@swarm` + its own login; datasources, alerting and SMTP all provisioned from `grafana/` (config as code) |
 | `alloy` | `grafana/alloy:v1.5.1` | **public** OTLP gateway at `alloy.<domain>` (HTTP via 443, gRPC via 4317) behind Traefik basic auth (`alloy-auth@swarm`); pipeline in `alloy-config.alloy` |
 | `cadvisor`, `node-exporter` | pinned | global; container and host metrics |
 | `postgres-exporter` | `v0.15.0` | reads the shared Postgres using the `postgres_*` secrets |
@@ -27,7 +27,9 @@ Configs are created from the files in this folder.
     export ALERT_EMAIL_TO=you@example.com        # required: who receives alerts
     docker stack deploy -c infrastructure/monitoring/stack.yml monitoring
 
-Needs the `grafana_smtp_password` secret first (see [Alert email](#alert-email)). In Portainer, set `ALERT_EMAIL_TO` as a stack env var.
+Needs the `grafana_smtp_password` secret first (see [Alert email](#alert-email)) and the `infra/grafana` image in the registry (push to main
+first so CI builds it). In Portainer: paste `stack.yml`, set `ALERT_EMAIL_TO` (and optionally `GRAFANA_TAG`), and add the registry
+under Registries (user `deployer`). From the CLI add `--with-registry-auth`.
 
 Prerequisites: postgres stack + traefik stack (Traefik must be on `monitoring-network` to be scraped).
 
@@ -41,7 +43,9 @@ name fails. Give the config a new name in `stack.yml` (e.g. `prometheus_config_v
 - `test-app/` is a disposable demo that generates traffic to validate the pipeline - see its README.
 
 ## Alerting (config as code)
-Everything lives in `grafana/` and is read-only in the Grafana UI (edit the file, bump the `_vN` config name in `stack.yml`, redeploy).
+Everything lives in `grafana/` and is baked into the Grafana image by CI, so it is read-only in the Grafana UI. To change it: edit the file, push
+(`latest / grafana` builds `infra/grafana:latest`), then redeploy the stack with "Re-pull image" in Portainer. For a pinned version run
+**release** with `grafana` and set `GRAFANA_TAG` to the printed tag.
 
 | File | What |
 | ---- | ---- |

@@ -26,9 +26,9 @@ Images (repository path in the registry): `apps/hello`, `apps/peninei-backend`, 
   Inputs: registry, username, password, image name, build context, tag, optional build args. It is a composite action rather than a
   reusable workflow because a reusable workflow does not receive the `registry` environment's secrets (the login step got empty
   credentials); the caller job declares `environment: registry`, reads the secrets and passes them in.
-- `latest-<image>.yml` - one small caller per image (checkout + the action) with its own `on.push.paths` filter, so only changed images rebuild. Each filter lists only that image's folder and its own workflow file
-  (not the shared action), so a push to `peninei/` never starts the hello or portfolio runs. Plain `paths:` filters avoid a third-party
-  paths-filter action. Trade-off: editing the shared action rebuilds nothing; test such a change by running a workflow by hand.
+- `latest-<image>.yml` - one small caller per image (checkout + the action) with its own `on.push.paths` filter, so only changed images rebuild. Each filter lists only that image's folder (not the shared action, and not the workflow's own file, since
+  a multi-commit push is judged on its combined diff and a workflow edit would rebuild the image), so a push to `peninei/` never starts the hello or portfolio runs. Plain `paths:` filters avoid a third-party
+  paths-filter action. Trade-off: editing a workflow or the shared action rebuilds nothing; test such a change by running the workflow by hand.
 - `release.yml` - `workflow_dispatch` with a **choice** input listing the images; one job per image gated by `inputs.image`. It computes the tag:
   `date -u +%Y.%m.%d` + (highest REV for today in the registry's `/v2/<repo>/tags/list`, +1). A `concurrency` group per image stops two runs
   racing for the same REV.

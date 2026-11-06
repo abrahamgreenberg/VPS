@@ -72,7 +72,7 @@ Order matters because later stacks reference earlier ones (networks, secrets, Tr
     docker stack deploy -c infrastructure/traefik/stack.yml     traefik
     docker stack deploy -c infrastructure/crowdsec/stack.yml    crowdsec     # needs CROWDSEC_BOUNCER_API_KEY
     docker stack deploy -c infrastructure/auth/stack.yml        auth         # name MUST be "auth"; needs GITHUB_CLIENT_ID
-    docker stack deploy -c infrastructure/monitoring/stack.yml  monitoring   # export ALERT_EMAIL_TO=... first
+    docker stack deploy -c infrastructure/monitoring/stack.yml  monitoring   # needs ALERT_EMAIL_TO; image from the registry (--with-registry-auth)
     docker stack deploy -c infrastructure/portainer/stack.yml   portainer
     docker stack deploy -c infrastructure/registry/stack.yml    registry     # needs the registry_htpasswd_v* secret named in its stack.yml; see its README
     # apps: see peninei/README.md

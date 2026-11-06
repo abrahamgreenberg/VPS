@@ -1,5 +1,5 @@
 # Push to main touching portfolio/ -> build and push apps/portfolio:latest (development tag).
-# Only portfolio/ (and this file) trigger it; pushes elsewhere in the repo do not.
+# Only changes under portfolio/ trigger it. Editing this workflow does NOT: run it by hand to test.
 name: latest / portfolio
 
 on:
@@ -7,7 +7,6 @@ on:
     branches: [main]
     paths:
       - "portfolio/**"
-      - ".github/workflows/latest-portfolio.yml"
   workflow_dispatch: {}
 
 permissions:

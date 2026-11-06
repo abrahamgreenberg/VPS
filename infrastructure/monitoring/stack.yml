@@ -67,8 +67,10 @@ services:
       update_config:
         order: stop-first
 
+  # Image = grafana + provisioning baked in (grafana/Dockerfile, built by CI). Pull needs the registry login:
+  # `docker stack deploy --with-registry-auth` or the registry added in Portainer.
   grafana:
-    image: grafana/grafana:11.4.0
+    image: registry.abrahamgreenberg.co.uk/infra/grafana:${GRAFANA_TAG:-latest}
     environment:
       GF_SECURITY_ADMIN_USER__FILE: /run/secrets/grafana_admin_user
       GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
@@ -83,15 +85,6 @@ services:
       GF_SMTP_STARTTLS_POLICY: MandatoryStartTLS
       # Recipient, substituted into provisioning/alerting/contact-points.yaml. Required at deploy time.
       ALERT_EMAIL_TO: ${ALERT_EMAIL_TO:?set ALERT_EMAIL_TO to the address that receives alerts}
-    configs:
-      - source: grafana_datasources_v1
-        target: /etc/grafana/provisioning/datasources/datasources.yaml
-      - source: grafana_contact_points_v1
-        target: /etc/grafana/provisioning/alerting/contact-points.yaml
-      - source: grafana_notification_policies_v1
-        target: /etc/grafana/provisioning/alerting/notification-policies.yaml
-      - source: grafana_alert_rules_v1
-        target: /etc/grafana/provisioning/alerting/alert-rules.yaml
     secrets:
       - grafana_admin_user
       - grafana_admin_password
@@ -227,15 +220,6 @@ configs:
     file: ./tempo-config.yaml
   alloy_config:
     file: ./alloy-config.alloy
-  # Grafana provisioning. Swarm configs are immutable: after editing a file, bump its _vN suffix here and in the service.
-  grafana_datasources_v1:
-    file: ./grafana/datasources.yaml
-  grafana_contact_points_v1:
-    file: ./grafana/contact-points.yaml
-  grafana_notification_policies_v1:
-    file: ./grafana/notification-policies.yaml
-  grafana_alert_rules_v1:
-    file: ./grafana/alert-rules.yaml
 
 volumes:
   prometheus_data:

@@ -16,6 +16,7 @@ on:
         options:
           - hello
           - portfolio
+          - grafana
 
 permissions:
   contents: read
@@ -48,6 +49,7 @@ jobs:
           case "$CHOICE" in
             hello) name=apps/hello; context=hello ;;
             portfolio) name=apps/portfolio; context=portfolio ;;
+            grafana) name=infra/grafana; context=infrastructure/monitoring/grafana ;;
             *) echo "::error::unknown image '$CHOICE'"; exit 1 ;;
           esac
           echo "name=$name" >> "$GITHUB_OUTPUT"
