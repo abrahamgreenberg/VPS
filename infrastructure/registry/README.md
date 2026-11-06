@@ -94,9 +94,22 @@ Inspect (as `ci` or `admin`):
   `docker secret rm <old name>`. Then update everything that holds a password: `docker login` on the PC (`ci`),
   GitHub secrets (`ci`), Portainer -> Registries (`deployer`), and your password manager.
 - **Delete a tag by hand** (admin): `skopeo delete` / `regctl tag rm`, or let retention do it.
-- **Disk:** `docker exec $(docker ps -qf name=registry_zot) du -sh /var/lib/registry`. The weekly prune job does not
+- **Disk:** the Zot image has no shell tools, so measure from the host: `sudo du -sh /var/lib/docker/volumes/registry_registry_data/_data`
+  (volume name is `<stack>_<volume>`). Compare with `docker system df` (images on the host) and `df -h /`. The weekly prune job does not
   touch this named volume.
-- Logs: `docker service logs registry_zot`. Repeated bad logins are slowed by `failDelay`; CrowdSec only blocks them if it is really ingesting Traefik logs (unverified, see the [crowdsec README](../crowdsec/README.md#known-gap---verify)).
+
+## Storage: is every image stored twice?
+Yes, once in the registry and once on the Docker host (and a third copy on the PC that built it), but the two copies are
+much smaller than "2x":
+- The registry keeps layers **compressed** and **de-duplicated by digest**; the host stores them uncompressed. E.g. `postgres:15`
+  is ~164 MB of registry content but ~633 MB on a Docker host.
+- Tags share layers. Six retained tags of one app mostly reuse the same base-image and dependency layers; only the layers that
+  changed (usually the app code) are stored again.
+- Retention caps the registry at `latest` + 5 dated tags per repo, and the weekly prune removes unused host images after 14 days.
+- Building on the VPS used to cost host space too (image + BuildKit cache); now the host only holds images it actually runs.
+
+## Logs
+`docker service logs registry_zot`. Repeated bad logins are slowed by `failDelay`; CrowdSec only blocks them if it is really ingesting Traefik logs (unverified, see the [crowdsec README](../crowdsec/README.md#known-gap---verify)).
 
 ## Backups
 Not yet. The registry is reproducible: every image can be rebuilt from git by CI, and the config + users are in the repo
