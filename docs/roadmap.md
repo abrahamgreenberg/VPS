@@ -9,23 +9,22 @@ The overview is in the [README](../README.md#roadmap). This is the detailed list
 | Auth / bouncer rollout                       | Finish before starting anything new                   | Done                                   |
 | Host security + local backups + housekeeping | Biggest risks first                                   | Done (see [operations](operations.md)) |
 | Docker hardening                             | Finish the security pass                              | Next                                   |
-| Private registry                             | Unlocks building off the VPS; small, self-contained   | Not started                            |
-| CI/CD (GitHub Actions -> registry -> deploy) | Needs the registry; moves peninei off VPS-side builds | Not started                            |
+| Private registry                             | Unlocks building off the VPS; small, self-contained   | Done                                   |
+| CI/CD (GitHub Actions -> registry -> deploy) | Needs the registry; moves peninei off VPS-side builds | Phases 1-2 done; peninei is next       |
 | Off-box backups                              | Local dumps don't survive losing the disk             | Later                                  |
-| Portfolio and other websites                 | Easy once registry + CI/CD template exists            | Later                                  |
+| Portfolio and other websites                 | Easy once registry + CI/CD template exists            | Built, deploy pending                  |
+| Alerting (Grafana, email)                    | Know when something breaks without looking            | Infra alerts done; app/data ones later |
 | Ongoing                                      | Telemetry fixes, alerts, repo tidying                 | Interleave                             |
 
 ## Next
 
-- [ ] **Private image registry** at `registry.<domain>` ([infrastructure/registry](../infrastructure/registry/README.md)): Zot, htpasswd auth
-      (not `sso`), CrowdSec, retention of `latest` + the 5 newest `YYYY.MM.DD.REV` tags. Written and tested locally; deploy it, then
-      prove the flow with a simple app (push from PC -> `docker stack deploy --with-registry-auth` on the VPS).
-- [ ] Move peninei (then the others) to `registry.<domain>/...` images: build + push from PC,
-      `docker stack deploy --with-registry-auth` on the VPS, so nothing is built on the VPS
-- [ ] CI/CD with GitHub Actions (plan: [ci-cd.md](ci-cd.md)): push to `main` builds and pushes `latest`; a manual `workflow_dispatch` builds and pushes the
-      next `YYYY.MM.DD.REV`. Needs thought on a public repo: only collaborators can dispatch, forks never get secrets, restrict
-      the dispatch job to an environment with required reviewers, push with the `ci` user only, never use `pull_request_target`
-      with secrets; then deploy (manual `docker stack deploy` first)
+- [ ] **Peninei on the registry** (CI phase 3, [ci-cd.md](ci-cd.md)): `latest-peninei-backend.yml` + `latest-peninei-frontend.yml` (path-filtered)
+      and release options (backend + migrate share a tag); then `peninei/stack.yml` and `peninei/migrate/stack.yml` use registry images,
+      move the stack under Portainer (remove the CLI stack, redeploy), and delete the VPS build files. Open question: the value of
+      `VITE_FRONTEND_API_URL` on the VPS (relative `/api` proposed)
+- [ ] **Deploy what CI now builds**: push, then in Portainer add the `portfolio` stack and move `monitoring` (`docker stack rm monitoring`, then paste
+      `stack.yml`; volumes survive). Hello is the proven example
+- [ ] CI later phases: PR validation (build without push), Trivy scan, docker-hardening checks
 - [ ] **Upgrade Node 20 -> 24 (LTS)** for peninei backend/frontend and `hello`: Node 20 reached end of life on 2026-04-30. The
       base image is one `ARG NODE_IMAGE` in `peninei/backend/Dockerfile`; re-run the backend e2e check (migrate + a Prisma query) after
 - [ ] Fix peninei telemetry: add traces, fix logs actually landing in Loki (metrics work; the log pipeline needs debugging)
@@ -91,19 +90,21 @@ hosting bill, so it may not be worth it for this project.
 ## Alerts worth adding
 
 The metrics pipeline exists (Prometheus + Loki + cAdvisor + node-exporter + postgres-exporter + peninei's own OTEL
-metrics). Infra alerts (disk, memory, targets, Postgres, restarts, OOM, 5xx, cert expiry) are provisioned with email delivery
-([monitoring README](../infrastructure/monitoring/README.md#alerting-config-as-code)); the rest below is still to do.
+metrics). Eight infra alerts (disk, memory, targets, Postgres, restarts, OOM, 5xx, cert expiry) are provisioned with email delivery
+([monitoring README](../infrastructure/monitoring/README.md#alerting-config-as-code)); the unchecked ones below are still to do. Peninei's metrics (`halachas_*`, `sync_*`) exist in Prometheus but have no rules yet; a
+freshness rule needs care because an OTEL counter only appears after its first increment (a missing series is not zero).
 
 **Infra health**
 
-- Disk usage > 80% on the host (`node_filesystem_avail_bytes`)
-- Container restart loop - N restarts in 5 minutes (cAdvisor)
-- A Swarm service's running replica count < desired for > 2 minutes
-- Container OOM-killed
+- [x] Disk usage > 85% on the host
+- [x] Container restart loop (more than 3 containers started for a service in 10 minutes)
+- [ ] A Swarm service's running replica count < desired for > 2 minutes (no metric for desired replicas; cAdvisor can't see it)
+- [x] Container OOM-killed
+- [x] Memory > 90%, a metrics target down, Postgres down
 
 **App health (peninei, and future apps via the same OTEL pattern)**
 
-- HTTP 5xx rate over a rolling window (`http_requests_total{status_code=~"5.."}`)
+- [x] Traefik 5xx rate > 5% (edge level). Still to do: peninei's own `http_requests_total{status_code=~"5.."}`
 - p95 request latency above threshold (`http_request_duration_ms`)
 - `sync_duration_ms` p99 spike
 
@@ -115,7 +116,7 @@ metrics). Infra alerts (disk, memory, targets, Postgres, restarts, OOM, 5xx, cer
 **Security**
 
 - Spike in CrowdSec bans/decisions over baseline -> possible attack in progress
-- TLS certificate expiring within 14 days (Traefik/ACME)
+- [x] TLS certificate expiring within 14 days (Traefik/ACME)
 
 **Meta**
 
@@ -141,3 +142,8 @@ metrics). Infra alerts (disk, memory, targets, Postgres, restarts, OOM, 5xx, cer
 - [x] Host hardening (firewall, SSH, fail2ban, unattended-upgrades) and Portainer port closed
 - [x] Grafana config as code (datasources, contact point, policy, 8 infra alert rules) + email via SMTP relay from alerts@<domain>
 - [x] Nightly local Postgres backup + weekly prune timers
+- [x] Private registry (Zot) deployed at `registry.<domain>`: htpasswd users admin/ci/deployer, CrowdSec, retention of `latest` + 5 dated tags; flow proven with `hello`
+- [x] GitHub Actions CI phases 1-2: composite `build-image` action (environment secrets), per-image `latest-*.yml` with strict path filters, manual `release.yml` (`YYYY.MM.DD.REV` from registry tags), SHA-pinned actions + Dependabot, allowed-actions policy and `registry` environment
+- [x] Portfolio containerised (nginx-unprivileged), Swarm stack with `portfolio.` + `fywr.` hosts, latest + release CI (deploy pending)
+- [x] Observability stack as CI-built images (prometheus, loki, tempo, alloy, grafana with configs baked in): edit, push, redeploy in Portainer; no Swarm configs to version
+- [x] Grafana email alerts from `alerts@<domain>` through Resend (domain verified in Namecheap DNS)
